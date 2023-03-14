@@ -36,6 +36,7 @@
 #include "arch/riscv/isa.hh"
 #include "arch/riscv/regs/misc.hh"
 #include "arch/riscv/utility.hh"
+#include "base/bitfield.hh"
 #include "cpu/exec_context.hh"
 #include "cpu/static_inst.hh"
 
@@ -712,6 +713,49 @@ class VsSegIntrlvMicroInst : public VectorArithMicroInst
 
     std::string generateDisassembly(Addr,
         const loader::SymbolTable *)  const override;
+};
+
+class VCompressPopcMicroInst : public VectorArithMicroInst
+{
+private:
+    RegId srcRegIdxArr[1];  // vm
+    RegId destRegIdxArr[1]; // vcnt
+
+  public:
+    VCompressPopcMicroInst(ExtMachInst extMachInst);
+    Fault execute(ExecContext *, trace::InstRecord *) const override;
+    std::string generateDisassembly(Addr, const loader::SymbolTable *)
+        const override;
+
+};
+
+template<typename Type>
+class VCompressMicroInst : public VectorArithMicroInst
+{
+  private:
+    RegId srcRegIdxArr[4];  // vs, vcnt, vm, old_vd
+    RegId destRegIdxArr[1]; // vd
+    uint8_t vsIdx;
+    uint8_t vdIdx;
+  public:
+    VCompressMicroInst(ExtMachInst extMachInst, uint8_t microVl,
+        uint8_t microIdx, uint8_t _vsIdx, uint8_t _vdIdx);
+    Fault execute(ExecContext *, trace::InstRecord *) const override;
+    std::string generateDisassembly(Addr, const loader::SymbolTable *)
+        const override;
+};
+
+template<typename Type>
+class Vcompress_vm : public VectorArithMacroInst
+{
+  private:
+    RegId srcRegIdxArr[2];  // vs, vm
+    RegId destRegIdxArr[1]; // vd
+  public:
+    // Vcompress doesn't require vlen to decode.
+    Vcompress_vm(ExtMachInst _machInst, uint32_t _vlen);
+    std::string generateDisassembly(Addr, const loader::SymbolTable *)
+        const override;
 };
 
 } // namespace RiscvISA
