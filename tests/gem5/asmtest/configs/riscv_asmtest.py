@@ -32,8 +32,13 @@ gem5 while still being functinal.
 """
 
 import argparse
+import os
 import sys
 
+
+import m5
+
+from gem5.components.boards.riscv_board import RiscvBoard
 from gem5.components.boards.simple_board import SimpleBoard
 from gem5.components.cachehierarchies.classic.no_cache import NoCache
 from gem5.components.memory import SingleChannelDDR3_1600
@@ -43,7 +48,10 @@ from gem5.components.processors.cpu_types import (
 )
 from gem5.components.processors.simple_processor import SimpleProcessor
 from gem5.isas import ISA
-from gem5.resources.resource import obtain_resource
+from gem5.resources.resource import (
+    DiskImageResource,
+    obtain_resource,
+)
 from gem5.simulate.simulator import Simulator
 
 parser = argparse.ArgumentParser(
@@ -73,12 +81,24 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--full-system",
+    action="store_true",
+    default=False,
+)
+
+parser.add_argument(
     "-n",
     "--num-cores",
     type=int,
     default=1,
     required=False,
     help="The number of CPU cores to run.",
+)
+
+parser.add_argument(
+    "--max-tick",
+    type=int,
+    default=m5.MaxTick,
 )
 
 args = parser.parse_args()
@@ -98,22 +118,34 @@ if args.riscv_32bits:
         for i in range(len(simple_core.core.isa)):
             simple_core.core.isa[i].riscv_type = "RV32"
 
-motherboard = SimpleBoard(
-    clk_freq="3GHz",
-    processor=processor,
-    memory=memory,
-    cache_hierarchy=cache_hierarchy,
-)
+if args.full_system:
+    motherboard = RiscvBoard(
+        clk_freq="3GHz",
+        processor=processor,
+        memory=memory,
+        cache_hierarchy=cache_hierarchy,
+    )
+else:
+    motherboard = SimpleBoard(
+        clk_freq="3GHz",
+        processor=processor,
+        memory=memory,
+        cache_hierarchy=cache_hierarchy,
+    )
 
 # Set the workload
 binary = obtain_resource(
     args.resource, resource_directory=args.resource_directory
 )
-motherboard.set_se_binary_workload(binary)
+disk = DiskImageResource(os.path.join(args.resource_directory, args.resource))
+if args.full_system:
+    motherboard.set_kernel_disk_workload(binary, disk)
+else:
+    motherboard.set_se_binary_workload(binary)
 
 # Run the simulation
 simulator = Simulator(board=motherboard)
-simulator.run()
+simulator.run(max_ticks=args.max_tick)
 
 print(
     "Exiting @ tick {} because {}.".format(

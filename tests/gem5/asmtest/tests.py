@@ -24,12 +24,51 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
+
 from testlib import *
+from testlib.configuration import constants
+from testlib.helper import (
+    diff_out_file,
+    joinpath,
+)
 
 if config.bin_path:
     resource_path = config.bin_path
 else:
     resource_path = joinpath(absdirpath(__file__), "..", "resources")
+
+
+class MatchExitCode(verifier.Verifier):
+    """
+    Looking for a match between a regex pattern and the content of a list
+    of files. Verifier will pass as long as the pattern is found in at least
+    one of the files.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.exit_code = 0
+
+    def parse_file(self, fname):
+        if not os.path.exists(fname):
+            return False
+
+        with open(fname, "rb") as file_:
+            code = ord(file_.read(1))
+            return code == self.exit_code
+
+    def test(self, params):
+        fixtures = params.fixtures
+        # Get the file from the tempdir of the test.
+        tempdir = fixtures[constants.tempdir_fixture_name].path
+
+        fname = "exitcode"
+        if self.parse_file(joinpath(tempdir, fname)):
+            return  # Success
+
+        test_util.fail("Could not match exit code.")
+
 
 # The following lists the RISCV binaries. Those commented out presently result
 # in a test failure. This is outlined in the following Jira issue:
@@ -346,6 +385,11 @@ rv32_binaries = (
     "rv32uzfh-ps-ldst",
     "rv32uzfh-ps-move",
     "rv32uzfh-ps-recoding",
+)
+
+bare_biaries = (
+    "rv64mi-p-csr",
+    # "rv64mi-p-illegal",
 )
 
 cpu_types = ("atomic", "timing", "minor", "o3")
