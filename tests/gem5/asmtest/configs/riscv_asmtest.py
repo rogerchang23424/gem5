@@ -81,6 +81,12 @@ parser.add_argument(
     help="The number of CPU cores to run.",
 )
 
+parser.add_argument(
+    "--full-system",
+    action="store_true",
+    default=False,
+)
+
 args = parser.parse_args()
 
 # Setup the system.
