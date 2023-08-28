@@ -94,7 +94,8 @@ def VMemBase(name, Name, ea_code, memacc_code, mem_flags,
          'set_vlenb': setVlenb(),
          'set_vlen': setVlen(),
          'declare_vmem_template': declareVMemTemplate(Name + 'Micro'),
-         'fault_code': getFaultCode() if fault_only_first else ''},
+         'fault_code': getFaultCode() if fault_only_first else '',
+         'required_vector': requiredVector()},
         inst_flags)
 
     if mem_flags:

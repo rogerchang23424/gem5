@@ -35,11 +35,14 @@ let {{
     def setDestWrapper(destRegId):
         return "setDestRegIdx(_numDestRegs++, " + destRegId + ");\n" + \
                "_numTypedDestRegs[VecRegClass]++;\n"
+
     def setSrcWrapper(srcRegId):
         return "setSrcRegIdx(_numSrcRegs++, " + srcRegId + ");\n"
+
     def setSrcVm():
         return "if (!this->vm)\n" + \
                "    setSrcRegIdx(_numSrcRegs++, vecRegClass[0]);"
+
     def vmDeclAndReadData():
         return '''
             [[maybe_unused]] RiscvISA::vreg_t tmp_v0;
@@ -49,8 +52,10 @@ let {{
                 v0 = tmp_v0.as<uint8_t>();
             }
         '''
+
     def copyOldVd(vd_idx):
         return 'COPY_OLD_VD(%d);' % vd_idx
+
     def loopWrapper(code, micro_inst = True):
         if micro_inst:
             upper_bound = "this->microVl"
@@ -61,9 +66,11 @@ let {{
                 %s
             }
         ''' % (upper_bound, code)
+
     def maskCondWrapper(code):
         return "if (this->vm || elem_mask(v0, ei)) {\n" + \
                code + "}\n"
+
     def eiDeclarePrefix(code, widening = False):
         if widening:
             return '''
@@ -141,6 +148,16 @@ let {{
             code += ('template class'
                      f' {class_name}<uint{size}_t, {idx_type}>;\n')
         return code
+
+    def requiredVector():
+        return '''
+        MISA misa = xc->readMiscReg(MISCREG_ISA);
+        STATUS status = xc->readMiscReg(MISCREG_STATUS);
+        if (!misa.rvv || status.vs == VPUStatus::OFF) {
+            return std::make_shared<IllegalInstFault>(
+                "RVV is disabled or VPU is off", machInst);
+        }
+        '''
 }};
 
 
@@ -219,7 +236,9 @@ def format VectorIntFormat(code, category, *flags) {{
          'set_vlenb' : set_vlenb,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': declareVArithTemplate(Name + "Micro")},
+         'declare_varith_template': declareVArithTemplate(Name + "Micro"),
+         'required_vector': requiredVector(),
+        },
         flags)
 
     header_output = \
@@ -277,7 +296,9 @@ def format VectorIntExtFormat(code, category, *flags) {{
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
          'ext_div': ext_div,
-         'declare_varith_template': declareVArithTemplate(Name + "Micro")},
+         'declare_varith_template': declareVArithTemplate(Name + "Micro"),
+         'required_vector': requiredVector(),
+        },
         flags)
 
     header_output = \
@@ -357,7 +378,9 @@ def format VectorIntWideningFormat(code, category, *flags) {{
          'set_vlen': set_vlen,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector(),
+        },
         flags)
 
     header_output = \
@@ -423,8 +446,9 @@ def format VectorIntNarrowingFormat(code, category, *flags) {{
          'set_vlen': set_vlen,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': varith_micro_declare
-        },
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+         },
         flags)
 
     header_output = \
@@ -494,7 +518,9 @@ def format VectorIntMaskFormat(code, category, *flags) {{
          'set_vlenb': set_vlenb,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': declareVArithTemplate(Name + "Micro")},
+         'declare_varith_template': declareVArithTemplate(Name + "Micro"),
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -560,7 +586,9 @@ def format VectorGatherFormat(code, category, *flags) {{
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
          'idx_type': idx_type,
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -631,7 +659,9 @@ def format VectorFloatFormat(code, category, *flags) {{
          'set_vlenb': set_vlenb,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(2),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -684,7 +714,9 @@ def format VectorFloatCvtFormat(code, category, *flags) {{
          'set_vlenb': set_vlenb,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -765,7 +797,9 @@ def format VectorFloatWideningFormat(code, category, *flags) {{
          'set_vlen': set_vlen,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(2),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -822,7 +856,9 @@ def format VectorFloatWideningCvtFormat(code, category, *flags) {{
          'set_vlen': set_vlen,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -880,7 +916,9 @@ def format VectorFloatNarrowingCvtFormat(code, category, *flags) {{
          'set_vlen': set_vlen,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -935,7 +973,9 @@ def format VectorFloatMaskFormat(code, category, *flags) {{
          'set_vlenb': set_vlenb,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(2),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -955,7 +995,9 @@ def format VMvWholeFormat(code, category, *flags) {{
         Name + "Micro",
         'VMvWholeMicroInst',
         {'code': code,
-         'set_vlen': setVlen()},
+         'set_vlen': setVlen(),
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -1004,7 +1046,9 @@ def format ViotaFormat(code, category, *flags){{
          'vm_decl_rd': vm_decl_rd,
          'set_vm_idx': set_vm_idx,
          'copy_old_vd': copyOldVd(1),
-         'declare_varith_template': declareVArithTemplate(Name + "Micro")},
+         'declare_varith_template': declareVArithTemplate(Name + "Micro"),
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -1044,7 +1088,8 @@ def format Vector1Vs1VdMaskFormat(code, category, *flags){{
          'set_vm_idx': set_vm_idx,
          'copy_old_vd': copyOldVd(1),
          'declare_varith_template': declareVArithTemplate(Name, 'uint', 8, 8),
-         },
+         'required_vector': requiredVector(),
+        },
         flags)
 
     header_output = Vector1Vs1VdMaskDeclare.subst(iop)
@@ -1063,7 +1108,8 @@ def format Vector1Vs1RdMaskFormat(code, category, *flags){{
         {'code': code,
          'vm_decl_rd': vm_decl_rd,
          'set_vm_idx': set_vm_idx,
-         'declare_varith_template': declareVArithTemplate(Name, 'uint', 8, 8)
+         'declare_varith_template': declareVArithTemplate(Name, 'uint', 8, 8),
+         'required_vector': requiredVector()
         },
         flags)
 
@@ -1090,7 +1136,9 @@ def format VectorNonSplitFormat(code, category, *flags) {{
             {'code': code,
              'vm_decl_rd': vm_decl_rd,
              'set_vm_idx': set_vm_idx,
-             'declare_varith_template': varith_template},
+             'declare_varith_template': varith_template,
+             'required_vector': requiredVector()
+            },
             flags)
         header_output = VectorNonSplitDeclare.subst(iop)
         decoder_output = VectorNonSplitConstructor.subst(iop)
@@ -1103,7 +1151,9 @@ def format VectorNonSplitFormat(code, category, *flags) {{
             {'code': code,
              'vm_decl_rd': vm_decl_rd,
              'set_vm_idx': set_vm_idx,
-             'declare_varith_template': declareVArithTemplate(Name)},
+             'declare_varith_template': declareVArithTemplate(Name),
+             'required_vector': requiredVector()
+            },
             flags)
         header_output = VectorNonSplitDeclare.subst(iop)
         decoder_output = VectorNonSplitConstructor.subst(iop)
@@ -1148,7 +1198,8 @@ def format VectorMaskFormat(code, category, *flags) {{
          'set_src_reg_idx': set_src_reg_idx,
          'set_vlenb': set_vlenb,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': declareVArithTemplate(Name, 'uint', 8, 8)
+         'declare_varith_template': declareVArithTemplate(Name, 'uint', 8, 8),
+         'required_vector': requiredVector()
         },
         flags)
 
@@ -1198,7 +1249,9 @@ def format VectorReduceIntFormat(code, category, *flags) {{
          'vm_decl_rd': vm_decl_rd,
          'type_def': type_def,
          'copy_old_vd': copyOldVd(2),
-         'declare_varith_template': declareVArithTemplate(Name + "Micro")},
+         'declare_varith_template': declareVArithTemplate(Name + "Micro"),
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -1255,7 +1308,9 @@ def format VectorReduceFloatFormat(code, category, *flags) {{
          'vm_decl_rd': vm_decl_rd,
          'type_def': type_def,
          'copy_old_vd': copyOldVd(2),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -1313,7 +1368,9 @@ def format VectorReduceFloatWideningFormat(code, category, *flags) {{
          'vm_decl_rd': vm_decl_rd,
          'type_def': type_def,
          'copy_old_vd': copyOldVd(2),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector(),
+        },
         flags)
 
     header_output = \
@@ -1374,7 +1431,9 @@ def format VectorIntVxsatFormat(code, category, *flags) {{
          'set_vlenb': set_vlenb,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': declareVArithTemplate(Name + "Micro")},
+         'declare_varith_template': declareVArithTemplate(Name + "Micro"),
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -1423,7 +1482,9 @@ def format VectorReduceIntWideningFormat(code, category, *flags) {{
          'set_vlen': set_vlen,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(2),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \
@@ -1503,7 +1564,9 @@ def VectorSlideBase(name, Name, category, code, flags, macro_construtor,
          'set_vlen': set_vlen,
          'vm_decl_rd': vm_decl_rd,
          'copy_old_vd': copyOldVd(old_vd_idx),
-         'declare_varith_template': varith_micro_declare},
+         'declare_varith_template': varith_micro_declare,
+         'required_vector': requiredVector()
+        },
         flags)
 
     header_output = \

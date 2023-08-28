@@ -35,6 +35,7 @@ def format VConfOp(code, write_code, declare_class, branch_class, *flags) {{
         {
             'code': code,
             'write_code': write_code,
+            'required_vector': requiredVector(),
         },
         flags
     )
@@ -157,12 +158,7 @@ def template VConfExecute {{
         trace::InstRecord *traceData) const
     {
         auto tc = xc->tcBase();
-        MISA misa = xc->readMiscReg(MISCREG_ISA);
-        STATUS status = xc->readMiscReg(MISCREG_STATUS);
-        if (!misa.rvv || status.vs == VPUStatus::OFF) {
-            return std::make_shared<IllegalInstFault>(
-                "RVV is disabled or VPU is off", machInst);
-        }
+        %(required_vector)s;
 
         %(op_decl)s;
         %(op_rd)s;
