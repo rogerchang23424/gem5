@@ -59,9 +59,7 @@ Random::Random(uint32_t s)
     init(s);
 }
 
-Random::~Random()
-{
-}
+Random::~Random() {}
 
 void
 Random::init(uint32_t s)

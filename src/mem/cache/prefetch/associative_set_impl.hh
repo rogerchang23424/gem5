@@ -42,20 +42,19 @@ AssociativeSet<Entry>::AssociativeSet(const char *name,
                                       replacement_policy::Base *repl_policy,
                                       BaseIndexingPolicy *indexing_policy,
                                       Entry const &init_val)
-  : AssociativeCache<Entry>(name, num_entries, associativity_,
-                            repl_policy, indexing_policy, init_val)
-{
-}
+    : AssociativeCache<Entry>(name, num_entries, associativity_, repl_policy,
+                              indexing_policy, init_val)
+{}
 
 template <class Entry>
-Entry*
+Entry *
 AssociativeSet<Entry>::findEntry(Addr addr, bool is_secure) const
 {
     Addr tag = indexingPolicy->extractTag(addr);
     auto candidates = indexingPolicy->getPossibleEntries(addr);
 
     for (auto candidate : candidates) {
-        Entry* entry = static_cast<Entry*>(candidate);
+        Entry *entry = static_cast<Entry *>(candidate);
         if (entry->matchTag(tag, is_secure)) {
             return entry;
         }
@@ -64,14 +63,14 @@ AssociativeSet<Entry>::findEntry(Addr addr, bool is_secure) const
     return nullptr;
 }
 
-template<class Entry>
+template <class Entry>
 void
-AssociativeSet<Entry>::insertEntry(Addr addr, bool is_secure, Entry* entry)
+AssociativeSet<Entry>::insertEntry(Addr addr, bool is_secure, Entry *entry)
 {
-   entry->insert(indexingPolicy->extractTag(addr), is_secure);
-   replPolicy->reset(entry->replacementData);
+    entry->insert(indexingPolicy->extractTag(addr), is_secure);
+    replPolicy->reset(entry->replacementData);
 }
 
 } // namespace gem5
 
-#endif//__CACHE_PREFETCH_ASSOCIATIVE_SET_IMPL_HH__
+#endif //__CACHE_PREFETCH_ASSOCIATIVE_SET_IMPL_HH__

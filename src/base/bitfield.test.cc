@@ -147,7 +147,6 @@ TEST(BitfieldTest, ExtractThreeBits)
     EXPECT_EQ((1 << 2), bits(x, 31, 29));
 }
 
-
 /*
  * The following tests "mbits(X, Y, Z)". mbits returns a value with bits Y to
  * Z from X (in position Y to Z).
@@ -194,6 +193,7 @@ TEST(BitfieldTest, SignExtendNegativeInputOutsideRange)
     uint64_t output = 0xF800000010000008;
     EXPECT_EQ(output, sext<60>(val));
 }
+
 /*
  * The following tests the "szext<N>(X)" function. szext carries out a sign
  * extention from N bits to 64 bits on value X. Will zero bits past the sign
@@ -306,7 +306,6 @@ TEST(BitfieldTest, FindMsb63)
     EXPECT_EQ(63, findMsbSet(val));
 }
 
-
 TEST(BitfieldTest, FindMsbZero)
 {
     EXPECT_EQ(0, findMsbSet(0));
@@ -326,17 +325,17 @@ TEST(BitfieldTest, FindLsbZero)
 
 TEST(BitfieldTest, FindLsbGeneralized)
 {
-    static constexpr size_t N{1000};
-    std::bitset<N> bs{0};
+    static constexpr size_t N{ 1000 };
+    std::bitset<N> bs{ 0 };
     EXPECT_EQ(findLsbSet(bs), N);
-    for (size_t i{0}; i < N ; ++i) {
-        bs = std::bitset<N>{1} << i;
+    for (size_t i{ 0 }; i < N; ++i) {
+        bs = std::bitset<N>{ 1 } << i;
         ASSERT_EQ(findLsbSet(bs), i);
     }
 
-    const auto leadingOne = std::bitset<N>{1} << (N-1);
-    for (size_t i{0}; i < N ; ++i) {
-        bs = leadingOne | (std::bitset<N>{1} << i);
+    const auto leadingOne = std::bitset<N>{ 1 } << (N - 1);
+    for (size_t i{ 0 }; i < N; ++i) {
+        bs = leadingOne | (std::bitset<N>{ 1 } << i);
         ASSERT_EQ(findLsbSet(bs), i);
     }
 }
