@@ -65,8 +65,7 @@ class SerializationFixture : public ::testing::Test
     using ::testing::Test::Test;
 
     /** Generate a temporary directory name. */
-    static std::string
-    generateTempDirName()
+    static std::string generateTempDirName()
     {
         return "/tmp/temp_dir_test" + std::to_string(dirNumber++) + "/";
     }
@@ -75,8 +74,7 @@ class SerializationFixture : public ::testing::Test
     std::string getDirName() const { return dirName; }
 
     /** Get the path to the checkpoint file. */
-    std::string
-    getCptPath() const
+    std::string getCptPath() const
     {
         return getDirName() + std::string(CheckpointIn::baseFilename);
     }
@@ -86,16 +84,14 @@ class SerializationFixture : public ::testing::Test
      * function should be used when testing unserialization, since it
      * simulates a previous serialization.
      */
-    void
-    simulateSerialization(std::string contents) const
+    void simulateSerialization(std::string contents) const
     {
         std::ofstream cp(getCptPath());
         cp << contents;
         cp.close();
     }
 
-    void
-    SetUp() override
+    void SetUp() override
     {
         // Create the directory
         dirName = generateTempDirName();
@@ -103,8 +99,7 @@ class SerializationFixture : public ::testing::Test
         assert(!(success == -1 && errno != EEXIST));
     }
 
-    void
-    TearDown() override
+    void TearDown() override
     {
         // There may be a cpt file inside, so try to remove it; otherwise,
         // rmdir does not work
@@ -114,6 +109,7 @@ class SerializationFixture : public ::testing::Test
         assert(success == 0);
     }
 };
+
 unsigned SerializationFixture::dirNumber = 0;
 
-} // anonymous namespace
+} // namespace gem5

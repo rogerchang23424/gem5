@@ -45,7 +45,6 @@
 #ifndef __SERIALIZE_HANDLERS_HH__
 #define __SERIALIZE_HANDLERS_HH__
 
-
 #include <iostream>
 #include <type_traits>
 #include <utility>
@@ -74,15 +73,14 @@ namespace gem5
  * which fills in value using the contents of s, and returns if that was
  * successful.
  */
-template <class T, class Enable=void>
+template <class T, class Enable = void>
 struct ParseParam;
 
 // Specialization for anything to_number can accept.
 template <class T>
-struct ParseParam<T, decltype(to_number("", std::declval<T&>()), void())>
+struct ParseParam<T, decltype(to_number("", std::declval<T &>()), void())>
 {
-    static bool
-    parse(const std::string &s, T &value)
+    static bool parse(const std::string &s, T &value)
     {
         return to_number(s, value);
     }
@@ -91,8 +89,7 @@ struct ParseParam<T, decltype(to_number("", std::declval<T&>()), void())>
 template <>
 struct ParseParam<bool>
 {
-    static bool
-    parse(const std::string &s, bool &value)
+    static bool parse(const std::string &s, bool &value)
     {
         return to_bool(s, value);
     }
@@ -101,8 +98,7 @@ struct ParseParam<bool>
 template <>
 struct ParseParam<std::string>
 {
-    static bool
-    parse(const std::string &s, std::string &value)
+    static bool parse(const std::string &s, std::string &value)
     {
         // String requires no processing to speak of
         value = s;
@@ -121,7 +117,7 @@ struct ParseParam<std::string>
  * This default implementation falls back to the << operator which should work
  * for many types.
  */
-template <class T, class Enabled=void>
+template <class T, class Enabled = void>
 struct ShowParam
 {
     static void show(std::ostream &os, const T &value) { os << value; }
@@ -134,8 +130,7 @@ struct ShowParam<T, std::enable_if_t<std::is_same_v<char, T> ||
                                      std::is_same_v<unsigned char, T> ||
                                      std::is_same_v<signed char, T>>>
 {
-    static void
-    show(std::ostream &os, const T &value)
+    static void show(std::ostream &os, const T &value)
     {
         if (std::is_signed_v<T>)
             os << (int)value;
@@ -147,8 +142,7 @@ struct ShowParam<T, std::enable_if_t<std::is_same_v<char, T> ||
 template <>
 struct ShowParam<bool>
 {
-    static void
-    show(std::ostream &os, const bool &value)
+    static void show(std::ostream &os, const bool &value)
     {
         // Display bools as strings
         os << (value ? "true" : "false");

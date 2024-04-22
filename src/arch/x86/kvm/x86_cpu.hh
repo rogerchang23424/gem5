@@ -93,8 +93,8 @@ class X86KvmCPU : public BaseKvmCPU
     Tick kvmRunDrain() override;
 
     uint64_t getHostCycles() const override;
-    void
-    stutterPC(PCStateBase &pc) const override
+
+    void stutterPC(PCStateBase &pc) const override
     {
         pc.as<X86ISA::PCState>().setNPC(pc.instAddr());
     }

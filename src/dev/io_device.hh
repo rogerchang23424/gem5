@@ -66,8 +66,7 @@ class PioPort : public SimpleTimingPort
     /** The device that this port serves. */
     Device *device;
 
-    Tick
-    recvAtomic(PacketPtr pkt) override
+    Tick recvAtomic(PacketPtr pkt) override
     {
         // Technically the packet only reaches us after the header delay,
         // and typically we also need to deserialise any payload.
@@ -80,15 +79,14 @@ class PioPort : public SimpleTimingPort
         return delay + receive_delay;
     }
 
-    AddrRangeList
-    getAddrRanges() const override
+    AddrRangeList getAddrRanges() const override
     {
         return device->getAddrRanges();
     }
 
   public:
-    PioPort(Device *dev) :
-        SimpleTimingPort(dev->name() + ".pio", dev), device(dev)
+    PioPort(Device *dev)
+        : SimpleTimingPort(dev->name() + ".pio", dev), device(dev)
     {}
 };
 
@@ -138,10 +136,9 @@ class PioDevice : public ClockedObject
     void init() override;
 
     Port &getPort(const std::string &if_name,
-            PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 
     friend class PioPort<PioDevice>;
-
 };
 
 class BasicPioDevice : public PioDevice

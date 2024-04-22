@@ -100,8 +100,7 @@ class CheckerCPU : public BaseCPU, public ExecContext
 
     void setDcachePort(RequestPort *dcache_port);
 
-    Port &
-    getDataPort() override
+    Port &getDataPort() override
     {
         // the checker does not have ports on its own so return the
         // data port of the actual CPU core
@@ -109,8 +108,7 @@ class CheckerCPU : public BaseCPU, public ExecContext
         return *dcachePort;
     }
 
-    Port &
-    getInstPort() override
+    Port &getInstPort() override
     {
         // the checker does not have ports on its own so return the
         // data port of the actual CPU core
@@ -119,8 +117,7 @@ class CheckerCPU : public BaseCPU, public ExecContext
     }
 
   protected:
-
-    std::vector<Process*> workload;
+    std::vector<Process *> workload;
 
     System *systemPtr;
 
@@ -145,11 +142,10 @@ class CheckerCPU : public BaseCPU, public ExecContext
     std::queue<int> miscRegIdxs;
 
   public:
-
     // Primary thread being run.
     SimpleThread *thread;
 
-    BaseMMU* getMMUPtr() { return mmu; }
+    BaseMMU *getMMUPtr() { return mmu; }
 
     virtual Counter totalInsts() const override { return 0; }
 
@@ -173,31 +169,27 @@ class CheckerCPU : public BaseCPU, public ExecContext
     // storage (which is pretty hard to imagine they would have reason
     // to do).
 
-    RegVal
-    getRegOperand(const StaticInst *si, int idx) override
+    RegVal getRegOperand(const StaticInst *si, int idx) override
     {
-        const RegId& id = si->srcRegIdx(idx);
+        const RegId &id = si->srcRegIdx(idx);
         if (id.is(InvalidRegClass))
             return 0;
         return thread->getReg(id);
     }
 
-    void
-    getRegOperand(const StaticInst *si, int idx, void *val) override
+    void getRegOperand(const StaticInst *si, int idx, void *val) override
     {
         thread->getReg(si->srcRegIdx(idx), val);
     }
 
-    void *
-    getWritableRegOperand(const StaticInst *si, int idx) override
+    void *getWritableRegOperand(const StaticInst *si, int idx) override
     {
         return thread->getWritableReg(si->destRegIdx(idx));
     }
 
-    void
-    setRegOperand(const StaticInst *si, int idx, RegVal val) override
+    void setRegOperand(const StaticInst *si, int idx, RegVal val) override
     {
-        const RegId& id = si->destRegIdx(idx);
+        const RegId &id = si->destRegIdx(idx);
         if (id.is(InvalidRegClass))
             return;
         const RegId flat = id.flatten(*thread->getIsaPtr());
@@ -205,10 +197,9 @@ class CheckerCPU : public BaseCPU, public ExecContext
         result.emplace(flat.regClass(), val);
     }
 
-    void
-    setRegOperand(const StaticInst *si, int idx, const void *val) override
+    void setRegOperand(const StaticInst *si, int idx, const void *val) override
     {
-        const RegId& id = si->destRegIdx(idx);
+        const RegId &id = si->destRegIdx(idx);
         if (id.is(InvalidRegClass))
             return;
         const RegId flat = id.flatten(*thread->getIsaPtr());
@@ -218,86 +209,69 @@ class CheckerCPU : public BaseCPU, public ExecContext
 
     bool readPredicate() const override { return thread->readPredicate(); }
 
-    void
-    setPredicate(bool val) override
-    {
-        thread->setPredicate(val);
-    }
+    void setPredicate(bool val) override { thread->setPredicate(val); }
 
-    bool
-    readMemAccPredicate() const override
+    bool readMemAccPredicate() const override
     {
         return thread->readMemAccPredicate();
     }
 
-    void
-    setMemAccPredicate(bool val) override
+    void setMemAccPredicate(bool val) override
     {
         thread->setMemAccPredicate(val);
     }
 
-    uint64_t
-    getHtmTransactionUid() const override
+    uint64_t getHtmTransactionUid() const override
     {
         panic("not yet supported!");
         return 0;
     };
 
-    uint64_t
-    newHtmTransactionUid() const override
+    uint64_t newHtmTransactionUid() const override
     {
         panic("not yet supported!");
         return 0;
     };
 
-    Fault
-    initiateMemMgmtCmd(Request::Flags flags) override
+    Fault initiateMemMgmtCmd(Request::Flags flags) override
     {
         panic("not yet supported!");
         return NoFault;
     }
 
-    bool
-    inHtmTransactionalState() const override
+    bool inHtmTransactionalState() const override
     {
         return (getHtmTransactionalDepth() > 0);
     }
 
-    uint64_t
-    getHtmTransactionalDepth() const override
+    uint64_t getHtmTransactionalDepth() const override
     {
         assert(thread->htmTransactionStarts >= thread->htmTransactionStops);
         return (thread->htmTransactionStarts - thread->htmTransactionStops);
     }
 
-    const PCStateBase &
-    pcState() const override
+    const PCStateBase &pcState() const override { return thread->pcState(); }
+
+    void pcState(const PCStateBase &val) override
     {
-        return thread->pcState();
-    }
-    void
-    pcState(const PCStateBase &val) override
-    {
-        DPRINTF(Checker, "Changing PC to %s, old PC %s.\n",
-                         val, thread->pcState());
+        DPRINTF(Checker, "Changing PC to %s, old PC %s.\n", val,
+                thread->pcState());
         thread->pcState(val);
     }
+
     //////////////////////////////////////////
 
-    RegVal
-    readMiscRegNoEffect(int misc_reg) const
+    RegVal readMiscRegNoEffect(int misc_reg) const
     {
         return thread->readMiscRegNoEffect(misc_reg);
     }
 
-    RegVal
-    readMiscReg(int misc_reg) override
+    RegVal readMiscReg(int misc_reg) override
     {
         return thread->readMiscReg(misc_reg);
     }
 
-    void
-    setMiscRegNoEffect(int misc_reg, RegVal val)
+    void setMiscRegNoEffect(int misc_reg, RegVal val)
     {
         DPRINTF(Checker, "Setting misc reg %d with no effect to check later\n",
                 misc_reg);
@@ -305,8 +279,7 @@ class CheckerCPU : public BaseCPU, public ExecContext
         return thread->setMiscRegNoEffect(misc_reg, val);
     }
 
-    void
-    setMiscReg(int misc_reg, RegVal val) override
+    void setMiscReg(int misc_reg, RegVal val) override
     {
         DPRINTF(Checker, "Setting misc reg %d with effect to check later\n",
                 misc_reg);
@@ -314,49 +287,44 @@ class CheckerCPU : public BaseCPU, public ExecContext
         return thread->setMiscReg(misc_reg, val);
     }
 
-    RegVal
-    readMiscRegOperand(const StaticInst *si, int idx) override
+    RegVal readMiscRegOperand(const StaticInst *si, int idx) override
     {
-        const RegId& reg = si->srcRegIdx(idx);
+        const RegId &reg = si->srcRegIdx(idx);
         assert(reg.is(MiscRegClass));
         return thread->readMiscReg(reg.index());
     }
 
-    void
-    setMiscRegOperand(const StaticInst *si, int idx, RegVal val) override
+    void setMiscRegOperand(const StaticInst *si, int idx, RegVal val) override
     {
-        const RegId& reg = si->destRegIdx(idx);
+        const RegId &reg = si->destRegIdx(idx);
         assert(reg.is(MiscRegClass));
         return this->setMiscReg(reg.index(), val);
     }
 
     /////////////////////////////////////////
 
-    void
-    recordPCChange(const PCStateBase &val)
+    void recordPCChange(const PCStateBase &val)
     {
-       changedPC = true;
-       set(newPCState, val);
+        changedPC = true;
+        set(newPCState, val);
     }
 
-    void
-    demapPage(Addr vaddr, uint64_t asn) override
+    void demapPage(Addr vaddr, uint64_t asn) override
     {
         mmu->demapPage(vaddr, asn);
     }
 
     // monitor/mwait funtions
     void armMonitor(Addr address) override { BaseCPU::armMonitor(0, address); }
+
     bool mwait(PacketPtr pkt) override { return BaseCPU::mwait(0, pkt); }
 
-    void
-    mwaitAtomic(ThreadContext *tc) override
+    void mwaitAtomic(ThreadContext *tc) override
     {
         return BaseCPU::mwaitAtomic(0, tc, thread->mmu);
     }
 
-    AddressMonitor *
-    getAddrMonitor() override
+    AddressMonitor *getAddrMonitor() override
     {
         return BaseCPU::getCpuAddrMonitor(0);
     }
@@ -379,48 +347,47 @@ class CheckerCPU : public BaseCPU, public ExecContext
      */
     RequestPtr genMemFragmentRequest(Addr frag_addr, int size,
                                      Request::Flags flags,
-                                     const std::vector<bool>& byte_enable,
-                                     int& frag_size, int& size_left) const;
+                                     const std::vector<bool> &byte_enable,
+                                     int &frag_size, int &size_left) const;
 
     Fault readMem(Addr addr, uint8_t *data, unsigned size,
                   Request::Flags flags,
-                  const std::vector<bool>& byte_enable) override;
+                  const std::vector<bool> &byte_enable) override;
 
     Fault writeMem(uint8_t *data, unsigned size, Addr addr,
                    Request::Flags flags, uint64_t *res,
-                   const std::vector<bool>& byte_enable) override;
+                   const std::vector<bool> &byte_enable) override;
 
-    Fault
-    amoMem(Addr addr, uint8_t* data, unsigned size,
-           Request::Flags flags, AtomicOpFunctorPtr amo_op) override
+    Fault amoMem(Addr addr, uint8_t *data, unsigned size, Request::Flags flags,
+                 AtomicOpFunctorPtr amo_op) override
     {
         panic("AMO is not supported yet in CPU checker\n");
     }
 
-    unsigned int
-    readStCondFailures() const override
+    unsigned int readStCondFailures() const override
     {
         return thread->readStCondFailures();
     }
 
     void setStCondFailures(unsigned int sc_failures) override {}
+
     /////////////////////////////////////////////////////
 
-    void wakeup(ThreadID tid) override { }
+    void wakeup(ThreadID tid) override {}
 
-    void
-    handleError()
+    void handleError()
     {
         if (exitOnError)
             dumpAndExit();
     }
 
-    bool checkFlags(const RequestPtr &unverified_req, Addr vAddr,
-                    Addr pAddr, int flags);
+    bool checkFlags(const RequestPtr &unverified_req, Addr vAddr, Addr pAddr,
+                    int flags);
 
     void dumpAndExit();
 
     ThreadContext *tcBase() const override { return tc; }
+
     SimpleThread *threadBase() { return thread; }
 
     InstResult unverifiedResult;
@@ -449,7 +416,7 @@ class Checker : public CheckerCPU
   public:
     Checker(const Params &p)
         : CheckerCPU(p), updateThisCycle(false), unverifiedInst(NULL)
-    { }
+    {}
 
     void switchOut();
     void takeOverFrom(BaseCPU *oldCPU);
@@ -462,13 +429,12 @@ class Checker : public CheckerCPU
     void validateExecution(const DynInstPtr &inst);
     void validateState();
 
-    void copyResult(const DynInstPtr &inst, const InstResult& mismatch_val,
+    void copyResult(const DynInstPtr &inst, const InstResult &mismatch_val,
                     int start_idx);
     void handlePendingInt();
 
   private:
-    void
-    handleError(const DynInstPtr &inst)
+    void handleError(const DynInstPtr &inst)
     {
         if (exitOnError) {
             dumpAndExit(inst);

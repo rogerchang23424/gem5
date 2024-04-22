@@ -47,7 +47,8 @@ struct AtomicOpFunctor
      * @{
      */
     virtual void operator()(uint8_t *p) = 0;
-    virtual AtomicOpFunctor* clone() = 0;
+    virtual AtomicOpFunctor *clone() = 0;
+
     /** @} */ // end of api_atomic_op
     virtual ~AtomicOpFunctor() {}
 };
@@ -56,211 +57,247 @@ template <class T>
 struct TypedAtomicOpFunctor : public AtomicOpFunctor
 {
     void operator()(uint8_t *p) { execute((T *)p); }
-    virtual AtomicOpFunctor* clone() = 0;
+
+    virtual AtomicOpFunctor *clone() = 0;
     /**
      * @ingroup api_atomic_op
      */
-    virtual void execute(T * p) = 0;
+    virtual void execute(T *p) = 0;
 };
 
-template<typename T>
+template <typename T>
 class AtomicGeneric2Op : public TypedAtomicOpFunctor<T>
 {
   public:
-    AtomicGeneric2Op(T _a, std::function<void(T*,T)> _op)
-        : a(_a), op(_op)
-    {}
-    AtomicOpFunctor* clone() override
+    AtomicGeneric2Op(T _a, std::function<void(T *, T)> _op) : a(_a), op(_op) {}
+
+    AtomicOpFunctor *clone() override
     {
         return new AtomicGeneric2Op<T>(*this);
     }
-    void execute(T *b) override
-    {
-        op(b, a);
-    }
+
+    void execute(T *b) override { op(b, a); }
+
   private:
     T a;
-    std::function<void(T*,T)> op;
- };
+    std::function<void(T *, T)> op;
+};
 
-template<typename T>
+template <typename T>
 class AtomicGeneric3Op : public TypedAtomicOpFunctor<T>
 {
   public:
-    AtomicGeneric3Op(T _a, T _c, std::function<void(T*, T, T)> _op)
+    AtomicGeneric3Op(T _a, T _c, std::function<void(T *, T, T)> _op)
         : a(_a), c(_c), op(_op)
     {}
-    AtomicOpFunctor* clone() override
+
+    AtomicOpFunctor *clone() override
     {
         return new AtomicGeneric3Op<T>(*this);
     }
-    void execute(T *b) override
-    {
-        op(b, a, c);
-    }
+
+    void execute(T *b) override { op(b, a, c); }
+
   private:
     T a;
     T c;
-    std::function<void(T*, T, T)> op;
+    std::function<void(T *, T, T)> op;
 };
 
-template<typename T>
+template <typename T>
 class AtomicGenericPair3Op : public TypedAtomicOpFunctor<T>
 {
   public:
-    AtomicGenericPair3Op(std::array<T, 2>& _a, std::array<T, 2> _c,
-           std::function<void(T*, std::array<T, 2>&, std::array<T, 2>)> _op)
+    AtomicGenericPair3Op(
+        std::array<T, 2> &_a, std::array<T, 2> _c,
+        std::function<void(T *, std::array<T, 2> &, std::array<T, 2>)> _op)
         : a(_a), c(_c), op(_op)
     {}
-    AtomicOpFunctor* clone() override
+
+    AtomicOpFunctor *clone() override
     {
         return new AtomicGenericPair3Op<T>(*this);
     }
-    void execute(T* b) override
-    {
-        op(b, a, c);
-    }
+
+    void execute(T *b) override { op(b, a, c); }
+
   private:
     std::array<T, 2> a;
     std::array<T, 2> c;
-    std::function<void(T*, std::array<T, 2>&, std::array<T, 2>)> op;
+    std::function<void(T *, std::array<T, 2> &, std::array<T, 2>)> op;
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpAnd : public TypedAtomicOpFunctor<T>
 {
     // Bitwise operations are only legal on integral types
-    template<typename B>
+    template <typename B>
     typename std::enable_if<std::is_integral<B>::value, void>::type
-    executeImpl(B *b) { *b &= a; }
+    executeImpl(B *b)
+    {
+        *b &= a;
+    }
 
-    template<typename B>
+    template <typename B>
     typename std::enable_if<!std::is_integral<B>::value, void>::type
-    executeImpl(B *b) { }
+    executeImpl(B *b)
+    {}
 
   public:
     T a;
-    AtomicOpAnd(T _a) : a(_a) { }
+
+    AtomicOpAnd(T _a) : a(_a) {}
+
     void execute(T *b) { executeImpl<T>(b); }
-    AtomicOpFunctor* clone () { return new AtomicOpAnd(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpAnd(a); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpOr : public TypedAtomicOpFunctor<T>
 {
     // Bitwise operations are only legal on integral types
-    template<typename B>
+    template <typename B>
     typename std::enable_if<std::is_integral<B>::value, void>::type
-    executeImpl(B *b) { *b |= a; }
+    executeImpl(B *b)
+    {
+        *b |= a;
+    }
 
-    template<typename B>
+    template <typename B>
     typename std::enable_if<!std::is_integral<B>::value, void>::type
-    executeImpl(B *b) { }
+    executeImpl(B *b)
+    {}
 
   public:
     T a;
-    AtomicOpOr(T _a) : a(_a) { }
+
+    AtomicOpOr(T _a) : a(_a) {}
+
     void execute(T *b) { executeImpl<T>(b); }
-    AtomicOpFunctor* clone () { return new AtomicOpOr(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpOr(a); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpXor : public TypedAtomicOpFunctor<T>
 {
     // Bitwise operations are only legal on integral types
-    template<typename B>
+    template <typename B>
     typename std::enable_if<std::is_integral<B>::value, void>::type
-    executeImpl(B *b) { *b ^= a; }
+    executeImpl(B *b)
+    {
+        *b ^= a;
+    }
 
-    template<typename B>
+    template <typename B>
     typename std::enable_if<!std::is_integral<B>::value, void>::type
-    executeImpl(B *b) { }
+    executeImpl(B *b)
+    {}
 
   public:
     T a;
+
     AtomicOpXor(T _a) : a(_a) {}
+
     void execute(T *b) { executeImpl<T>(b); }
-    AtomicOpFunctor* clone () { return new AtomicOpXor(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpXor(a); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpExch : public TypedAtomicOpFunctor<T>
 {
   public:
     T a;
-    AtomicOpExch(T _a) : a(_a) { }
+
+    AtomicOpExch(T _a) : a(_a) {}
+
     void execute(T *b) { *b = a; }
-    AtomicOpFunctor* clone () { return new AtomicOpExch(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpExch(a); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpAdd : public TypedAtomicOpFunctor<T>
 {
   public:
     T a;
-    AtomicOpAdd(T _a) : a(_a) { }
+
+    AtomicOpAdd(T _a) : a(_a) {}
+
     void execute(T *b) { *b += a; }
-    AtomicOpFunctor* clone () { return new AtomicOpAdd(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpAdd(a); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpSub : public TypedAtomicOpFunctor<T>
 {
   public:
     T a;
-    AtomicOpSub(T _a) : a(_a) { }
+
+    AtomicOpSub(T _a) : a(_a) {}
+
     void execute(T *b) { *b -= a; }
-    AtomicOpFunctor* clone () { return new AtomicOpSub(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpSub(a); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpInc : public TypedAtomicOpFunctor<T>
 {
   public:
-    AtomicOpInc() { }
+    AtomicOpInc() {}
+
     void execute(T *b) { *b += 1; }
-    AtomicOpFunctor* clone () { return new AtomicOpInc(); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpInc(); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpDec : public TypedAtomicOpFunctor<T>
 {
   public:
     AtomicOpDec() {}
+
     void execute(T *b) { *b -= 1; }
-    AtomicOpFunctor* clone () { return new AtomicOpDec(); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpDec(); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpMax : public TypedAtomicOpFunctor<T>
 {
   public:
     T a;
-    AtomicOpMax(T _a) : a(_a) { }
 
-    void
-    execute(T *b)
+    AtomicOpMax(T _a) : a(_a) {}
+
+    void execute(T *b)
     {
         if (a > *b)
             *b = a;
     }
-    AtomicOpFunctor* clone () { return new AtomicOpMax(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpMax(a); }
 };
 
-template<typename T>
+template <typename T>
 class AtomicOpMin : public TypedAtomicOpFunctor<T>
 {
   public:
     T a;
+
     AtomicOpMin(T _a) : a(_a) {}
 
-    void
-    execute(T *b)
+    void execute(T *b)
     {
         if (a < *b)
             *b = a;
     }
-    AtomicOpFunctor* clone () { return new AtomicOpMin(a); }
+
+    AtomicOpFunctor *clone() { return new AtomicOpMin(a); }
 };
 
 /**

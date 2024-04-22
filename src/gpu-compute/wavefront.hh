@@ -136,7 +136,9 @@ class Wavefront : public SimObject
     void freeResources();
     GPUDynInstPtr nextInstr();
     void setStatus(status_e newStatus);
+
     status_e getStatus() { return status; }
+
     void resizeRegFiles(int num_vregs, int num_sregs);
     bool isGmInstruction(GPUDynInstPtr ii);
     bool isLmInstruction(GPUDynInstPtr ii);
@@ -232,7 +234,7 @@ class Wavefront : public SimObject
 
     // Map to track the dyn instruction id of each vector register value
     // produced, indexed by physical vector register ID
-    std::unordered_map<int,uint64_t> rawDist;
+    std::unordered_map<int, uint64_t> rawDist;
 
     // Counts the number of reads performed to each physical register
     // - counts are reset to 0 for each dynamic wavefront launched
@@ -248,11 +250,7 @@ class Wavefront : public SimObject
     ~Wavefront();
     virtual void init();
 
-    void
-    setParent(ComputeUnit *cu)
-    {
-        computeUnit = cu;
-    }
+    void setParent(ComputeUnit *cu) { computeUnit = cu; }
 
     void validateRequestCounters();
     void start(uint64_t _wfDynId, uint64_t _base_ptr);
@@ -264,9 +262,8 @@ class Wavefront : public SimObject
     Addr pc() const;
     void pc(Addr new_pc);
 
-    VectorMask& execMask();
+    VectorMask &execMask();
     bool execMask(int lane) const;
-
 
     void discardFetch();
 
@@ -287,11 +284,7 @@ class Wavefront : public SimObject
     bool sleepDone();
     void setSleepTime(int sleep_time);
 
-    TheGpuISA::GPUISA&
-    gpuISA()
-    {
-        return _gpuISA;
-    }
+    TheGpuISA::GPUISA &gpuISA() { return _gpuISA; }
 
     void barrierId(int bar_id);
     int barrierId() const;

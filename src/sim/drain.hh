@@ -290,7 +290,7 @@ class Drainable
      *
      * @ingroup api_drain
      */
-    virtual void drainResume() {};
+    virtual void drainResume(){};
 
     /**
      * Signal that an object is drained
@@ -302,13 +302,14 @@ class Drainable
      *
      * @ingroup api_drain
      */
-    void signalDrainDone() const {
+    void signalDrainDone() const
+    {
         switch (_drainState) {
-          case DrainState::Running:
-          case DrainState::Drained:
-          case DrainState::Resuming:
+        case DrainState::Running:
+        case DrainState::Drained:
+        case DrainState::Resuming:
             return;
-          case DrainState::Draining:
+        case DrainState::Draining:
             _drainState = DrainState::Drained;
             _drainManager.signalDrainDone();
             return;
@@ -341,7 +342,7 @@ class Drainable
      *
      * @ingroup api_drain
      */
-    virtual void notifyFork() {};
+    virtual void notifyFork(){};
 
   private:
     /** DrainManager interface to request a drain operation */

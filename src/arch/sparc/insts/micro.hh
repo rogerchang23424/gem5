@@ -43,47 +43,42 @@ class SparcMacroInst : public SparcStaticInst
     const uint32_t numMicroops;
 
     // Constructor.
-    SparcMacroInst(const char *mnem, ExtMachInst _machInst,
-                   OpClass __opClass, uint32_t _numMicroops) :
-            SparcStaticInst(mnem, _machInst, __opClass),
-            numMicroops(_numMicroops)
+    SparcMacroInst(const char *mnem, ExtMachInst _machInst, OpClass __opClass,
+                   uint32_t _numMicroops)
+        : SparcStaticInst(mnem, _machInst, __opClass),
+          numMicroops(_numMicroops)
     {
         assert(numMicroops);
         microops = new StaticInstPtr[numMicroops];
         flags[IsMacroop] = true;
     }
 
-    ~SparcMacroInst()
-    {
-        delete [] microops;
-    }
+    ~SparcMacroInst() { delete[] microops; }
 
-    std::string generateDisassembly(
-        Addr pc, const loader::SymbolTable *symtab) const override;
+    std::string
+    generateDisassembly(Addr pc,
+                        const loader::SymbolTable *symtab) const override;
 
     StaticInstPtr *microops;
 
-    StaticInstPtr
-    fetchMicroop(MicroPC upc) const override
+    StaticInstPtr fetchMicroop(MicroPC upc) const override
     {
         assert(upc < numMicroops);
         return microops[upc];
     }
 
-    Fault
-    execute(ExecContext *, trace::InstRecord *) const override
+    Fault execute(ExecContext *, trace::InstRecord *) const override
     {
         panic("Tried to execute a macroop directly!\n");
     }
 
-    Fault
-    initiateAcc(ExecContext *, trace::InstRecord *) const override
+    Fault initiateAcc(ExecContext *, trace::InstRecord *) const override
     {
         panic("Tried to execute a macroop directly!\n");
     }
 
-    Fault
-    completeAcc(PacketPtr, ExecContext *, trace::InstRecord *) const override
+    Fault completeAcc(PacketPtr, ExecContext *,
+                      trace::InstRecord *) const override
     {
         panic("Tried to execute a macroop directly!\n");
     }
@@ -93,15 +88,13 @@ class SparcMicroInst : public SparcStaticInst
 {
   protected:
     // Constructor.
-    SparcMicroInst(const char *mnem, ExtMachInst _machInst,
-                   OpClass __opClass) :
-            SparcStaticInst(mnem, _machInst, __opClass)
+    SparcMicroInst(const char *mnem, ExtMachInst _machInst, OpClass __opClass)
+        : SparcStaticInst(mnem, _machInst, __opClass)
     {
         flags[IsMicroop] = true;
     }
 
-    void
-    advancePC(PCStateBase &pc_state) const override
+    void advancePC(PCStateBase &pc_state) const override
     {
         auto &spc = pc_state.as<PCState>();
         if (flags[IsLastMicroop])
@@ -110,8 +103,7 @@ class SparcMicroInst : public SparcStaticInst
             spc.uAdvance();
     }
 
-    void
-    advancePC(ThreadContext *tc) const override
+    void advancePC(ThreadContext *tc) const override
     {
         PCState pc = tc->pcState().as<PCState>();
         if (flags[IsLastMicroop])
@@ -127,8 +119,8 @@ class SparcDelayedMicroInst : public SparcMicroInst
   protected:
     // Constructor.
     SparcDelayedMicroInst(const char *mnem, ExtMachInst _machInst,
-                          OpClass __opClass) :
-            SparcMicroInst(mnem, _machInst, __opClass)
+                          OpClass __opClass)
+        : SparcMicroInst(mnem, _machInst, __opClass)
     {
         flags[IsDelayedCommit] = true;
     }

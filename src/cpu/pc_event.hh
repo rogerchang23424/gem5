@@ -52,12 +52,17 @@ class PCEvent
   public:
     PCEvent(PCEventScope *q, const std::string &desc, Addr pc);
 
-    virtual ~PCEvent() { if (scope) remove(); }
+    virtual ~PCEvent()
+    {
+        if (scope)
+            remove();
+    }
 
     // for DPRINTF
     virtual const std::string name() const { return description; }
 
     std::string descr() const { return description; }
+
     Addr pc() const { return evpc; }
 
     bool remove();
@@ -77,22 +82,22 @@ class PCEventQueue : public PCEventScope
     class MapCompare
     {
       public:
-        bool
-        operator()(PCEvent * const &l, PCEvent * const &r) const
+        bool operator()(PCEvent *const &l, PCEvent *const &r) const
         {
             return l->pc() < r->pc();
         }
-        bool
-        operator()(PCEvent * const &l, Addr pc) const
+
+        bool operator()(PCEvent *const &l, Addr pc) const
         {
             return l->pc() < pc;
         }
-        bool
-        operator()(Addr pc, PCEvent * const &r) const
+
+        bool operator()(Addr pc, PCEvent *const &r) const
         {
             return pc < r->pc();
         }
     };
+
     typedef std::vector<PCEvent *> Map;
 
   public:
@@ -114,6 +119,7 @@ class PCEventQueue : public PCEventScope
 
     bool remove(PCEvent *event) override;
     bool schedule(PCEvent *event) override;
+
     bool service(Addr pc, ThreadContext *tc)
     {
         if (pcMap.empty())
@@ -123,14 +129,13 @@ class PCEventQueue : public PCEventScope
     }
 
     range_t equal_range(Addr pc);
+
     range_t equal_range(PCEvent *event) { return equal_range(event->pc()); }
 
     void dump() const;
 };
 
-
-inline
-PCEvent::PCEvent(PCEventScope *s, const std::string &desc, Addr pc)
+inline PCEvent::PCEvent(PCEventScope *s, const std::string &desc, Addr pc)
     : description(desc), scope(s), evpc(pc)
 {
     scope->schedule(this);

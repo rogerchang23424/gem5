@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2013 ARM Limited
  * All rights reserved
  *
@@ -56,29 +56,24 @@ namespace o3
 
 class SimpleTrace : public ProbeListenerObject
 {
-
   public:
-    SimpleTrace(const SimpleTraceParams &params) :
-        ProbeListenerObject(params)
-    {
-    }
+    SimpleTrace(const SimpleTraceParams &params) : ProbeListenerObject(params)
+    {}
 
     /** Register the probe listeners. */
     void regProbeListeners() override;
 
-    std::string
-    name() const override
+    std::string name() const override
     {
         return ProbeListenerObject::name() + ".trace";
     }
 
   private:
-    void traceFetch(const DynInstConstPtr& dynInst);
-    void traceCommit(const DynInstConstPtr& dynInst);
-
+    void traceFetch(const DynInstConstPtr &dynInst);
+    void traceCommit(const DynInstConstPtr &dynInst);
 };
 
 } // namespace o3
 } // namespace gem5
 
-#endif//__CPU_O3_PROBE_SIMPLE_TRACE_HH__
+#endif //__CPU_O3_PROBE_SIMPLE_TRACE_HH__

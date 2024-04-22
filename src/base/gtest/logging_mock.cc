@@ -34,7 +34,8 @@
 namespace gem5
 {
 
-namespace {
+namespace
+{
 
 class GTestLogger : public Logger
 {
@@ -42,8 +43,7 @@ class GTestLogger : public Logger
     using Logger::Logger;
 
   protected:
-    void
-    log(const Loc &loc, std::string s) override
+    void log(const Loc &loc, std::string s) override
     {
         gtestLogOutput << s;
         SUCCEED() << s;
@@ -56,12 +56,12 @@ class GTestExitLogger : public Logger
     using Logger::Logger;
 
   protected:
-    void
-    log(const Loc &loc, std::string s) override
+    void log(const Loc &loc, std::string s) override
     {
         gtestLogOutput << s;
         std::cerr << loc.file << ":" << loc.line << ": " << s;
     }
+
     // Throw an exception to escape down to the gtest framework.
     void exit() override { throw GTestException(); }
 };
@@ -74,33 +74,38 @@ class GTestExitLogger : public Logger
 // veriables to ensure they are initialized ondemand, so it is also safe to use
 // them inside constructor of other global objects.
 
-Logger&
-Logger::getPanic() {
-    static GTestExitLogger* panic_logger = new GTestExitLogger("panic: ");
+Logger &
+Logger::getPanic()
+{
+    static GTestExitLogger *panic_logger = new GTestExitLogger("panic: ");
     return *panic_logger;
 }
 
-Logger&
-Logger::getFatal() {
-    static GTestExitLogger* fatal_logger = new GTestExitLogger("fatal: ");
+Logger &
+Logger::getFatal()
+{
+    static GTestExitLogger *fatal_logger = new GTestExitLogger("fatal: ");
     return *fatal_logger;
 }
 
-Logger&
-Logger::getWarn() {
-    static GTestLogger* warn_logger = new GTestLogger("warn: ");
+Logger &
+Logger::getWarn()
+{
+    static GTestLogger *warn_logger = new GTestLogger("warn: ");
     return *warn_logger;
 }
 
-Logger&
-Logger::getInfo() {
-    static GTestLogger* info_logger = new GTestLogger("info: ");
+Logger &
+Logger::getInfo()
+{
+    static GTestLogger *info_logger = new GTestLogger("info: ");
     return *info_logger;
 }
 
-Logger&
-Logger::getHack() {
-    static GTestLogger* hack_logger = new GTestLogger("hack: ");
+Logger &
+Logger::getHack()
+{
+    static GTestLogger *hack_logger = new GTestLogger("hack: ");
     return *hack_logger;
 }
 

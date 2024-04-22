@@ -50,7 +50,8 @@ class RemoteGDB : public BaseRemoteGDB
 
     class MipsGdbRegCache : public BaseGdbRegCache
     {
-      using BaseGdbRegCache::BaseGdbRegCache;
+        using BaseGdbRegCache::BaseGdbRegCache;
+
       private:
         struct
         {
@@ -65,13 +66,16 @@ class RemoteGDB : public BaseRemoteGDB
             uint32_t fsr;
             uint32_t fir;
         } r;
+
       public:
         char *data() const { return (char *)&r; }
+
         size_t size() const { return sizeof(r); }
-        void getRegs(ThreadContext*);
-        void setRegs(ThreadContext*) const;
-        const std::string
-        name() const
+
+        void getRegs(ThreadContext *);
+        void setRegs(ThreadContext *) const;
+
+        const std::string name() const
         {
             return gdb->name() + ".MipsGdbRegCache";
         }
@@ -82,11 +86,12 @@ class RemoteGDB : public BaseRemoteGDB
   public:
     RemoteGDB(System *_system, ListenSocketConfig _listen_config);
     BaseGdbRegCache *gdbRegs();
-    std::vector<std::string>
-    availableFeatures() const
+
+    std::vector<std::string> availableFeatures() const
     {
-        return {"qXfer:features:read+"};
+        return { "qXfer:features:read+" };
     };
+
     bool getXferFeaturesRead(const std::string &annex, std::string &output);
 };
 

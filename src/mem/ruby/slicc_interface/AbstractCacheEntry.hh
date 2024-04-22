@@ -74,12 +74,11 @@ class AbstractCacheEntry : public ReplaceableEntry
     void changePermission(AccessPermission new_perm);
 
     using ReplaceableEntry::print;
-    virtual void print(std::ostream& out) const = 0;
+    virtual void print(std::ostream &out) const = 0;
 
     // The methods below are those called by ruby runtime, add when it
     // is absolutely necessary and should all be virtual function.
-    virtual DataBlock&
-    getDataBlk()
+    virtual DataBlock &getDataBlk()
     {
         panic("getDataBlk() not implemented!");
 
@@ -89,10 +88,8 @@ class AbstractCacheEntry : public ReplaceableEntry
     }
 
     int validBlocks;
-    virtual int& getNumValidBlocks()
-    {
-        return validBlocks;
-    }
+
+    virtual int &getNumValidBlocks() { return validBlocks; }
 
     // Functions for locking and unlocking the cache entry.  These are required
     // for supporting atomic memory accesses.
@@ -120,6 +117,7 @@ class AbstractCacheEntry : public ReplaceableEntry
     void setInHtmWriteSet(bool val);
     bool getInHtmReadSet() const;
     bool getInHtmWriteSet() const;
+
     virtual void invalidateEntry() {}
 
   private:
@@ -128,8 +126,8 @@ class AbstractCacheEntry : public ReplaceableEntry
     bool m_htmInWriteSet;
 };
 
-inline std::ostream&
-operator<<(std::ostream& out, const AbstractCacheEntry& obj)
+inline std::ostream &
+operator<<(std::ostream &out, const AbstractCacheEntry &obj)
 {
     obj.print(out);
     out << std::flush;

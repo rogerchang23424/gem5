@@ -51,20 +51,18 @@ class BareMetalWorkload : public Workload
     void initState() override;
 
     Addr getEntry() const override { return 0; }
+
     ByteOrder byteOrder() const override { return ByteOrder::little; }
+
     loader::Arch getArch() const override { return loader::UnknownArch; }
-    const loader::SymbolTable &
-    symtab(ThreadContext *tc) override
+
+    const loader::SymbolTable &symtab(ThreadContext *tc) override
     {
         static loader::SymbolTable sym_tab;
         return sym_tab;
     }
 
-    bool
-    insertSymbol(const loader::Symbol &symbol) override
-    {
-        return false;
-    }
+    bool insertSymbol(const loader::Symbol &symbol) override { return false; }
 };
 
 } // namespace X86ISA

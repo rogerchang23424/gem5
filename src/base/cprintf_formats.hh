@@ -50,12 +50,14 @@ struct Format
     bool blankSpace;
     bool fillZero;
     bool uppercase;
+
     enum
     {
         Dec,
         Hex,
         Oct
     } base;
+
     enum
     {
         None,
@@ -64,12 +66,14 @@ struct Format
         Character,
         Floating
     } format;
+
     enum
     {
         Best,
         Fixed,
         Scientific
     } floatFormat;
+
     int precision;
     int width;
     bool getPrecision;
@@ -77,8 +81,7 @@ struct Format
 
     Format() { clear(); }
 
-    void
-    clear()
+    void clear()
     {
         alternateForm = false;
         flushLeft = false;
@@ -110,15 +113,15 @@ _formatInteger(std::ostream &out, const T &data, Format &fmt)
     std::ios::fmtflags flags(out.flags());
 
     switch (fmt.base) {
-      case Format::Hex:
+    case Format::Hex:
         out.setf(std::ios::hex, std::ios::basefield);
         break;
 
-      case Format::Oct:
+    case Format::Oct:
         out.setf(std::ios::oct, std::ios::basefield);
         break;
 
-      case Format::Dec:
+    case Format::Dec:
         out.setf(std::ios::dec, std::ios::basefield);
         break;
     }
@@ -128,15 +131,15 @@ _formatInteger(std::ostream &out, const T &data, Format &fmt)
             out.setf(std::ios::showbase);
         } else {
             switch (fmt.base) {
-              case Format::Hex:
+            case Format::Hex:
                 out << "0x";
                 fmt.width -= 2;
                 break;
-              case Format::Oct:
+            case Format::Oct:
                 out << "0";
                 fmt.width -= 1;
                 break;
-              case Format::Dec:
+            case Format::Dec:
                 break;
             }
         }
@@ -172,7 +175,7 @@ _formatFloat(std::ostream &out, const T &data, Format &fmt)
         out.fill('0');
 
     switch (fmt.floatFormat) {
-      case Format::Scientific:
+    case Format::Scientific:
         if (fmt.precision != -1) {
             if (fmt.width > 0)
                 out.width(fmt.width);
@@ -191,7 +194,7 @@ _formatFloat(std::ostream &out, const T &data, Format &fmt)
             out.setf(std::ios::uppercase);
         break;
 
-      case Format::Fixed:
+    case Format::Fixed:
         if (fmt.precision != -1) {
             if (fmt.width > 0)
                 out.width(fmt.width);
@@ -204,7 +207,7 @@ _formatFloat(std::ostream &out, const T &data, Format &fmt)
 
         break;
 
-      default:
+    default:
         if (fmt.precision != -1)
             out.precision(fmt.precision);
 
@@ -336,26 +339,31 @@ formatInteger(std::ostream &out, const T &data, Format &fmt)
 {
     _formatInteger(out, data, fmt);
 }
+
 static inline void
 formatInteger(std::ostream &out, char data, Format &fmt)
 {
     _formatInteger(out, (int)data, fmt);
 }
+
 static inline void
 formatInteger(std::ostream &out, unsigned char data, Format &fmt)
 {
     _formatInteger(out, (int)data, fmt);
 }
+
 static inline void
 formatInteger(std::ostream &out, signed char data, Format &fmt)
 {
     _formatInteger(out, (int)data, fmt);
 }
+
 static inline void
 formatInteger(std::ostream &out, const unsigned char *data, Format &fmt)
 {
     _formatInteger(out, (uintptr_t)data, fmt);
 }
+
 static inline void
 formatInteger(std::ostream &out, const signed char *data, Format &fmt)
 {

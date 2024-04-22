@@ -58,33 +58,26 @@ namespace X86ISA
 template <class Device>
 class IntResponsePort : public SimpleTimingPort
 {
-    Device * device;
+    Device *device;
 
   public:
-    IntResponsePort(const std::string& _name, SimObject* _parent,
-                 Device* dev) :
-        SimpleTimingPort(_name, _parent), device(dev)
-    {
-    }
+    IntResponsePort(const std::string &_name, SimObject *_parent, Device *dev)
+        : SimpleTimingPort(_name, _parent), device(dev)
+    {}
 
-    AddrRangeList
-    getAddrRanges() const
-    {
-        return device->getIntAddrRange();
-    }
+    AddrRangeList getAddrRanges() const { return device->getIntAddrRange(); }
 
-    Tick
-    recvAtomic(PacketPtr pkt)
+    Tick recvAtomic(PacketPtr pkt)
     {
         panic_if(pkt->cmd != MemCmd::WriteReq,
-                "%s received unexpected command %s from %s.\n",
-                name(), pkt->cmd.toString(), getPeer());
+                 "%s received unexpected command %s from %s.\n", name(),
+                 pkt->cmd.toString(), getPeer());
         pkt->headerDelay = pkt->payloadDelay = 0;
         return device->recvMessage(pkt);
     }
 };
 
-template<class T>
+template <class T>
 PacketPtr
 buildIntPacket(Addr addr, T payload)
 {
@@ -103,29 +96,32 @@ class IntRequestPort : public QueuedRequestPort
     ReqPacketQueue reqQueue;
     SnoopRespPacketQueue snoopRespQueue;
 
-    Device* device;
+    Device *device;
     Tick latency;
 
     typedef std::function<void(PacketPtr)> OnCompletionFunc;
+
     struct OnCompletion : public Packet::SenderState
     {
         OnCompletionFunc func;
+
         OnCompletion(OnCompletionFunc _func) : func(_func) {}
     };
+
     // If nothing extra needs to happen, just clean up the packet.
     static void defaultOnCompletion(PacketPtr pkt) { delete pkt; }
 
   public:
-    IntRequestPort(const std::string& _name, SimObject* _parent,
-                  Device* dev, Tick _latency) :
-        QueuedRequestPort(_name, reqQueue, snoopRespQueue),
-        reqQueue(*_parent, *this), snoopRespQueue(*_parent, *this),
-        device(dev), latency(_latency)
-    {
-    }
+    IntRequestPort(const std::string &_name, SimObject *_parent, Device *dev,
+                   Tick _latency)
+        : QueuedRequestPort(_name, reqQueue, snoopRespQueue),
+          reqQueue(*_parent, *this),
+          snoopRespQueue(*_parent, *this),
+          device(dev),
+          latency(_latency)
+    {}
 
-    bool
-    recvTimingResp(PacketPtr pkt) override
+    bool recvTimingResp(PacketPtr pkt) override
     {
         assert(pkt->isResponse());
         auto *oc = safe_cast<OnCompletion *>(pkt->popSenderState());
@@ -134,9 +130,8 @@ class IntRequestPort : public QueuedRequestPort
         return true;
     }
 
-    void
-    sendMessage(PacketPtr pkt, bool timing,
-            OnCompletionFunc func=defaultOnCompletion)
+    void sendMessage(PacketPtr pkt, bool timing,
+                     OnCompletionFunc func = defaultOnCompletion)
     {
         if (timing) {
             pkt->pushSenderState(new OnCompletion(func));

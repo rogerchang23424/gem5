@@ -146,7 +146,7 @@ sc_object::sc_object(const sc_object &other)
 }
 
 sc_object &
-sc_object::operator = (const sc_object &other)
+sc_object::operator=(const sc_object &other)
 {
     *_gem5_object = *other._gem5_object;
     return *this;

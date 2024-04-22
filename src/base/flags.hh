@@ -63,12 +63,11 @@ class Flags
      *
      * @param flags The value to initialize the flags with.
      */
-    Flags(Type flags=0) : _flags(flags) {}
+    Flags(Type flags = 0) : _flags(flags) {}
 
     operator const Type() const { return _flags; }
 
-    const Flags<T> &
-    operator=(T flags)
+    const Flags<T> &operator=(T flags)
     {
         _flags = flags;
         return *this;
@@ -121,8 +120,7 @@ class Flags
      * @param mask The mask containing the bits to be modified.
      * @param condition If true, set masked bits; otherwise, clear them.
      */
-    void
-    set(Type mask, bool condition)
+    void set(Type mask, bool condition)
     {
         condition ? set(mask) : clear(mask);
     }
@@ -137,11 +135,11 @@ class Flags
      * @param flags Flags to extract new bits from.
      * @param mask Mask used to determine which bits are replaced.
      */
-    void
-    replace(Type flags, Type mask)
+    void replace(Type flags, Type mask)
     {
         _flags = (_flags & ~mask) | (flags & mask);
     }
+
     /** @} */ // end of api_flags
 };
 

@@ -58,7 +58,7 @@ namespace gem5
  * address decoding. The value stored is a template type and can be
  * e.g. a port identifier, or a pointer.
  */
-template <typename V, int max_cache_size=0>
+template <typename V, int max_cache_size = 0>
 class AddrRangeMap
 {
   private:
@@ -71,6 +71,7 @@ class AddrRangeMap
      */
     typedef typename RangeMap::iterator iterator;
     typedef typename RangeMap::const_iterator const_iterator;
+
     /** @} */ // end of api_addr_range
 
     /**
@@ -86,16 +87,16 @@ class AddrRangeMap
      * @ingroup api_addr_range
      * @{
      */
-    const_iterator
-    contains(const AddrRange &r) const
+    const_iterator contains(const AddrRange &r) const
     {
         return find(r, [r](const AddrRange r1) { return r.isSubset(r1); });
     }
-    iterator
-    contains(const AddrRange &r)
+
+    iterator contains(const AddrRange &r)
     {
         return find(r, [r](const AddrRange r1) { return r.isSubset(r1); });
     }
+
     /** @} */ // end of api_addr_range
 
     /**
@@ -111,16 +112,10 @@ class AddrRangeMap
      * @ingroup api_addr_range
      * @{
      */
-    const_iterator
-    contains(Addr r) const
-    {
-        return contains(RangeSize(r, 1));
-    }
-    iterator
-    contains(Addr r)
-    {
-        return contains(RangeSize(r, 1));
-    }
+    const_iterator contains(Addr r) const { return contains(RangeSize(r, 1)); }
+
+    iterator contains(Addr r) { return contains(RangeSize(r, 1)); }
+
     /** @} */ // end of api_addr_range
 
     /**
@@ -136,23 +131,22 @@ class AddrRangeMap
      * @ingroup api_addr_range
      * @{
      */
-    const_iterator
-    intersects(const AddrRange &r) const
+    const_iterator intersects(const AddrRange &r) const
     {
         return find(r, [r](const AddrRange r1) { return r.intersects(r1); });
     }
-    iterator
-    intersects(const AddrRange &r)
+
+    iterator intersects(const AddrRange &r)
     {
         return find(r, [r](const AddrRange r1) { return r.intersects(r1); });
     }
+
     /** @} */ // end of api_addr_range
 
     /**
      * @ingroup api_addr_range
      */
-    iterator
-    insert(const AddrRange &r, const V& d)
+    iterator insert(const AddrRange &r, const V &d)
     {
         if (intersects(r) != end())
             return tree.end();
@@ -163,8 +157,7 @@ class AddrRangeMap
     /**
      * @ingroup api_addr_range
      */
-    void
-    erase(iterator p)
+    void erase(iterator p)
     {
         cache.remove(p);
         tree.erase(p);
@@ -173,20 +166,18 @@ class AddrRangeMap
     /**
      * @ingroup api_addr_range
      */
-    void
-    erase(iterator p, iterator q)
+    void erase(iterator p, iterator q)
     {
         for (auto it = p; it != q; it++) {
             cache.remove(p);
         }
-        tree.erase(p,q);
+        tree.erase(p, q);
     }
 
     /**
      * @ingroup api_addr_range
      */
-    void
-    clear()
+    void clear()
     {
         cache.erase(cache.begin(), cache.end());
         tree.erase(tree.begin(), tree.end());
@@ -195,56 +186,32 @@ class AddrRangeMap
     /**
      * @ingroup api_addr_range
      */
-    const_iterator
-    begin() const
-    {
-        return tree.begin();
-    }
+    const_iterator begin() const { return tree.begin(); }
 
     /**
      * @ingroup api_addr_range
      */
-    iterator
-    begin()
-    {
-        return tree.begin();
-    }
+    iterator begin() { return tree.begin(); }
 
     /**
      * @ingroup api_addr_range
      */
-    const_iterator
-    end() const
-    {
-        return tree.end();
-    }
+    const_iterator end() const { return tree.end(); }
 
     /**
      * @ingroup api_addr_range
      */
-    iterator
-    end()
-    {
-        return tree.end();
-    }
+    iterator end() { return tree.end(); }
 
     /**
      * @ingroup api_addr_range
      */
-    std::size_t
-    size() const
-    {
-        return tree.size();
-    }
+    std::size_t size() const { return tree.size(); }
 
     /**
      * @ingroup api_addr_range
      */
-    bool
-    empty() const
-    {
-        return tree.empty();
-    }
+    bool empty() const { return tree.empty(); }
 
   private:
     /**
@@ -252,8 +219,7 @@ class AddrRangeMap
      *
      * @param it Iterator to the entry in the address range map
      */
-    void
-    addNewEntryToCache(iterator it) const
+    void addNewEntryToCache(iterator it) const
     {
         if (max_cache_size != 0) {
             // If there's a cache, add this element to it.
@@ -283,8 +249,8 @@ class AddrRangeMap
      * @param f A condition on an address range
      * @return An iterator that contains the input address range
      */
-    iterator
-    find(const AddrRange &r, std::function<bool(const AddrRange)> cond)
+    iterator find(const AddrRange &r,
+                  std::function<bool(const AddrRange)> cond)
     {
         // Check the cache first
         for (auto c = cache.begin(); c != cache.end(); c++) {
@@ -314,14 +280,13 @@ class AddrRangeMap
                 return i;
             }
             // Keep looking if the next range merges with the current one.
-        } while (next != begin() &&
-                 (--next)->first.mergesWith(i->first));
+        } while (next != begin() && (--next)->first.mergesWith(i->first));
 
         return end();
     }
 
-    const_iterator
-    find(const AddrRange &r, std::function<bool(const AddrRange)> cond) const
+    const_iterator find(const AddrRange &r,
+                        std::function<bool(const AddrRange)> cond) const
     {
         return const_cast<AddrRangeMap *>(this)->find(r, cond);
     }

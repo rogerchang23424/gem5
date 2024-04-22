@@ -90,8 +90,8 @@ class I8259 : public BasicPioDevice
 
     I8259(const Params &p);
 
-    Port &
-    getPort(const std::string &if_name, PortID idx=InvalidPortID) override
+    Port &getPort(const std::string &if_name,
+                  PortID idx = InvalidPortID) override
     {
         if (if_name == "inputs")
             return *inputs.at(idx);
@@ -106,17 +106,9 @@ class I8259 : public BasicPioDevice
     Tick read(PacketPtr pkt) override;
     Tick write(PacketPtr pkt) override;
 
-    void
-    maskAll()
-    {
-        IMR = 0xFF;
-    }
+    void maskAll() { IMR = 0xFF; }
 
-    void
-    unmaskAll()
-    {
-        IMR = 0x00;
-    }
+    void unmaskAll() { IMR = 0x00; }
 
     void signalInterrupt(int line);
     void raiseInterruptPin(int number);

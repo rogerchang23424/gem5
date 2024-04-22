@@ -61,7 +61,6 @@ namespace gem5
 class MSHRQueue : public Queue<MSHR>
 {
   private:
-
     /**
      * The number of entries to reserve for future demand accesses.
      * Prevent prefetcher from taking all mshr entries
@@ -69,7 +68,6 @@ class MSHRQueue : public Queue<MSHR>
     const int demandReserve;
 
   public:
-
     /**
      * Create a queue with a given number of entries.
      * @param num_entrys The number of entries in this queue.
@@ -146,10 +144,7 @@ class MSHRQueue : public Queue<MSHR>
      * Returns true if the pending list is not empty.
      * @return True if there are outstanding requests.
      */
-    bool havePending() const
-    {
-        return !readyList.empty();
-    }
+    bool havePending() const { return !readyList.empty(); }
 
     /**
      * Returns true if sufficient mshrs for prefetch.

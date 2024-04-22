@@ -39,23 +39,16 @@ struct Access
     Addr addr;
     Addr size;
 
-    Access(bool _read, Addr _addr, Addr _size) :
-        read(_read), addr(_addr), size(_size)
+    Access(bool _read, Addr _addr, Addr _size)
+        : read(_read), addr(_addr), size(_size)
     {}
 
-    bool
-    operator == (const Access &other) const
+    bool operator==(const Access &other) const
     {
-        return read == other.read &&
-               addr == other.addr &&
-               size == other.size;
+        return read == other.read && addr == other.addr && size == other.size;
     }
 
-    bool
-    operator != (const Access &other) const
-    {
-        return !(*this == other);
-    }
+    bool operator!=(const Access &other) const { return !(*this == other); }
 };
 
 using Accesses = std::vector<Access>;
@@ -68,38 +61,37 @@ class BackingStore
 
     BackingStore(Addr _base, size_t _size) : store(_size, 0), base(_base) {}
 
-    void
-    rangeCheck(Addr addr, Addr size)
+    void rangeCheck(Addr addr, Addr size)
     {
         panic_if(addr < base || addr + size > base + store.size(),
-                 "Range [%#x,%#x) outside of [%#x,%#x).",
-                 addr, addr + size, base, base + store.size());
+                 "Range [%#x,%#x) outside of [%#x,%#x).", addr, addr + size,
+                 base, base + store.size());
     }
 
     mutable Accesses accesses;
 
-    ::testing::AssertionResult
-    expect_access(size_t idx, const Access &other) const
+    ::testing::AssertionResult expect_access(size_t idx,
+                                             const Access &other) const
     {
         if (idx >= accesses.size()) {
-            return ::testing::AssertionFailure() << "index " << idx <<
-                " out of bounds";
+            return ::testing::AssertionFailure()
+                   << "index " << idx << " out of bounds";
         }
 
         if (accesses[idx] != other) {
-            return ::testing::AssertionFailure() << "access[" << idx <<
-                "] was " << accesses[idx] << ", expected " << other;
+            return ::testing::AssertionFailure()
+                   << "access[" << idx << "] was " << accesses[idx]
+                   << ", expected " << other;
         }
         return ::testing::AssertionSuccess();
     }
 
-    ::testing::AssertionResult
-    expect_accesses(Accesses expected) const
+    ::testing::AssertionResult expect_accesses(Accesses expected) const
     {
         if (accesses.size() != expected.size()) {
-            return ::testing::AssertionFailure() <<
-                "Wrong number of accesses, was " << accesses.size() <<
-                " expected " << expected.size();
+            return ::testing::AssertionFailure()
+                   << "Wrong number of accesses, was " << accesses.size()
+                   << " expected " << expected.size();
         }
 
         auto failure = ::testing::AssertionFailure();
@@ -120,16 +112,14 @@ class BackingStore
             return ::testing::AssertionSuccess();
     }
 
-    void
-    writeBlob(Addr ptr, const void *data, int size)
+    void writeBlob(Addr ptr, const void *data, int size)
     {
         rangeCheck(ptr, size);
         accesses.emplace_back(false, ptr, size);
         memcpy(store.data() + (ptr - base), data, size);
     }
 
-    void
-    readBlob(Addr ptr, void *data, int size)
+    void readBlob(Addr ptr, void *data, int size)
     {
         rangeCheck(ptr, size);
         accesses.emplace_back(true, ptr, size);
@@ -138,24 +128,24 @@ class BackingStore
 };
 
 ::testing::AssertionResult
-accessed(const char *expr1, const char *expr2,
-         const BackingStore &store, const Accesses &expected)
+accessed(const char *expr1, const char *expr2, const BackingStore &store,
+         const Accesses &expected)
 {
     return store.expect_accesses(expected);
 }
 
-#define EXPECT_ACCESSES(store, ...) \
-    do { \
-        Accesses expected({__VA_ARGS__}); \
-        EXPECT_PRED_FORMAT2(accessed, store, expected); \
-        store.accesses.clear(); \
+#define EXPECT_ACCESSES(store, ...)                                           \
+    do {                                                                      \
+        Accesses expected({ __VA_ARGS__ });                                   \
+        EXPECT_PRED_FORMAT2(accessed, store, expected);                       \
+        store.accesses.clear();                                               \
     } while (false)
 
 std::ostream &
-operator << (std::ostream &os, const Access &access)
+operator<<(std::ostream &os, const Access &access)
 {
-    ccprintf(os, "%s(%#x, %d)", access.read ? "read" : "write",
-            access.addr, access.size);
+    ccprintf(os, "%s(%#x, %d)", access.read ? "read" : "write", access.addr,
+             access.size);
     return os;
 }
 
@@ -165,17 +155,16 @@ class TestProxy
     BackingStore &store;
 
     TestProxy(BackingStore &_store) : store(_store) {}
+
     // Sneaky constructor for testing guest_abi integration.
     TestProxy(ThreadContext *tc) : store(*(BackingStore *)tc) {}
 
-    void
-    writeBlob(Addr ptr, const void *data, int size)
+    void writeBlob(Addr ptr, const void *data, int size)
     {
         store.writeBlob(ptr, data, size);
     }
 
-    void
-    readBlob(Addr ptr, void *data, int size)
+    void readBlob(Addr ptr, void *data, int size)
     {
         store.readBlob(ptr, data, size);
     }
@@ -230,7 +219,6 @@ TEST(ProxyPtr, Dirty)
     EXPECT_EQ(store.store[0x102], 0xa5);
     EXPECT_EQ(store.store[0x103], 0xa5);
 }
-
 
 TEST(ProxyPtr, LoadAndFlush)
 {
@@ -480,8 +468,7 @@ namespace guest_abi
 template <>
 struct Argument<TestABI, Addr>
 {
-    static Addr
-    get(ThreadContext *tc, typename TestABI::State &state)
+    static Addr get(ThreadContext *tc, typename TestABI::State &state)
     {
         return 0x1000;
     }

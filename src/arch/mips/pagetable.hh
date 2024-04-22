@@ -37,7 +37,8 @@
 namespace gem5
 {
 
-namespace MipsISA {
+namespace MipsISA
+{
 
 // ITB/DTB page table entry
 struct PTE
@@ -69,6 +70,7 @@ struct PTE
     int OffsetMask;
 
     bool Valid() { return (V0 | V1); };
+
     void serialize(CheckpointOut &cp) const;
     void unserialize(CheckpointIn &cp);
 };
@@ -77,9 +79,11 @@ struct PTE
 struct TlbEntry
 {
     Addr _pageStart;
+
     TlbEntry() {}
-    TlbEntry(Addr asn, Addr vaddr, Addr paddr,
-             bool uncacheable, bool read_only)
+
+    TlbEntry(Addr asn, Addr vaddr, Addr paddr, bool uncacheable,
+             bool read_only)
         : _pageStart(paddr)
     {
         if (uncacheable || read_only)
@@ -87,24 +91,13 @@ struct TlbEntry
                  " or read-only mappings\n");
     }
 
-    Addr pageStart()
-    {
-        return _pageStart;
-    }
+    Addr pageStart() { return _pageStart; }
 
-    void
-    updateVaddr(Addr new_vaddr) {}
+    void updateVaddr(Addr new_vaddr) {}
 
-    void serialize(CheckpointOut &cp) const
-    {
-        SERIALIZE_SCALAR(_pageStart);
-    }
+    void serialize(CheckpointOut &cp) const { SERIALIZE_SCALAR(_pageStart); }
 
-    void unserialize(CheckpointIn &cp)
-    {
-        UNSERIALIZE_SCALAR(_pageStart);
-    }
-
+    void unserialize(CheckpointIn &cp) { UNSERIALIZE_SCALAR(_pageStart); }
 };
 
 } // namespace MipsISA

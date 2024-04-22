@@ -49,23 +49,17 @@ struct PacketFifoEntry
     unsigned slack;
     int priv;
 
-    PacketFifoEntry()
-    {
-        clear();
-    }
+    PacketFifoEntry() { clear(); }
 
     PacketFifoEntry(const PacketFifoEntry &s)
         : packet(s.packet), number(s.number), slack(s.slack), priv(s.priv)
-    {
-    }
+    {}
 
     PacketFifoEntry(EthPacketPtr p, uint64_t n)
         : packet(p), number(n), slack(0), priv(-1)
-    {
-    }
+    {}
 
-    void
-    clear()
+    void clear()
     {
         packet = NULL;
         number = 0;
@@ -80,7 +74,6 @@ struct PacketFifoEntry
 class PacketFifo
 {
   public:
-
     typedef std::list<PacketFifoEntry> fifo_list;
     typedef fifo_list::iterator iterator;
     typedef fifo_list::const_iterator const_iterator;
@@ -94,19 +87,26 @@ class PacketFifo
 
   public:
     explicit PacketFifo(int max)
-        : _counter(0), _maxsize(max), _size(0), _reserved(0) {}
+        : _counter(0), _maxsize(max), _size(0), _reserved(0)
+    {}
+
     virtual ~PacketFifo() {}
 
     unsigned packets() const { return fifo.size(); }
+
     unsigned maxsize() const { return _maxsize; }
+
     unsigned size() const { return _size; }
+
     unsigned reserved() const { return _reserved; }
+
     unsigned avail() const { return _maxsize - _size - _reserved; }
+
     bool empty() const { return size() <= 0; }
+
     bool full() const { return avail() <= 0; }
 
-    unsigned
-    reserve(unsigned len = 0)
+    unsigned reserve(unsigned len = 0)
     {
         assert(avail() >= len);
         _reserved += len;
@@ -114,15 +114,16 @@ class PacketFifo
     }
 
     iterator begin() { return fifo.begin(); }
+
     iterator end() { return fifo.end(); }
 
     const_iterator begin() const { return fifo.begin(); }
+
     const_iterator end() const { return fifo.end(); }
 
     EthPacketPtr front() { return fifo.begin()->packet; }
 
-    bool
-    push(EthPacketPtr ptr)
+    bool push(EthPacketPtr ptr)
     {
         assert(ptr->length);
         assert(_reserved <= ptr->length);
@@ -139,8 +140,7 @@ class PacketFifo
         return true;
     }
 
-    void
-    pop()
+    void pop()
     {
         if (empty())
             return;
@@ -152,8 +152,7 @@ class PacketFifo
         fifo.pop_front();
     }
 
-    void
-    clear()
+    void clear()
     {
         for (iterator i = begin(); i != end(); ++i)
             i->clear();
@@ -162,8 +161,7 @@ class PacketFifo
         _reserved = 0;
     }
 
-    void
-    remove(iterator i)
+    void remove(iterator i)
     {
         if (i != fifo.begin()) {
             iterator prev = i;
@@ -182,16 +180,14 @@ class PacketFifo
 
     bool copyout(void *dest, unsigned offset, unsigned len);
 
-    int
-    countPacketsBefore(const_iterator i) const
+    int countPacketsBefore(const_iterator i) const
     {
         if (i == fifo.end())
             return 0;
         return i->number - fifo.begin()->number;
     }
 
-    int
-    countPacketsAfter(const_iterator i) const
+    int countPacketsAfter(const_iterator i) const
     {
         auto end = fifo.end();
         if (i == end)
@@ -199,8 +195,7 @@ class PacketFifo
         return (--end)->number - i->number;
     }
 
-    void
-    check() const
+    void check() const
     {
         unsigned total = 0;
         for (auto i = begin(); i != end(); ++i)
@@ -210,9 +205,9 @@ class PacketFifo
             panic("total (%d) is not == to size (%d)\n", total, _size);
     }
 
-/**
- * Serialization stuff
- */
+    /**
+     * Serialization stuff
+     */
   public:
     void serialize(const std::string &base, CheckpointOut &cp) const;
     void unserialize(const std::string &base, CheckpointIn &cp);

@@ -63,11 +63,11 @@ template <class TC>
 class CheckerThreadContext : public ThreadContext
 {
   public:
-    CheckerThreadContext(TC *actual_tc,
-                         CheckerCPU *checker_cpu)
-        : actualTC(actual_tc), checkerTC(checker_cpu->thread),
+    CheckerThreadContext(TC *actual_tc, CheckerCPU *checker_cpu)
+        : actualTC(actual_tc),
+          checkerTC(checker_cpu->thread),
           checkerCPU(checker_cpu)
-    { }
+    {}
 
   private:
     /** The main CPU's ThreadContext, or class that implements the
@@ -81,8 +81,7 @@ class CheckerThreadContext : public ThreadContext
     CheckerCPU *checkerCPU;
 
   public:
-    bool
-    schedule(PCEvent *e) override
+    bool schedule(PCEvent *e) override
     {
         [[maybe_unused]] bool check_ret = checkerTC->schedule(e);
         bool actual_ret = actualTC->schedule(e);
@@ -90,8 +89,7 @@ class CheckerThreadContext : public ThreadContext
         return actual_ret;
     }
 
-    bool
-    remove(PCEvent *e) override
+    bool remove(PCEvent *e) override
     {
         [[maybe_unused]] bool check_ret = checkerTC->remove(e);
         bool actual_ret = actualTC->remove(e);
@@ -99,18 +97,17 @@ class CheckerThreadContext : public ThreadContext
         return actual_ret;
     }
 
-    void
-    scheduleInstCountEvent(Event *event, Tick count) override
+    void scheduleInstCountEvent(Event *event, Tick count) override
     {
         actualTC->scheduleInstCountEvent(event, count);
     }
-    void
-    descheduleInstCountEvent(Event *event) override
+
+    void descheduleInstCountEvent(Event *event) override
     {
         actualTC->descheduleInstCountEvent(event);
     }
-    Tick
-    getCurrentInstCount() override
+
+    Tick getCurrentInstCount() override
     {
         return actualTC->getCurrentInstCount();
     }
@@ -123,17 +120,16 @@ class CheckerThreadContext : public ThreadContext
 
     ContextID contextId() const override { return actualTC->contextId(); }
 
-    void
-    setContextId(ContextID id) override
+    void setContextId(ContextID id) override
     {
-       actualTC->setContextId(id);
-       checkerTC->setContextId(id);
+        actualTC->setContextId(id);
+        checkerTC->setContextId(id);
     }
 
     /** Returns this thread's ID number. */
     int threadId() const override { return actualTC->threadId(); }
-    void
-    setThreadId(int id) override
+
+    void setThreadId(int id) override
     {
         checkerTC->setThreadId(id);
         actualTC->setThreadId(id);
@@ -141,19 +137,11 @@ class CheckerThreadContext : public ThreadContext
 
     BaseMMU *getMMUPtr() override { return actualTC->getMMUPtr(); }
 
-    CheckerCPU *
-    getCheckerCpuPtr() override
-    {
-        return checkerCPU;
-    }
+    CheckerCPU *getCheckerCpuPtr() override { return checkerCPU; }
 
     BaseISA *getIsaPtr() const override { return actualTC->getIsaPtr(); }
 
-    InstDecoder *
-    getDecoderPtr() override
-    {
-        return actualTC->getDecoderPtr();
-    }
+    InstDecoder *getDecoderPtr() override { return actualTC->getDecoderPtr(); }
 
     System *getSystemPtr() override { return actualTC->getSystemPtr(); }
 
@@ -161,16 +149,11 @@ class CheckerThreadContext : public ThreadContext
 
     void setProcessPtr(Process *p) override { actualTC->setProcessPtr(p); }
 
-    void
-    connectMemPorts(ThreadContext *tc)
-    {
-        actualTC->connectMemPorts(tc);
-    }
+    void connectMemPorts(ThreadContext *tc) { actualTC->connectMemPorts(tc); }
 
     Status status() const override { return actualTC->status(); }
 
-    void
-    setStatus(Status new_status) override
+    void setStatus(Status new_status) override
     {
         actualTC->setStatus(new_status);
         checkerTC->setStatus(new_status);
@@ -185,33 +168,30 @@ class CheckerThreadContext : public ThreadContext
     /// Set the status to Halted.
     void halt() override { actualTC->halt(); }
 
-    void
-    takeOverFrom(ThreadContext *oldContext) override
+    void takeOverFrom(ThreadContext *oldContext) override
     {
         actualTC->takeOverFrom(oldContext);
         checkerTC->copyState(oldContext);
     }
 
-    void
-    regStats(const std::string &name) override
+    void regStats(const std::string &name) override
     {
         actualTC->regStats(name);
         checkerTC->regStats(name);
     }
 
     Tick readLastActivate() override { return actualTC->readLastActivate(); }
+
     Tick readLastSuspend() override { return actualTC->readLastSuspend(); }
 
     // @todo: Do I need this?
-    void
-    copyArchRegs(ThreadContext *tc) override
+    void copyArchRegs(ThreadContext *tc) override
     {
         actualTC->copyArchRegs(tc);
         checkerTC->copyArchRegs(tc);
     }
 
-    void
-    clearArchRegs() override
+    void clearArchRegs() override
     {
         actualTC->clearArchRegs();
         checkerTC->clearArchRegs();
@@ -220,33 +200,28 @@ class CheckerThreadContext : public ThreadContext
     //
     // New accessors for new decoder.
     //
-    RegVal
-    getReg(const RegId &reg) const override
+    RegVal getReg(const RegId &reg) const override
     {
         return actualTC->getReg(reg);
     }
 
-    void
-    getReg(const RegId &reg, void *val) const override
+    void getReg(const RegId &reg, void *val) const override
     {
         actualTC->getReg(reg, val);
     }
 
-    void *
-    getWritableReg(const RegId &reg) override
+    void *getWritableReg(const RegId &reg) override
     {
         return actualTC->getWritableReg(reg);
     }
 
-    void
-    setReg(const RegId &reg, RegVal val) override
+    void setReg(const RegId &reg, RegVal val) override
     {
         actualTC->setReg(reg, val);
         checkerTC->setReg(reg, val);
     }
 
-    void
-    setReg(const RegId &reg, const void *val) override
+    void setReg(const RegId &reg, const void *val) override
     {
         actualTC->setReg(reg, val);
         checkerTC->setReg(reg, val);
@@ -256,83 +231,76 @@ class CheckerThreadContext : public ThreadContext
     const PCStateBase &pcState() const override { return actualTC->pcState(); }
 
     /** Sets this thread's PC state. */
-    void
-    pcState(const PCStateBase &val) override
+    void pcState(const PCStateBase &val) override
     {
-        DPRINTF(Checker, "Changing PC to %s, old PC %s\n",
-                         val, checkerTC->pcState());
+        DPRINTF(Checker, "Changing PC to %s, old PC %s\n", val,
+                checkerTC->pcState());
         checkerTC->pcState(val);
         checkerCPU->recordPCChange(val);
         return actualTC->pcState(val);
     }
 
-    void
-    pcStateNoRecord(const PCStateBase &val) override
+    void pcStateNoRecord(const PCStateBase &val) override
     {
         return actualTC->pcState(val);
     }
 
-    RegVal
-    readMiscRegNoEffect(RegIndex misc_reg) const override
+    RegVal readMiscRegNoEffect(RegIndex misc_reg) const override
     {
         return actualTC->readMiscRegNoEffect(misc_reg);
     }
 
-    RegVal
-    readMiscReg(RegIndex misc_reg) override
+    RegVal readMiscReg(RegIndex misc_reg) override
     {
         return actualTC->readMiscReg(misc_reg);
     }
 
-    void
-    setMiscRegNoEffect(RegIndex misc_reg, RegVal val) override
+    void setMiscRegNoEffect(RegIndex misc_reg, RegVal val) override
     {
-        DPRINTF(Checker, "Setting misc reg with no effect: %d to both Checker"
-                         " and O3..\n", misc_reg);
+        DPRINTF(Checker,
+                "Setting misc reg with no effect: %d to both Checker"
+                " and O3..\n",
+                misc_reg);
         checkerTC->setMiscRegNoEffect(misc_reg, val);
         actualTC->setMiscRegNoEffect(misc_reg, val);
     }
 
-    void
-    setMiscReg(RegIndex misc_reg, RegVal val) override
+    void setMiscReg(RegIndex misc_reg, RegVal val) override
     {
-        DPRINTF(Checker, "Setting misc reg with effect: %d to both Checker"
-                         " and O3..\n", misc_reg);
+        DPRINTF(Checker,
+                "Setting misc reg with effect: %d to both Checker"
+                " and O3..\n",
+                misc_reg);
         checkerTC->setMiscReg(misc_reg, val);
         actualTC->setMiscReg(misc_reg, val);
     }
 
-    unsigned
-    readStCondFailures() const override
+    unsigned readStCondFailures() const override
     {
         return actualTC->readStCondFailures();
     }
 
-    void
-    setStCondFailures(unsigned sc_failures) override
+    void setStCondFailures(unsigned sc_failures) override
     {
         actualTC->setStCondFailures(sc_failures);
     }
 
     // hardware transactional memory
-    void
-    htmAbortTransaction(uint64_t htm_uid, HtmFailureFaultCause cause) override
+    void htmAbortTransaction(uint64_t htm_uid,
+                             HtmFailureFaultCause cause) override
     {
         panic("function not implemented");
     }
 
-    BaseHTMCheckpointPtr&
-    getHtmCheckpointPtr() override
+    BaseHTMCheckpointPtr &getHtmCheckpointPtr() override
     {
         return actualTC->getHtmCheckpointPtr();
     }
 
-    void
-    setHtmCheckpointPtr(BaseHTMCheckpointPtr new_cpt) override
+    void setHtmCheckpointPtr(BaseHTMCheckpointPtr new_cpt) override
     {
         panic("function not implemented");
     }
-
 };
 
 } // namespace gem5

@@ -91,7 +91,6 @@ class ThreadContext : public PCEventScope
     bool useForClone = false;
 
   public:
-
     bool getUseForClone() { return useForClone; }
 
     void setUseForClone(bool new_val) { useForClone = new_val; }
@@ -116,7 +115,7 @@ class ThreadContext : public PCEventScope
         Halted
     };
 
-    virtual ~ThreadContext() { };
+    virtual ~ThreadContext(){};
 
     virtual BaseCPU *getCpuPtr() = 0;
 
@@ -169,7 +168,7 @@ class ThreadContext : public PCEventScope
 
     virtual void takeOverFrom(ThreadContext *old_context) = 0;
 
-    virtual void regStats(const std::string &name) {};
+    virtual void regStats(const std::string &name){};
 
     virtual void scheduleInstCountEvent(Event *event, Tick count) = 0;
     virtual void descheduleInstCountEvent(Event *event) = 0;
@@ -197,8 +196,8 @@ class ThreadContext : public PCEventScope
     virtual const PCStateBase &pcState() const = 0;
 
     virtual void pcState(const PCStateBase &val) = 0;
-    void
-    pcState(Addr addr)
+
+    void pcState(Addr addr)
     {
         std::unique_ptr<PCStateBase> new_pc(getIsaPtr()->newPCState(addr));
         pcState(*new_pc);
@@ -231,7 +230,7 @@ class ThreadContext : public PCEventScope
     // hardware transactional memory
     virtual void htmAbortTransaction(uint64_t htm_uid,
                                      HtmFailureFaultCause cause) = 0;
-    virtual BaseHTMCheckpointPtr& getHtmCheckpointPtr() = 0;
+    virtual BaseHTMCheckpointPtr &getHtmCheckpointPtr() = 0;
     virtual void setHtmCheckpointPtr(BaseHTMCheckpointPtr cpt) = 0;
 };
 
@@ -249,7 +248,6 @@ void serialize(const ThreadContext &tc, CheckpointOut &cp);
 void unserialize(ThreadContext &tc, CheckpointIn &cp);
 
 /** @} */
-
 
 /**
  * Copy state between thread contexts in preparation for CPU handover.

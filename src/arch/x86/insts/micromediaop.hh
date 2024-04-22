@@ -54,44 +54,30 @@ class MediaOpBase : public X86MicroopBase
 
     // Constructor
     MediaOpBase(ExtMachInst mach_inst, const char *mnem, const char *inst_mnem,
-            uint64_t set_flags, OpClass op_class,
-            uint8_t src_size, uint8_t dest_size, uint8_t _ext) :
-        X86MicroopBase(mach_inst, mnem, inst_mnem, set_flags, op_class),
-        srcSize(src_size), destSize(dest_size), ext(_ext)
+                uint64_t set_flags, OpClass op_class, uint8_t src_size,
+                uint8_t dest_size, uint8_t _ext)
+        : X86MicroopBase(mach_inst, mnem, inst_mnem, set_flags, op_class),
+          srcSize(src_size),
+          destSize(dest_size),
+          ext(_ext)
     {}
 
-    bool
-    scalarOp() const
-    {
-        return ext & MediaScalarOp;
-    }
+    bool scalarOp() const { return ext & MediaScalarOp; }
 
-    int
-    numItems(int size) const
+    int numItems(int size) const
     {
         return scalarOp() ? 1 : (sizeof(uint64_t) / size);
     }
 
-    bool
-    multHi() const
-    {
-        return ext & MediaMultHiOp;
-    }
+    bool multHi() const { return ext & MediaMultHiOp; }
 
-    bool
-    partHi() const
-    {
-        return ext & MediaPartHiOp;
-    }
+    bool partHi() const { return ext & MediaPartHiOp; }
 
-    bool
-    signedOp() const
-    {
-        return ext & MediaSignedOp;
-    }
+    bool signedOp() const { return ext & MediaSignedOp; }
 
   public:
     uint8_t getSrcSize() const { return srcSize; }
+
     uint8_t getDestSize() const { return destSize; }
 };
 

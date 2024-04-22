@@ -57,7 +57,6 @@ namespace gem5
 class FlashDevice : public AbstractNVM
 {
   public:
-
     /** Initialize functions*/
     FlashDevice(const FlashDeviceParams &);
     ~FlashDevice();
@@ -114,22 +113,19 @@ class FlashDevice : public AbstractNVM
     };
 
     /** Device access functions Inherrited from AbstractNVM*/
-    void
-    initializeMemory(uint64_t disk_size, uint32_t sector_size) override
+    void initializeMemory(uint64_t disk_size, uint32_t sector_size) override
     {
         initializeFlash(disk_size, sector_size);
     }
 
-    void
-    readMemory(uint64_t address, uint32_t amount,
-               const std::function<void()> &event) override
+    void readMemory(uint64_t address, uint32_t amount,
+                    const std::function<void()> &event) override
     {
         accessDevice(address, amount, event, ActionRead);
     }
 
-    void
-    writeMemory(uint64_t address, uint32_t amount,
-                const std::function<void()> &event) override
+    void writeMemory(uint64_t address, uint32_t amount,
+                     const std::function<void()> &event) override
     {
         accessDevice(address, amount, event, ActionWrite);
     }

@@ -44,7 +44,6 @@
 #ifndef __SIM_CLOCKED_OBJECT_HH__
 #define __SIM_CLOCKED_OBJECT_HH__
 
-
 #include "params/ClockedObject.hh"
 #include "sim/core.hh"
 #include "sim/clock_domain.hh"
@@ -61,7 +60,6 @@ namespace gem5
  */
 class Clocked
 {
-
   private:
     // the tick value of the next clock edge (>= curTick()) at the
     // time of the last call to update()
@@ -75,8 +73,7 @@ class Clocked
      *  Align cycle and tick to the next clock edge if not already done. When
      *  complete, tick must be at least curTick().
      */
-    void
-    update() const
+    void update() const
     {
         // both tick and cycle are up-to-date and we are done, note
         // that the >= is important as it captures cases where tick
@@ -107,7 +104,6 @@ class Clocked
     ClockDomain &clockDomain;
 
   protected:
-
     /**
      * Create a clocked object and set the clock domain based on the
      * parameters.
@@ -126,15 +122,14 @@ class Clocked
     /**
      * Virtual destructor due to inheritance.
      */
-    virtual ~Clocked() { }
+    virtual ~Clocked() {}
 
     /**
      * Reset the object's clock using the current global tick value. Likely
      * to be used only when the global clock is reset. Currently, this done
      * only when Ruby is done warming up the memory system.
      */
-    void
-    resetClock() const
+    void resetClock() const
     {
         Cycles elapsedCycles(divCeil(curTick(), clockPeriod()));
         cycle = elapsedCycles;
@@ -148,12 +143,10 @@ class Clocked
     virtual void clockPeriodUpdated() {}
 
   public:
-
     /**
      * Update the tick to the current tick.
      */
-    void
-    updateClockPeriod()
+    void updateClockPeriod()
     {
         update();
         clockPeriodUpdated();
@@ -173,8 +166,7 @@ class Clocked
      * this tick can be
      *     curTick() + [0, clockPeriod()) + clockPeriod() * cycles
      */
-    Tick
-    clockEdge(Cycles cycles=Cycles(0)) const
+    Tick clockEdge(Cycles cycles = Cycles(0)) const
     {
         // align tick to the next clock edge
         update();
@@ -187,12 +179,11 @@ class Clocked
      * Determine the current cycle, corresponding to a tick aligned to
      * a clock edge.
      *
-     * @return When curTick() is on a clock edge, return the Cycle corresponding
-     * to that clock edge. When curTick() is not on a clock edge, return the
-     * Cycle corresponding to the next clock edge.
+     * @return When curTick() is on a clock edge, return the Cycle
+     * corresponding to that clock edge. When curTick() is not on a clock edge,
+     * return the Cycle corresponding to the next clock edge.
      */
-    Cycles
-    curCycle() const
+    Cycles curCycle() const
     {
         // align cycle to the next clock edge.
         update();
@@ -218,8 +209,7 @@ class Clocked
 
     double voltage() const { return clockDomain.voltage(); }
 
-    Cycles
-    ticksToCycles(Tick t) const
+    Cycles ticksToCycles(Tick t) const
     {
         return Cycles(divCeil(t, clockPeriod()));
     }

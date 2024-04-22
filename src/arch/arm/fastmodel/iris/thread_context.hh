@@ -83,12 +83,11 @@ class ThreadContext : public gem5::ThreadContext
 
     virtual void initFromIrisInstance(const ResourceMap &resources);
 
-    iris::ResourceId extractResourceId(
-            const ResourceMap &resources, const std::string &name);
-    void extractResourceMap(ResourceIds &ids,
-            const ResourceMap &resources, const IdxNameMap &idx_names);
-    iris::MemorySpaceId getMemorySpaceId(const Iris::CanonicalMsn& msn) const;
-
+    iris::ResourceId extractResourceId(const ResourceMap &resources,
+                                       const std::string &name);
+    void extractResourceMap(ResourceIds &ids, const ResourceMap &resources,
+                            const IdxNameMap &idx_names);
+    iris::MemorySpaceId getMemorySpaceId(const Iris::CanonicalMsn &msn) const;
 
     ResourceIds miscRegIds;
     ResourceIds intReg32Ids;
@@ -113,8 +112,8 @@ class ThreadContext : public gem5::ThreadContext
     // events which are supposed to happen at the current instruction count.
     void maintainStepping();
 
-
     using BpId = uint64_t;
+
     struct BpInfo
     {
         Addr pc;
@@ -125,7 +124,9 @@ class ThreadContext : public gem5::ThreadContext
         BpInfo(Addr _pc) : pc(_pc), events(new EventList) {}
 
         bool empty() const { return events->empty(); }
+
         bool validIds() const { return !ids.empty(); }
+
         void clearIds() { ids.clear(); }
     };
 
@@ -144,22 +145,30 @@ class ThreadContext : public gem5::ThreadContext
 
     virtual const std::vector<iris::MemorySpaceId> &getBpSpaceIds() const = 0;
 
-
-    iris::IrisErrorCode instanceRegistryChanged(
-            uint64_t esId, const iris::IrisValueMap &fields, uint64_t time,
-            uint64_t sInstId, bool syncEc, std::string &error_message_out);
-    iris::IrisErrorCode phaseInitLeave(
-            uint64_t esId, const iris::IrisValueMap &fields, uint64_t time,
-            uint64_t sInstId, bool syncEc, std::string &error_message_out);
-    iris::IrisErrorCode simulationTimeEvent(
-            uint64_t esId, const iris::IrisValueMap &fields, uint64_t time,
-            uint64_t sInstId, bool syncEc, std::string &error_message_out);
-    iris::IrisErrorCode breakpointHit(
-            uint64_t esId, const iris::IrisValueMap &fields, uint64_t time,
-            uint64_t sInstId, bool syncEc, std::string &error_message_out);
-    iris::IrisErrorCode semihostingEvent(
-            uint64_t esId, const iris::IrisValueMap &fields, uint64_t time,
-            uint64_t sInstId, bool syncEc, std::string &error_message_out);
+    iris::IrisErrorCode
+    instanceRegistryChanged(uint64_t esId, const iris::IrisValueMap &fields,
+                            uint64_t time, uint64_t sInstId, bool syncEc,
+                            std::string &error_message_out);
+    iris::IrisErrorCode phaseInitLeave(uint64_t esId,
+                                       const iris::IrisValueMap &fields,
+                                       uint64_t time, uint64_t sInstId,
+                                       bool syncEc,
+                                       std::string &error_message_out);
+    iris::IrisErrorCode simulationTimeEvent(uint64_t esId,
+                                            const iris::IrisValueMap &fields,
+                                            uint64_t time, uint64_t sInstId,
+                                            bool syncEc,
+                                            std::string &error_message_out);
+    iris::IrisErrorCode breakpointHit(uint64_t esId,
+                                      const iris::IrisValueMap &fields,
+                                      uint64_t time, uint64_t sInstId,
+                                      bool syncEc,
+                                      std::string &error_message_out);
+    iris::IrisErrorCode semihostingEvent(uint64_t esId,
+                                         const iris::IrisValueMap &fields,
+                                         uint64_t time, uint64_t sInstId,
+                                         bool syncEc,
+                                         std::string &error_message_out);
 
     iris::EventStreamId regEventStreamId;
     iris::EventStreamId initEventStreamId;
@@ -168,17 +177,18 @@ class ThreadContext : public gem5::ThreadContext
     iris::EventStreamId semihostingEventStreamId;
 
     mutable iris::IrisInstance client;
+
     iris::IrisCppAdapter &call() const { return client.irisCall(); }
+
     iris::IrisCppAdapter &noThrow() const { return client.irisCallNoThrow(); }
 
     mutable ArmISA::PCState pc;
 
-    void readMem(iris::MemorySpaceId space,
-                 Addr addr, void *p, size_t size);
-    void writeMem(iris::MemorySpaceId space,
-                  Addr addr, const void *p, size_t size);
-    bool translateAddress(Addr &paddr, iris::MemorySpaceId p_space,
-                          Addr vaddr, iris::MemorySpaceId v_space);
+    void readMem(iris::MemorySpaceId space, Addr addr, void *p, size_t size);
+    void writeMem(iris::MemorySpaceId space, Addr addr, const void *p,
+                  size_t size);
+    bool translateAddress(Addr &paddr, iris::MemorySpaceId p_space, Addr vaddr,
+                          iris::MemorySpaceId v_space);
 
   public:
     ThreadContext(gem5::BaseCPU *cpu, int id, System *system,
@@ -197,57 +207,54 @@ class ThreadContext : public gem5::ThreadContext
     Tick getCurrentInstCount() override;
 
     gem5::BaseCPU *getCpuPtr() override { return _cpu; }
+
     int cpuId() const override { return _cpu->cpuId(); }
+
     uint32_t socketId() const override { return _cpu->socketId(); }
 
     int threadId() const override { return _threadId; }
+
     void setThreadId(int id) override { _threadId = id; }
 
     int contextId() const override { return _contextId; }
+
     void setContextId(int id) override { _contextId = id; }
 
-    BaseMMU *
-    getMMUPtr() override
-    {
-        return _mmu;
-    }
+    BaseMMU *getMMUPtr() override { return _mmu; }
 
     CheckerCPU *getCheckerCpuPtr() override { return nullptr; }
-    InstDecoder *
-    getDecoderPtr() override
+
+    InstDecoder *getDecoderPtr() override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
     System *getSystemPtr() override { return _cpu->system; }
 
-    BaseISA *
-    getIsaPtr() const override
-    {
-        return _isa;
-    }
+    BaseISA *getIsaPtr() const override { return _isa; }
 
     void sendFunctional(PacketPtr pkt) override;
 
-    Process *
-    getProcessPtr() override
+    Process *getProcessPtr() override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
-    void
-    setProcessPtr(Process *p) override
+
+    void setProcessPtr(Process *p) override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
     Status status() const override;
     void setStatus(Status new_status) override;
+
     void activate() override { setStatus(Active); }
+
     void suspend() override { setStatus(Suspended); }
+
     void halt() override { setStatus(Halted); }
 
-    void
-    takeOverFrom(gem5::ThreadContext *old_context) override
+    void takeOverFrom(gem5::ThreadContext *old_context) override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
@@ -256,27 +263,22 @@ class ThreadContext : public gem5::ThreadContext
 
     // Not necessarily the best location for these...
     // Having an extra function just to read these is obnoxious
-    Tick
-    readLastActivate() override
+    Tick readLastActivate() override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
+
     Tick readLastSuspend() override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    void
-    copyArchRegs(gem5::ThreadContext *tc) override
+    void copyArchRegs(gem5::ThreadContext *tc) override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    void
-    clearArchRegs() override
-    {
-        warn("Ignoring clearArchRegs()");
-    }
+    void clearArchRegs() override { warn("Ignoring clearArchRegs()"); }
 
     //
     // New accessors for new decoder.
@@ -293,56 +295,52 @@ class ThreadContext : public gem5::ThreadContext
 
     iris::ResourceId getVecRegRscId(RegIndex vec_reg) const;
     virtual const ArmISA::VecRegContainer &readVecReg(const RegId &reg) const;
-    virtual ArmISA::VecRegContainer &
-    getWritableVecReg(const RegId &reg)
+
+    virtual ArmISA::VecRegContainer &getWritableVecReg(const RegId &reg)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    virtual RegVal
-    readVecElem(const RegId &reg) const
+    virtual RegVal readVecElem(const RegId &reg) const
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
     iris::ResourceId getVecPredRegRscId(RegIndex vec_reg) const;
     virtual const ArmISA::VecPredRegContainer &
-        readVecPredReg(const RegId &reg) const;
+    readVecPredReg(const RegId &reg) const;
+
     virtual ArmISA::VecPredRegContainer &
     getWritableVecPredReg(const RegId &reg)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    virtual RegVal
-    readCCReg(RegIndex reg_idx) const
+    virtual RegVal readCCReg(RegIndex reg_idx) const
     {
         return readCCRegFlat(reg_idx);
     }
 
     virtual void setIntReg(RegIndex reg_idx, RegVal val);
 
-    virtual void
-    setVecReg(const RegId &reg, const ArmISA::VecRegContainer &val)
+    virtual void setVecReg(const RegId &reg,
+                           const ArmISA::VecRegContainer &val)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    virtual void
-    setVecElem(const RegId& reg, RegVal val)
+    virtual void setVecElem(const RegId &reg, RegVal val)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    virtual void
-    setVecPredReg(const RegId &reg,
-                  const ArmISA::VecPredRegContainer &val)
+    virtual void setVecPredReg(const RegId &reg,
+                               const ArmISA::VecPredRegContainer &val)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    virtual void
-    setCCReg(RegIndex reg_idx, RegVal val)
+    virtual void setCCReg(RegIndex reg_idx, RegVal val)
     {
         setCCRegFlat(reg_idx, val);
     }
@@ -354,29 +352,27 @@ class ThreadContext : public gem5::ThreadContext
 
     iris::ResourceId getMiscRegRscId(RegIndex misc_reg) const;
     RegVal readMiscRegNoEffect(RegIndex misc_reg) const override;
-    RegVal
-    readMiscReg(RegIndex misc_reg) override
+
+    RegVal readMiscReg(RegIndex misc_reg) override
     {
         return readMiscRegNoEffect(misc_reg);
     }
 
     void setMiscRegNoEffect(RegIndex misc_reg, const RegVal val) override;
-    void
-    setMiscReg(RegIndex misc_reg, const RegVal val) override
+
+    void setMiscReg(RegIndex misc_reg, const RegVal val) override
     {
         setMiscRegNoEffect(misc_reg, val);
     }
 
     // Also not necessarily the best location for these two.  Hopefully will go
     // away once we decide upon where st cond failures goes.
-    unsigned
-    readStCondFailures() const override
+    unsigned readStCondFailures() const override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    void
-    setStCondFailures(unsigned sc_failures) override
+    void setStCondFailures(unsigned sc_failures) override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
@@ -398,37 +394,38 @@ class ThreadContext : public gem5::ThreadContext
     virtual void setIntRegFlat(RegIndex idx, uint64_t val);
 
     virtual const ArmISA::VecRegContainer &readVecRegFlat(RegIndex idx) const;
-    virtual ArmISA::VecRegContainer &
-    getWritableVecRegFlat(RegIndex idx)
-    {
-        panic("%s not implemented.", __FUNCTION__);
-    }
-    virtual void
-    setVecRegFlat(RegIndex idx, const ArmISA::VecRegContainer &val)
+
+    virtual ArmISA::VecRegContainer &getWritableVecRegFlat(RegIndex idx)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    virtual RegVal
-    readVecElemFlat(RegIndex idx) const
+    virtual void setVecRegFlat(RegIndex idx,
+                               const ArmISA::VecRegContainer &val)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
-    virtual void
-    setVecElemFlat(RegIndex idx, RegVal val)
+
+    virtual RegVal readVecElemFlat(RegIndex idx) const
+    {
+        panic("%s not implemented.", __FUNCTION__);
+    }
+
+    virtual void setVecElemFlat(RegIndex idx, RegVal val)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
     virtual ArmISA::VecPredRegContainer readVecPredRegFlat(RegIndex idx) const;
+
     virtual ArmISA::VecPredRegContainer &
     getWritableVecPredRegFlat(RegIndex idx)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
-    virtual void
-    setVecPredRegFlat(RegIndex idx,
-            const ArmISA::VecPredRegContainer &val)
+
+    virtual void setVecPredRegFlat(RegIndex idx,
+                                   const ArmISA::VecPredRegContainer &val)
     {
         panic("%s not implemented.", __FUNCTION__);
     }
@@ -436,26 +433,26 @@ class ThreadContext : public gem5::ThreadContext
     iris::ResourceId getCCRegFlatRscId(RegIndex cc_reg) const;
     virtual RegVal readCCRegFlat(RegIndex idx) const;
     virtual void setCCRegFlat(RegIndex idx, RegVal val);
+
     /** @} */
 
     // hardware transactional memory
-    void
-    htmAbortTransaction(uint64_t htm_uid, HtmFailureFaultCause cause) override
+    void htmAbortTransaction(uint64_t htm_uid,
+                             HtmFailureFaultCause cause) override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    BaseHTMCheckpointPtr &
-    getHtmCheckpointPtr() override
+    BaseHTMCheckpointPtr &getHtmCheckpointPtr() override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    void
-    setHtmCheckpointPtr(BaseHTMCheckpointPtr cpt) override
+    void setHtmCheckpointPtr(BaseHTMCheckpointPtr cpt) override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
+
     void readMemWithCurrentMsn(Addr vaddr, size_t size, char *data);
     void writeMemWithCurrentMsn(Addr vaddr, size_t size, const char *data);
 };

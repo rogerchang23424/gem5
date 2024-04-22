@@ -63,8 +63,11 @@ class RubyDirectedTester : public ClockedObject
 
       protected:
         virtual bool recvTimingResp(PacketPtr pkt);
+
         virtual void recvReqRetry()
-        { panic("%s does not expect a retry\n", name()); }
+        {
+            panic("%s does not expect a retry\n", name());
+        }
     };
 
     typedef RubyDirectedTesterParams Params;
@@ -72,9 +75,9 @@ class RubyDirectedTester : public ClockedObject
     ~RubyDirectedTester();
 
     Port &getPort(const std::string &if_name,
-                  PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 
-    RequestPort* getCpuPort(int idx);
+    RequestPort *getCpuPort(int idx);
 
     void init() override;
 
@@ -82,11 +85,13 @@ class RubyDirectedTester : public ClockedObject
 
     void incrementCycleCompletions() { m_requests_completed++; }
 
-    void printStats(std::ostream& out) const {}
-    void clearStats() {}
-    void printConfig(std::ostream& out) const {}
+    void printStats(std::ostream &out) const {}
 
-    void print(std::ostream& out) const;
+    void clearStats() {}
+
+    void printConfig(std::ostream &out) const {}
+
+    void print(std::ostream &out) const;
 
   protected:
     EventFunctionWrapper directedStartEvent;
@@ -97,13 +102,13 @@ class RubyDirectedTester : public ClockedObject
     void checkForDeadlock();
 
     // Private copy constructor and assignment operator
-    RubyDirectedTester(const RubyDirectedTester& obj);
-    RubyDirectedTester& operator=(const RubyDirectedTester& obj);
+    RubyDirectedTester(const RubyDirectedTester &obj);
+    RubyDirectedTester &operator=(const RubyDirectedTester &obj);
 
     uint64_t m_requests_completed;
-    std::vector<RequestPort*> ports;
+    std::vector<RequestPort *> ports;
     uint64_t m_requests_to_complete;
-    DirectedGenerator* generator;
+    DirectedGenerator *generator;
 };
 
 } // namespace gem5

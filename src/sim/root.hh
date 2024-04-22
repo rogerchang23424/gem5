@@ -89,8 +89,7 @@ class Root : public SimObject
      *
      * @return Pointer to the single root object.
      */
-    static Root *
-    root()
+    static Root *root()
     {
         assert(_root);
         return _root;
@@ -123,11 +122,12 @@ class Root : public SimObject
     };
 
   public:
-
     /// Check whether time syncing is enabled.
     bool timeSyncEnabled() const { return _enabled; }
+
     /// Retrieve the period for the sync event.
     const Time timeSyncPeriod() const { return _period; }
+
     /// Retrieve the threshold for time remaining to spin wait.
     const Time timeSyncSpinThreshold() const { return _spinThreshold; }
 

@@ -40,10 +40,10 @@ class SemiCallType : public CallType
     SemiCallType() : CallType("semi") {}
 
     bool isDefault() const override { return CALL_TYPE_IS_DEFAULT; }
+
     const DispatchTable &getDispatch() const override { return semi_dispatch; }
 
-    void
-    printDesc(std::ostream &os) const override
+    void printDesc(std::ostream &os) const override
     {
         os << "Use the semi-hosting based invocation method.";
     }

@@ -46,16 +46,15 @@ class SEWorkload : public gem5::SEWorkload
   public:
     PARAMS(MipsSEWorkload);
 
-    SEWorkload(const Params &p, Addr page_shift) :
-        gem5::SEWorkload(p, page_shift)
+    SEWorkload(const Params &p, Addr page_shift)
+        : gem5::SEWorkload(p, page_shift)
     {}
 
-    void
-    setSystem(System *sys) override
+    void setSystem(System *sys) override
     {
         gem5::SEWorkload::setSystem(sys);
-        gdb = BaseRemoteGDB::build<RemoteGDB>(
-                params().remote_gdb_port, system);
+        gdb =
+            BaseRemoteGDB::build<RemoteGDB>(params().remote_gdb_port, system);
     }
 
     loader::Arch getArch() const override { return loader::Mips; }
@@ -74,8 +73,7 @@ namespace guest_abi
 template <>
 struct Result<MipsISA::SEWorkload::SyscallABI, SyscallReturn>
 {
-    static void
-    store(ThreadContext *tc, const SyscallReturn &ret)
+    static void store(ThreadContext *tc, const SyscallReturn &ret)
     {
         if (ret.successful()) {
             // no error

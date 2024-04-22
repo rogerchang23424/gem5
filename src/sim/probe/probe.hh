@@ -113,7 +113,8 @@ class ProbeListenerObject : public SimObject
   public:
     ProbeListenerObject(const ProbeListenerObjectParams &params);
     virtual ~ProbeListenerObject();
-    ProbeManager* getProbeManager() { return manager; }
+
+    ProbeManager *getProbeManager() { return manager; }
 };
 
 /**
@@ -128,10 +129,10 @@ class ProbeListener
   public:
     ProbeListener(ProbeManager *manager, const std::string &name);
     virtual ~ProbeListener();
-    ProbeListener(const ProbeListener& other) = delete;
-    ProbeListener& operator=(const ProbeListener& other) = delete;
-    ProbeListener(ProbeListener&& other) noexcept = delete;
-    ProbeListener& operator=(ProbeListener&& other) noexcept = delete;
+    ProbeListener(const ProbeListener &other) = delete;
+    ProbeListener &operator=(const ProbeListener &other) = delete;
+    ProbeListener(ProbeListener &&other) noexcept = delete;
+    ProbeListener &operator=(ProbeListener &&other) noexcept = delete;
 
   protected:
     ProbeManager *const manager;
@@ -147,12 +148,15 @@ class ProbePoint
 {
   protected:
     const std::string name;
+
   public:
     ProbePoint(ProbeManager *manager, const std::string &name);
+
     virtual ~ProbePoint() {}
 
     virtual void addListener(ProbeListener *listener) = 0;
     virtual void removeListener(ProbeListener *listener) = 0;
+
     std::string getName() const { return name; }
 };
 
@@ -169,9 +173,8 @@ class ProbeManager
     std::vector<ProbePoint *> points;
 
   public:
-    ProbeManager(SimObject *obj)
-        : object(obj)
-    {}
+    ProbeManager(SimObject *obj) : object(obj) {}
+
     virtual ~ProbeManager() {}
 
     /**
@@ -214,6 +217,7 @@ class ProbeListenerArgBase : public ProbeListener
     ProbeListenerArgBase(ProbeManager *pm, const std::string &name)
         : ProbeListener(pm, name)
     {}
+
     virtual void notify(const Arg &val) = 0;
 };
 
@@ -229,7 +233,7 @@ class ProbeListenerArg : public ProbeListenerArgBase<Arg>
 {
   private:
     T *object;
-    void (T::* function)(const Arg &);
+    void (T::*function)(const Arg &);
 
   public:
     /**
@@ -238,7 +242,7 @@ class ProbeListenerArg : public ProbeListenerArgBase<Arg>
      * @param func a pointer to the function on obj (called on notify).
      */
     ProbeListenerArg(T *obj, const std::string &name,
-        void (T::* func)(const Arg &))
+                     void (T::*func)(const Arg &))
         : ProbeListenerArgBase<Arg>(obj->getProbeManager(), name),
           object(obj),
           function(func)
@@ -268,8 +272,7 @@ class ProbePointArg : public ProbePoint
   public:
     ProbePointArg(ProbeManager *manager, std::string name)
         : ProbePoint(manager, name)
-    {
-    }
+    {}
 
     /**
      * Informs whether any listeners are attached to this probe. This can
@@ -284,8 +287,7 @@ class ProbePointArg : public ProbePoint
      * @brief adds a ProbeListener to this ProbePoints notify list.
      * @param l the ProbeListener to add to the notify list.
      */
-    void
-    addListener(ProbeListener *l) override
+    void addListener(ProbeListener *l) override
     {
         // check listener not already added
         if (std::find(listeners.begin(), listeners.end(), l) ==
@@ -298,8 +300,7 @@ class ProbePointArg : public ProbePoint
      * @brief remove a ProbeListener from this ProbePoints notify list.
      * @param l the ProbeListener to remove from the notify list.
      */
-    void
-    removeListener(ProbeListener *l) override
+    void removeListener(ProbeListener *l) override
     {
         listeners.erase(std::remove(listeners.begin(), listeners.end(), l),
                         listeners.end());
@@ -309,15 +310,13 @@ class ProbePointArg : public ProbePoint
      * @brief called at the ProbePoint call site, passes arg to each listener.
      * @param arg the argument to pass to each listener.
      */
-    void
-    notify(const Arg &arg)
+    void notify(const Arg &arg)
     {
         for (auto l = listeners.begin(); l != listeners.end(); ++l) {
             (*l)->notify(arg);
         }
     }
 };
-
 
 /**
  * ProbeListenerArgFunc generates a listener for the class of Arg and
@@ -333,7 +332,8 @@ class ProbePointArg : public ProbePoint
 template <class Arg>
 class ProbeListenerArgFunc : public ProbeListenerArgBase<Arg>
 {
-  typedef std::function<void(const Arg &)> NotifyFunction;
+    typedef std::function<void(const Arg &)> NotifyFunction;
+
   private:
     NotifyFunction function;
 
@@ -345,9 +345,8 @@ class ProbeListenerArgFunc : public ProbeListenerArgBase<Arg>
      * @param func a pointer to the function on obj (called on notify).
      */
     ProbeListenerArgFunc(ProbeManager *pm, const std::string &name,
-                       const NotifyFunction &func)
-      : ProbeListenerArgBase<Arg>(pm, name),
-        function(func)
+                         const NotifyFunction &func)
+        : ProbeListenerArgBase<Arg>(pm, name), function(func)
     {}
 
     /**
@@ -358,7 +357,6 @@ class ProbeListenerArgFunc : public ProbeListenerArgBase<Arg>
     void notify(const Arg &val) override { function(val); }
 };
 
-
 } // namespace gem5
 
-#endif//__SIM_PROBE_PROBE_HH__
+#endif //__SIM_PROBE_PROBE_HH__

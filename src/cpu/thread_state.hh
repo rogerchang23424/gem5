@@ -83,15 +83,15 @@ struct ThreadState : public Serializable
     void setStatus(Status new_status) { _status = new_status; }
 
   public:
-
     /** Number of instructions committed. */
     Counter numInst;
-     /** Number of ops (including micro ops) committed. */
+    /** Number of ops (including micro ops) committed. */
     Counter numOp;
+
     // Defining the stat group
     struct ThreadStateStats : public statistics::Group
     {
-        ThreadStateStats(BaseCPU *cpu, const ThreadID& thread);
+        ThreadStateStats(BaseCPU *cpu, const ThreadID &thread);
         /** Stat for number instructions committed. */
         statistics::Scalar numInsts;
         /** Stat for number ops (including micro ops) committed. */
@@ -131,7 +131,6 @@ struct ThreadState : public Serializable
     Process *process;
 
   public:
-
     //
     // Count failed store conditionals so we can warn of apparent
     // application deadlock situations.

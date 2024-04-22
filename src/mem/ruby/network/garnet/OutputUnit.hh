@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef __MEM_RUBY_NETWORK_GARNET_0_OUTPUTUNIT_HH__
 #define __MEM_RUBY_NETWORK_GARNET_0_OUTPUTUNIT_HH__
 
@@ -62,8 +61,8 @@ class OutputUnit : public Consumer
     void set_out_link(NetworkLink *link);
     void set_credit_link(CreditLink *credit_link);
     void wakeup();
-    flitBuffer* getOutQueue();
-    void print(std::ostream& out) const {};
+    flitBuffer *getOutQueue();
+    void print(std::ostream &out) const {};
     void decrement_credit(int out_vc);
     void increment_credit(int out_vc);
     bool has_credit(int out_vc);
@@ -72,37 +71,23 @@ class OutputUnit : public Consumer
 
     inline PortDirection get_direction() { return m_direction; }
 
-    int
-    get_credit_count(int vc)
+    int get_credit_count(int vc) { return outVcState[vc].get_credit_count(); }
+
+    inline int get_outlink_id() { return m_out_link->get_id(); }
+
+    inline void set_vc_state(VC_state_type state, int vc, Tick curTime)
     {
-        return outVcState[vc].get_credit_count();
+        outVcState[vc].setState(state, curTime);
     }
 
-    inline int
-    get_outlink_id()
-    {
-        return m_out_link->get_id();
-    }
-
-    inline void
-    set_vc_state(VC_state_type state, int vc, Tick curTime)
-    {
-      outVcState[vc].setState(state, curTime);
-    }
-
-    inline bool
-    is_vc_idle(int vc, Tick curTime)
+    inline bool is_vc_idle(int vc, Tick curTime)
     {
         return (outVcState[vc].isInState(IDLE_, curTime));
     }
 
     void insert_flit(flit *t_flit);
 
-    inline int
-    getVcsPerVnet()
-    {
-        return m_vc_per_vnet;
-    }
+    inline int getVcsPerVnet() { return m_vc_per_vnet; }
 
     bool functionalRead(Packet *pkt, WriteMask &mask);
     uint32_t functionalWrite(Packet *pkt);

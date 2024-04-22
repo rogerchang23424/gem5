@@ -92,7 +92,6 @@ class Fetch
         IcachePort(Fetch *_fetch, CPU *_cpu);
 
       protected:
-
         /** Timing version of receive.  Handles setting fetch to the
          * proper status to start fetching. */
         virtual bool recvTimingResp(PacketPtr pkt);
@@ -111,9 +110,8 @@ class Fetch
 
         void markDelayed() {}
 
-        void
-        finish(const Fault &fault, const RequestPtr &req,
-            gem5::ThreadContext *tc, BaseMMU::Mode mode)
+        void finish(const Fault &fault, const RequestPtr &req,
+                    gem5::ThreadContext *tc, BaseMMU::Mode mode)
         {
             assert(mode == BaseMMU::Execute);
             fetch->finishTranslation(fault, req);
@@ -133,27 +131,24 @@ class Fetch
         RequestPtr req;
 
       public:
-        FinishTranslationEvent(Fetch *_fetch)
-            : fetch(_fetch), req(nullptr)
-        {}
+        FinishTranslationEvent(Fetch *_fetch) : fetch(_fetch), req(nullptr) {}
 
         void setFault(Fault _fault) { fault = _fault; }
+
         void setReq(const RequestPtr &_req) { req = _req; }
 
         /** Process the delayed finish translation */
-        void
-        process()
+        void process()
         {
             assert(fetch->numInst < fetch->fetchWidth);
             fetch->finishTranslation(fault, req);
         }
 
-        const char *
-        description() const
+        const char *description() const
         {
             return "CPU FetchFinishTranslation";
         }
-      };
+    };
 
   public:
     /** Overall fetch status. Used to determine if the CPU can
@@ -207,7 +202,6 @@ class Fetch
     /** Returns the name of fetch. */
     std::string name() const;
 
-
     /** Registers probes. */
     void regProbePoints();
 
@@ -260,6 +254,7 @@ class Fetch
 
     /** For priority-based fetch policies, need to keep update priorityList */
     void deactivateThread(ThreadID tid);
+
   private:
     /** Reset this pipeline stage */
     void resetStage();
@@ -299,14 +294,13 @@ class Fetch
     bool fetchCacheLine(Addr vaddr, ThreadID tid, Addr pc);
     void finishTranslation(const Fault &fault, const RequestPtr &mem_req);
 
-
     /** Check if an interrupt is pending and that we need to handle
      */
     bool checkInterrupt(Addr pc) { return interruptPending; }
 
     /** Squashes a specific thread and resets the PC. */
     void doSquash(const PCStateBase &new_pc, const DynInstPtr squashInst,
-            ThreadID tid);
+                  ThreadID tid);
 
     /** Squashes a specific thread and resets the PC. Also tells the CPU to
      * remove any instructions between fetch and decode
@@ -349,10 +343,7 @@ class Fetch
     void fetch(bool &status_change);
 
     /** Align a PC to the start of a fetch buffer block. */
-    Addr fetchBufferAlignPC(Addr addr)
-    {
-        return (addr & ~(fetchBufferMask));
-    }
+    Addr fetchBufferAlignPC(Addr addr) { return (addr & ~(fetchBufferMask)); }
 
     /** The decoder. */
     InstDecoder *decoder[MaxThreads];
@@ -361,8 +352,8 @@ class Fetch
 
   private:
     DynInstPtr buildInst(ThreadID tid, StaticInstPtr staticInst,
-            StaticInstPtr curMacroop, const PCStateBase &this_pc,
-            const PCStateBase &next_pc, bool trace);
+                         StaticInstPtr curMacroop, const PCStateBase &this_pc,
+                         const PCStateBase &next_pc, bool trace);
 
     /** Returns the appropriate thread to fetch, given the fetch policy. */
     ThreadID getFetchingThread();
@@ -405,7 +396,7 @@ class Fetch
     /** Wire to get commit's information from backwards time buffer. */
     TimeBuffer<TimeStruct>::wire fromCommit;
 
-    //Might be annoying how this name is different than the queue.
+    // Might be annoying how this name is different than the queue.
     /** Wire used to write any information heading to decode. */
     TimeBuffer<FetchStruct>::wire toDecode;
 

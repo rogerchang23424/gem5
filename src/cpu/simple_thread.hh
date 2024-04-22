@@ -98,7 +98,7 @@ class SimpleThread : public ThreadState, public ThreadContext
   protected:
     std::array<RegFile, CCRegClass + 1> regFiles;
 
-    BaseISA *const isa;    // one "instance" of the current ISA.
+    BaseISA *const isa; // one "instance" of the current ISA.
 
     std::unique_ptr<PCStateBase> _pcState;
 
@@ -112,8 +112,7 @@ class SimpleThread : public ThreadState, public ThreadContext
     bool memAccPredicate;
 
   public:
-    std::string
-    name() const
+    std::string name() const
     {
         return csprintf("%s.[tid:%i]", baseCpu->name(), threadId());
     }
@@ -141,8 +140,8 @@ class SimpleThread : public ThreadState, public ThreadContext
                  BaseMMU *_mmu, BaseISA *_isa, InstDecoder *_decoder);
     // SE
     SimpleThread(BaseCPU *_cpu, int _thread_num, System *_system,
-                 Process *_process, BaseMMU *_mmu,
-                 BaseISA *_isa, InstDecoder *_decoder);
+                 Process *_process, BaseMMU *_mmu, BaseISA *_isa,
+                 InstDecoder *_decoder);
 
     virtual ~SimpleThread() {}
 
@@ -164,31 +163,27 @@ class SimpleThread : public ThreadState, public ThreadContext
      */
     ThreadContext *getTC() { return this; }
 
-    void
-    demapPage(Addr vaddr, uint64_t asn)
-    {
-        mmu->demapPage(vaddr, asn);
-    }
+    void demapPage(Addr vaddr, uint64_t asn) { mmu->demapPage(vaddr, asn); }
 
     /*******************************************
      * ThreadContext interface functions.
      ******************************************/
 
     bool schedule(PCEvent *e) override { return pcEventQueue.schedule(e); }
+
     bool remove(PCEvent *e) override { return pcEventQueue.remove(e); }
 
-    void
-    scheduleInstCountEvent(Event *event, Tick count) override
+    void scheduleInstCountEvent(Event *event, Tick count) override
     {
         comInstEventQueue.schedule(event, count);
     }
-    void
-    descheduleInstCountEvent(Event *event) override
+
+    void descheduleInstCountEvent(Event *event) override
     {
         comInstEventQueue.deschedule(event);
     }
-    Tick
-    getCurrentInstCount() override
+
+    Tick getCurrentInstCount() override
     {
         return comInstEventQueue.getCurTick();
     }
@@ -196,10 +191,15 @@ class SimpleThread : public ThreadState, public ThreadContext
     BaseCPU *getCpuPtr() override { return baseCpu; }
 
     int cpuId() const override { return ThreadState::cpuId(); }
+
     uint32_t socketId() const override { return ThreadState::socketId(); }
+
     int threadId() const override { return ThreadState::threadId(); }
+
     void setThreadId(int id) override { ThreadState::setThreadId(id); }
+
     ContextID contextId() const override { return ThreadState::contextId(); }
+
     void setContextId(ContextID id) override { ThreadState::setContextId(id); }
 
     BaseMMU *getMMUPtr() override { return mmu; }
@@ -213,6 +213,7 @@ class SimpleThread : public ThreadState, public ThreadContext
     System *getSystemPtr() override { return system; }
 
     Process *getProcessPtr() override { return ThreadState::getProcessPtr(); }
+
     void setProcessPtr(Process *p) override { ThreadState::setProcessPtr(p); }
 
     Status status() const override { return _status; }
@@ -228,24 +229,19 @@ class SimpleThread : public ThreadState, public ThreadContext
     /// Set the status to Halted.
     void halt() override;
 
-    Tick
-    readLastActivate() override
+    Tick readLastActivate() override
     {
         return ThreadState::readLastActivate();
     }
-    Tick
-    readLastSuspend() override
-    {
-        return ThreadState::readLastSuspend();
-    }
+
+    Tick readLastSuspend() override { return ThreadState::readLastSuspend(); }
 
     void copyArchRegs(ThreadContext *tc) override;
 
-    void
-    clearArchRegs() override
+    void clearArchRegs() override
     {
         set(_pcState, isa->newPCState());
-        for (auto &rf: regFiles)
+        for (auto &rf : regFiles)
             rf.clear();
         isa->clear();
     }
@@ -254,63 +250,50 @@ class SimpleThread : public ThreadState, public ThreadContext
     // New accessors for new decoder.
     //
     const PCStateBase &pcState() const override { return *_pcState; }
+
     void pcState(const PCStateBase &val) override { set(_pcState, val); }
 
-    void
-    pcStateNoRecord(const PCStateBase &val) override
+    void pcStateNoRecord(const PCStateBase &val) override
     {
         set(_pcState, val);
     }
 
     bool readPredicate() const { return predicate; }
+
     void setPredicate(bool val) { predicate = val; }
 
-    RegVal
-    readMiscRegNoEffect(RegIndex misc_reg) const override
+    RegVal readMiscRegNoEffect(RegIndex misc_reg) const override
     {
         return isa->readMiscRegNoEffect(misc_reg);
     }
 
-    RegVal
-    readMiscReg(RegIndex misc_reg) override
+    RegVal readMiscReg(RegIndex misc_reg) override
     {
         return isa->readMiscReg(misc_reg);
     }
 
-    void
-    setMiscRegNoEffect(RegIndex misc_reg, RegVal val) override
+    void setMiscRegNoEffect(RegIndex misc_reg, RegVal val) override
     {
         return isa->setMiscRegNoEffect(misc_reg, val);
     }
 
-    void
-    setMiscReg(RegIndex misc_reg, RegVal val) override
+    void setMiscReg(RegIndex misc_reg, RegVal val) override
     {
         return isa->setMiscReg(misc_reg, val);
     }
 
     unsigned readStCondFailures() const override { return storeCondFailures; }
 
-    bool
-    readMemAccPredicate()
-    {
-        return memAccPredicate;
-    }
+    bool readMemAccPredicate() { return memAccPredicate; }
 
-    void
-    setMemAccPredicate(bool val)
-    {
-        memAccPredicate = val;
-    }
+    void setMemAccPredicate(bool val) { memAccPredicate = val; }
 
-    void
-    setStCondFailures(unsigned sc_failures) override
+    void setStCondFailures(unsigned sc_failures) override
     {
         storeCondFailures = sc_failures;
     }
 
-    RegVal
-    getReg(const RegId &arch_reg) const override
+    RegVal getReg(const RegId &arch_reg) const override
     {
         const RegId reg = arch_reg.flatten(*isa);
 
@@ -321,12 +304,11 @@ class SimpleThread : public ThreadState, public ThreadContext
 
         RegVal val = reg_file.reg(idx);
         DPRINTFV(reg_class.debug(), "Reading %s reg %s (%d) as %#x.\n",
-                reg.className(), reg_class.regName(arch_reg), idx, val);
+                 reg.className(), reg_class.regName(arch_reg), idx, val);
         return val;
     }
 
-    void
-    getReg(const RegId &arch_reg, void *val) const override
+    void getReg(const RegId &arch_reg, void *val) const override
     {
         const RegId reg = arch_reg.flatten(*isa);
 
@@ -337,12 +319,11 @@ class SimpleThread : public ThreadState, public ThreadContext
 
         reg_file.get(idx, val);
         DPRINTFV(reg_class.debug(), "Reading %s register %s (%d) as %s.\n",
-                reg.className(), reg_class.regName(arch_reg), idx,
-                reg_class.valString(val));
+                 reg.className(), reg_class.regName(arch_reg), idx,
+                 reg_class.valString(val));
     }
 
-    void *
-    getWritableReg(const RegId &arch_reg) override
+    void *getWritableReg(const RegId &arch_reg) override
     {
         const RegId reg = arch_reg.flatten(*isa);
         const RegIndex idx = reg.index();
@@ -351,8 +332,7 @@ class SimpleThread : public ThreadState, public ThreadContext
         return reg_file.ptr(idx);
     }
 
-    void
-    setReg(const RegId &arch_reg, RegVal val) override
+    void setReg(const RegId &arch_reg, RegVal val) override
     {
         const RegId reg = arch_reg.flatten(*isa);
 
@@ -365,12 +345,11 @@ class SimpleThread : public ThreadState, public ThreadContext
         const auto &reg_class = reg_file.regClass;
 
         DPRINTFV(reg_class.debug(), "Setting %s register %s (%d) to %#x.\n",
-                reg.className(), reg_class.regName(arch_reg), idx, val);
+                 reg.className(), reg_class.regName(arch_reg), idx, val);
         reg_file.reg(idx) = val;
     }
 
-    void
-    setReg(const RegId &arch_reg, const void *val) override
+    void setReg(const RegId &arch_reg, const void *val) override
     {
         const RegId reg = arch_reg.flatten(*isa);
 
@@ -380,8 +359,8 @@ class SimpleThread : public ThreadState, public ThreadContext
         const auto &reg_class = reg_file.regClass;
 
         DPRINTFV(reg_class.debug(), "Setting %s register %s (%d) to %s.\n",
-                reg.className(), reg_class.regName(arch_reg), idx,
-                reg_class.valString(val));
+                 reg.className(), reg_class.regName(arch_reg), idx,
+                 reg_class.valString(val));
         reg_file.set(idx, val);
     }
 
@@ -389,7 +368,7 @@ class SimpleThread : public ThreadState, public ThreadContext
     void htmAbortTransaction(uint64_t htm_uid,
                              HtmFailureFaultCause cause) override;
 
-    BaseHTMCheckpointPtr& getHtmCheckpointPtr() override;
+    BaseHTMCheckpointPtr &getHtmCheckpointPtr() override;
     void setHtmCheckpointPtr(BaseHTMCheckpointPtr new_cpt) override;
 };
 

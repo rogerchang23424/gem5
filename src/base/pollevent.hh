@@ -64,6 +64,7 @@ class PollEvent : public Serializable
     void disable();
     void enable();
     virtual void process(int revent) = 0;
+
     /** @} */ // end of api_poll_event
 
     /**
@@ -101,7 +102,6 @@ class PollQueue
     void schedule(PollEvent *event);
     void service();
     /** @} */ // end of api_poll_queue
-
 
   public:
     static void setupAsyncIO(int fd, bool set);

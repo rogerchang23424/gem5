@@ -99,14 +99,19 @@ class IndirectMemory : public Queued
         bool increasedIndirectCounter;
 
         PrefetchTableEntry(unsigned indirect_counter_bits)
-            : TaggedEntry(), address(0), secure(false), streamCounter(0),
-              enabled(false), index(0), baseAddr(0), shift(0),
+            : TaggedEntry(),
+              address(0),
+              secure(false),
+              streamCounter(0),
+              enabled(false),
+              index(0),
+              baseAddr(0),
+              shift(0),
               indirectCounter(indirect_counter_bits),
               increasedIndirectCounter(false)
         {}
 
-        void
-        invalidate() override
+        void invalidate() override
         {
             TaggedEntry::invalidate();
             address = 0;
@@ -120,6 +125,7 @@ class IndirectMemory : public Queued
             increasedIndirectCounter = false;
         }
     };
+
     /** Prefetch table */
     AssociativeCache<PrefetchTableEntry> prefetchTable;
 
@@ -143,14 +149,15 @@ class IndirectMemory : public Queued
 
         IndirectPatternDetectorEntry(unsigned int num_addresses,
                                      unsigned int num_shifts)
-          : TaggedEntry(), idx1(0), idx2(0), secondIndexSet(false),
-            numMisses(0),
-            baseAddr(num_addresses, std::vector<Addr>(num_shifts))
-        {
-        }
+            : TaggedEntry(),
+              idx1(0),
+              idx2(0),
+              secondIndexSet(false),
+              numMisses(0),
+              baseAddr(num_addresses, std::vector<Addr>(num_shifts))
+        {}
 
-        void
-        invalidate() override
+        void invalidate() override
         {
             TaggedEntry::invalidate();
             idx1 = 0;
@@ -159,6 +166,7 @@ class IndirectMemory : public Queued
             numMisses = 0;
         }
     };
+
     /** Indirect Pattern Detector (IPD) table */
     AssociativeCache<IndirectPatternDetectorEntry> ipd;
 
@@ -208,4 +216,4 @@ class IndirectMemory : public Queued
 } // namespace prefetch
 } // namespace gem5
 
-#endif//__MEM_CACHE_PREFETCH_INDIRECT_MEMORY_HH__
+#endif //__MEM_CACHE_PREFETCH_INDIRECT_MEMORY_HH__

@@ -57,26 +57,27 @@ class Command
     static std::map<std::string, Command &> &map();
 
   public:
-
     Command(const std::string &_name, int _min, int _max, FuncType _func,
-            const std::string &_usage) :
-        name(_name), minArgs(_min), maxArgs(_max), func(_func),
-        usageStr(_usage)
+            const std::string &_usage)
+        : name(_name),
+          minArgs(_min),
+          maxArgs(_max),
+          func(_func),
+          usageStr(_usage)
     {
         map().emplace(std::piecewise_construct,
-                    std::forward_as_tuple(std::string(_name)),
-                    std::forward_as_tuple(*this));
+                      std::forward_as_tuple(std::string(_name)),
+                      std::forward_as_tuple(*this));
     }
 
     ~Command() { map().erase(name); }
 
     static bool run(const DispatchTable &dt, Args &args);
 
-    static std::string
-    usageSummary()
+    static std::string usageSummary()
     {
         std::string summary;
-        for (auto &p: Command::map())
+        for (auto &p : Command::map())
             summary += "    " + p.first + " " + p.second.usageStr + "\n";
         return summary;
     }

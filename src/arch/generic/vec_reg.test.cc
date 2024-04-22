@@ -91,8 +91,7 @@ class TwoDifferentVecRegs : public testing::Test
     uint8_t *vec1_ptr;
     uint8_t *vec2_ptr;
 
-    void
-    SetUp() override
+    void SetUp() override
     {
         vec1_ptr = vec1.as<uint8_t>();
         vec2_ptr = vec2.as<uint8_t>();

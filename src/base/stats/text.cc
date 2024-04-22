@@ -74,8 +74,7 @@ std::list<Info *> &statsList();
 
 Text::Text()
     : mystream(false), stream(NULL), descriptions(false), spaces(false)
-{
-}
+{}
 
 Text::Text(std::ostream &stream) : Text()
 {
@@ -86,7 +85,6 @@ Text::Text(const std::string &file) : Text()
 {
     open(file);
 }
-
 
 Text::~Text()
 {
@@ -209,13 +207,11 @@ struct BasePrint
     std::string unitStr;
     bool spaces;
 
-    BasePrint(bool _spaces=false) : spaces(_spaces) {}
+    BasePrint(bool _spaces = false) : spaces(_spaces) {}
 
-    void
-    setup(std::string _name, Flags _flags, int _precision,
-        bool enable_descriptions, std::string _desc,
-        bool enable_units, std::string unit_str,
-        bool enable_spaces)
+    void setup(std::string _name, Flags _flags, int _precision,
+               bool enable_descriptions, std::string _desc, bool enable_units,
+               std::string unit_str, bool enable_spaces)
     {
         name = _name;
         flags = _flags;
@@ -227,8 +223,7 @@ struct BasePrint
         spaces = enable_spaces;
     }
 
-    void
-    printUnits(std::ostream &stream) const
+    void printUnits(std::ostream &stream) const
     {
         if (enableUnits && !unitStr.empty()) {
             ccprintf(stream, " (%s)", unitStr);
@@ -246,8 +241,7 @@ struct ScalarPrint : public BasePrint
     int pdfstrSpaces;
     int cdfstrSpaces;
 
-    ScalarPrint(bool spaces)
-      : BasePrint(spaces)
+    ScalarPrint(bool spaces) : BasePrint(spaces)
     {
         if (spaces) {
             nameSpaces = 40;
@@ -261,6 +255,7 @@ struct ScalarPrint : public BasePrint
             cdfstrSpaces = 0;
         }
     }
+
     void update(Result val, Result total);
     void operator()(std::ostream &stream, bool oneLine = false) const;
 };
@@ -321,8 +316,8 @@ struct VectorPrint : public BasePrint
     int nameSpaces;
 
     VectorPrint() = delete;
-    VectorPrint(bool spaces)
-      : BasePrint(spaces)
+
+    VectorPrint(bool spaces) : BasePrint(spaces)
     {
         if (spaces) {
             nameSpaces = 40;
@@ -330,6 +325,7 @@ struct VectorPrint : public BasePrint
             nameSpaces = 0;
         }
     }
+
     void operator()(std::ostream &stream) const;
 };
 
@@ -349,7 +345,7 @@ VectorPrint::operator()(std::ostream &stream) const
 
     ScalarPrint print(spaces);
     print.setup(name, flags, precision, descriptions, desc, enableUnits,
-        unitStr, spaces);
+                unitStr, spaces);
     print.pdf = _total ? 0.0 : Nan;
     print.cdf = _total ? 0.0 : Nan;
 
@@ -418,14 +414,13 @@ struct DistPrint : public BasePrint
     void operator()(std::ostream &stream) const;
 };
 
-DistPrint::DistPrint(const Text *text, const DistInfo &info)
-    : data(info.data)
+DistPrint::DistPrint(const Text *text, const DistInfo &info) : data(info.data)
 {
     init(text, info);
 }
 
-DistPrint::DistPrint(const Text *text, const VectorDistInfo &info,
-    int i) : data(info.data[i])
+DistPrint::DistPrint(const Text *text, const VectorDistInfo &info, int i)
+    : data(info.data[i])
 {
     init(text, info);
 
@@ -443,8 +438,8 @@ void
 DistPrint::init(const Text *text, const Info &info)
 {
     setup(text->statName(info.name), info.flags, info.precision,
-        text->descriptions, info.desc, text->enableUnits,
-        info.unit->getUnitString(), text->spaces);
+          text->descriptions, info.desc, text->enableUnits,
+          info.unit->getUnitString(), text->spaces);
     separatorString = info.separatorString;
     if (spaces) {
         nameSpaces = 40;
@@ -456,7 +451,8 @@ DistPrint::init(const Text *text, const Info &info)
 void
 DistPrint::operator()(std::ostream &stream) const
 {
-    if (flags.isSet(nozero) && data.samples == 0) return;
+    if (flags.isSet(nozero) && data.samples == 0)
+        return;
     std::string base = name + separatorString;
 
     ScalarPrint print(spaces);
@@ -591,7 +587,7 @@ Text::visit(const ScalarInfo &info)
 
     ScalarPrint print(spaces);
     print.setup(statName(info.name), info.flags, info.precision, descriptions,
-        info.desc, enableUnits, info.unit->getUnitString(), spaces);
+                info.desc, enableUnits, info.unit->getUnitString(), spaces);
     print.value = info.result();
     print.pdf = Nan;
     print.cdf = Nan;
@@ -608,7 +604,7 @@ Text::visit(const VectorInfo &info)
     size_type size = info.size();
     VectorPrint print(spaces);
     print.setup(statName(info.name), info.flags, info.precision, descriptions,
-        info.desc, enableUnits, info.unit->getUnitString(), spaces);
+                info.desc, enableUnits, info.unit->getUnitString(), spaces);
     print.separatorString = info.separatorString;
     print.vec = info.result();
     print.total = info.total();
@@ -679,9 +675,9 @@ Text::visit(const Vector2dInfo &info)
             total += yvec[j];
         }
 
-        print.name = statName(
-            info.name + "_" +
-            (havesub ? info.subnames[i] : std::to_string(i)));
+        print.name =
+            statName(info.name + "_" +
+                     (havesub ? info.subnames[i] : std::to_string(i)));
         print.desc = info.desc;
         print.unitStr = info.unit->getUnitString();
         print.vec = yvec;
@@ -759,8 +755,8 @@ void
 SparseHistPrint::init(const Text *text, const Info &info)
 {
     setup(text->statName(info.name), info.flags, info.precision,
-        text->descriptions, info.desc, text->enableUnits,
-        info.unit->getUnitString(), text->spaces);
+          text->descriptions, info.desc, text->enableUnits,
+          info.unit->getUnitString(), text->spaces);
     separatorString = info.separatorString;
 }
 
@@ -772,7 +768,7 @@ SparseHistPrint::operator()(std::ostream &stream) const
 
     ScalarPrint print(spaces);
     print.setup(base + "samples", flags, precision, descriptions, desc,
-        enableUnits, unitStr, spaces);
+                enableUnits, unitStr, spaces);
     print.pdf = Nan;
     print.cdf = Nan;
     print.value = data.samples;
@@ -783,7 +779,7 @@ SparseHistPrint::operator()(std::ostream &stream) const
         std::stringstream namestr;
         namestr << base;
 
-        namestr <<(*it).first;
+        namestr << (*it).first;
         print.name = namestr.str();
         print.value = (*it).second;
         print(stream);

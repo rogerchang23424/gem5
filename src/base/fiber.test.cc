@@ -58,7 +58,10 @@ TEST(Fiber, Starting)
     {
       public:
         StartingFiber(Fiber *link) : Fiber(link) {}
-        void main() { /** Do nothing */ }
+
+        void main()
+        { /** Do nothing */
+        }
     };
 
     StartingFiber fiber(Fiber::primaryFiber());
@@ -91,15 +94,13 @@ SwitchingFiber b("B", { &a, &c });
 SwitchingFiber c("C", { &a, Fiber::primaryFiber(), Fiber::primaryFiber() });
 
 std::vector<SwitchingFiber *>::iterator expectedIt;
-std::vector<SwitchingFiber *> expected({
-    &a, &b, &a, &a, /* main Fiber, */
-    &a, &b, &c, &a, &c,
-    /* main Fiber, */ &c, &c
-});
+std::vector<SwitchingFiber *> expected({ &a, &b, &a, &a, /* main Fiber, */
+                                         &a, &b, &c, &a, &c,
+                                         /* main Fiber, */ &c, &c });
 
-SwitchingFiber::SwitchingFiber(
-        const char *name, std::initializer_list<Fiber *> l) :
-    name(name), next(l)
+SwitchingFiber::SwitchingFiber(const char *name,
+                               std::initializer_list<Fiber *> l)
+    : name(name), next(l)
 {}
 
 void
@@ -138,8 +139,8 @@ TEST(Fiber, Switching)
     EXPECT_FALSE(c.finished());
 
     c.run();
-    EXPECT_EQ(expected.end(), expectedIt) <<
-        "Didn't exactly use up the expected Fiber sequence";
+    EXPECT_EQ(expected.end(), expectedIt)
+        << "Didn't exactly use up the expected Fiber sequence";
 
     EXPECT_TRUE(c.finished());
 }
@@ -150,10 +151,10 @@ class LinkedFiber : public Fiber
 {
   public:
     const int index;
+
     LinkedFiber(Fiber *link, int index) : Fiber(link), index(index) {}
 
-    void
-    main()
+    void main()
     {
         EXPECT_EQ(currentIndex, index);
         currentIndex++;

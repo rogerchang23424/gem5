@@ -49,16 +49,15 @@ class TimeBuffer
     std::vector<char *> index;
     unsigned base;
 
-    void valid(int idx) const
-    {
-        assert (idx >= -past && idx <= future);
-    }
+    void valid(int idx) const { assert(idx >= -past && idx <= future); }
 
   public:
     friend class wire;
+
     class wire
     {
         friend class TimeBuffer;
+
       protected:
         TimeBuffer<T> *buffer;
         int index;
@@ -69,17 +68,12 @@ class TimeBuffer
             index = idx;
         }
 
-        wire(TimeBuffer<T> *buf, int i)
-            : buffer(buf), index(i)
-        { }
+        wire(TimeBuffer<T> *buf, int i) : buffer(buf), index(i) {}
 
       public:
-        wire()
-        { }
+        wire() {}
 
-        wire(const wire &i)
-            : buffer(i.buffer), index(i.index)
-        { }
+        wire(const wire &i) : buffer(i.buffer), index(i.index) {}
 
         const wire &operator=(const wire &i)
         {
@@ -131,15 +125,20 @@ class TimeBuffer
             set(index - 1);
             return wire(this, i);
         }
+
         T &operator*() const { return *buffer->access(index); }
+
         T *operator->() const { return buffer->access(index); }
     };
 
-
   public:
     TimeBuffer(int p, int f)
-        : past(p), future(f), size(past + future + 1),
-          data(new char[size * sizeof(T)]), index(size), base(0)
+        : past(p),
+          future(f),
+          size(past + future + 1),
+          data(new char[size * sizeof(T)]),
+          index(size),
+          base(0)
     {
         assert(past >= 0 && future >= 0);
         char *ptr = data;
@@ -153,30 +152,20 @@ class TimeBuffer
         _id = -1;
     }
 
-    TimeBuffer()
-        : data(NULL)
-    {
-    }
+    TimeBuffer() : data(NULL) {}
 
     ~TimeBuffer()
     {
         for (unsigned i = 0; i < size; ++i)
             (reinterpret_cast<T *>(index[i]))->~T();
-        delete [] data;
+        delete[] data;
     }
 
-    void id(int id)
-    {
-        _id = id;
-    }
+    void id(int id) { _id = id; }
 
-    int id()
-    {
-        return _id;
-    }
+    int id() { return _id; }
 
-    void
-    advance()
+    void advance()
     {
         if (++base >= size)
             base = 0;
@@ -190,11 +179,11 @@ class TimeBuffer
     }
 
   protected:
-    //Calculate the index into this->index for element at position idx
-    //relative to now
+    // Calculate the index into this->index for element at position idx
+    // relative to now
     inline int calculateVectorIndex(int idx) const
     {
-        //Need more complex math here to calculate index.
+        // Need more complex math here to calculate index.
         valid(idx);
 
         int vector_index = idx + base;
@@ -222,7 +211,7 @@ class TimeBuffer
         return reinterpret_cast<T &>(*index[vector_index]);
     }
 
-    const T &operator[] (int idx) const
+    const T &operator[](int idx) const
     {
         int vector_index = calculateVectorIndex(idx);
 
@@ -236,15 +225,9 @@ class TimeBuffer
         return wire(this, idx);
     }
 
-    wire zero()
-    {
-        return wire(this, 0);
-    }
+    wire zero() { return wire(this, 0); }
 
-    unsigned getSize()
-    {
-        return size;
-    }
+    unsigned getSize() { return size; }
 };
 
 } // namespace gem5

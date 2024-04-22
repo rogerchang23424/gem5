@@ -62,58 +62,45 @@ struct DisplayTimings : public Serializable
      * @param v_sync Vertical sync in scan lines.
      * @param vbp Vertical back porch in scan lines.
      */
-    DisplayTimings(unsigned width, unsigned height,
-                   unsigned hbp, unsigned h_sync, unsigned hfp,
-                   unsigned vbp, unsigned v_sync, unsigned vfp);
+    DisplayTimings(unsigned width, unsigned height, unsigned hbp,
+                   unsigned h_sync, unsigned hfp, unsigned vbp,
+                   unsigned v_sync, unsigned vfp);
 
     void serialize(CheckpointOut &cp) const override;
     void unserialize(CheckpointIn &cp) override;
 
     /** How many pixel clocks are required for one line? */
-    Cycles
-    cyclesPerLine() const
+    Cycles cyclesPerLine() const
     {
-        return Cycles(hSync + hBackPorch +  width + hBackPorch);
+        return Cycles(hSync + hBackPorch + width + hBackPorch);
     }
 
     /** How many pixel clocks are required for one frame? */
-    Cycles
-    cyclesPerFrame() const
+    Cycles cyclesPerFrame() const
     {
         return Cycles(cyclesPerLine() * linesPerFrame());
     }
 
     /** Calculate the first line of the vsync signal */
-    unsigned
-    lineVSyncStart() const
-    {
-        return 0;
-    }
+    unsigned lineVSyncStart() const { return 0; }
 
     /** Calculate the first line of the vertical back porch */
-    unsigned
-    lineVBackPorchStart() const
-    {
-        return lineVSyncStart() + vSync;
-    }
+    unsigned lineVBackPorchStart() const { return lineVSyncStart() + vSync; }
 
     /** Calculate the first line of the visible region */
-    unsigned
-    lineFirstVisible() const
+    unsigned lineFirstVisible() const
     {
         return lineVBackPorchStart() + vBackPorch;
     }
 
     /** Calculate the first line of the back porch */
-    unsigned
-    lineFrontPorchStart() const
+    unsigned lineFrontPorchStart() const
     {
         return lineFirstVisible() + height;
     }
 
     /** Calculate the total number of lines in a frame */
-    unsigned
-    linesPerFrame() const
+    unsigned linesPerFrame() const
     {
         return lineFrontPorchStart() + vFrontPorch;
     }
@@ -160,9 +147,7 @@ struct DisplayTimings : public Serializable
  *   <li>Horizontal Front Porch
  * </ol>
  */
-class BasePixelPump
-    : public EventManager, public Clocked,
-      public Serializable
+class BasePixelPump : public EventManager, public Clocked, public Serializable
 {
   public:
     BasePixelPump(EventManager &em, ClockDomain &pxl_clk,
@@ -195,19 +180,17 @@ class BasePixelPump
     bool underrun() const { return _underrun; }
 
     /** Is the current line within the visible range? */
-    bool
-    visibleLine() const
+    bool visibleLine() const
     {
         return line >= _timings.lineFirstVisible() &&
-            line < _timings.lineFrontPorchStart();
+               line < _timings.lineFrontPorchStart();
     }
 
     /** Current pixel position within the visible area */
     unsigned posX() const { return _posX; }
 
     /** Current pixel position within the visible area */
-    unsigned
-    posY() const
+    unsigned posY() const
     {
         return visibleLine() ? line - _timings.lineFirstVisible() : 0;
     }
@@ -237,8 +220,8 @@ class BasePixelPump
      * @param line_length The number of pixels being requested.
      * @return The number of pixels actually retrieved.
      */
-    virtual size_t
-    nextLine(std::vector<Pixel>::iterator ps, size_t line_length)
+    virtual size_t nextLine(std::vector<Pixel>::iterator ps,
+                            size_t line_length)
     {
         size_t count = 0;
         while (count < line_length && nextPixel(*ps++))
@@ -247,13 +230,13 @@ class BasePixelPump
     }
 
     /** First pixel clock of the first VSync line. */
-    virtual void onVSyncBegin() {};
+    virtual void onVSyncBegin(){};
 
     /**
      * Callback on the first pixel of the line after the end VSync
      * region (typically the first pixel of the vertical back porch).
      */
-    virtual void onVSyncEnd() {};
+    virtual void onVSyncEnd(){};
 
     /**
      * Start of the HSync region.
@@ -261,7 +244,7 @@ class BasePixelPump
      * @note This is called even for scan lines outside of the visible
      * region.
      */
-    virtual void onHSyncBegin() {};
+    virtual void onHSyncBegin(){};
 
     /**
      * Start of the first pixel after the HSync region.
@@ -269,7 +252,7 @@ class BasePixelPump
      * @note This is called even for scan lines outside of the visible
      * region.
      */
-    virtual void onHSyncEnd() {};
+    virtual void onHSyncEnd(){};
 
     /**
      * Buffer underrun occurred on a frame.
@@ -281,10 +264,10 @@ class BasePixelPump
      * @param x Coordinate within the visible region.
      * @param y Coordinate within the visible region.
      */
-    virtual void onUnderrun(unsigned x, unsigned y) {};
+    virtual void onUnderrun(unsigned x, unsigned y){};
 
     /** Finished displaying the visible region of a frame */
-    virtual void onFrameDone() {};
+    virtual void onFrameDone(){};
 
   private: // Params
     /** Maximum number of pixels to handle per render callback */
@@ -302,7 +285,7 @@ class BasePixelPump
      */
     class PixelEvent : public Event, public Drainable
     {
-        typedef void (BasePixelPump::* CallbackType)();
+        typedef void (BasePixelPump::*CallbackType)();
 
       public:
         PixelEvent(const char *name, BasePixelPump *parent, CallbackType func);
@@ -315,11 +298,7 @@ class BasePixelPump
 
         const std::string name() const override { return _name; }
 
-        void
-        process() override
-        {
-            (parent.*func)();
-        }
+        void process() override { (parent.*func)(); }
 
         bool active() const { return scheduled() || suspended; }
 

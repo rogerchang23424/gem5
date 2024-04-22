@@ -47,9 +47,8 @@ class CortexR52TC : public Iris::ThreadContext
     static std::vector<iris::MemorySpaceId> bpSpaceIds;
 
   public:
-    CortexR52TC(gem5::BaseCPU *cpu, int id, System *system,
-                gem5::BaseMMU *mmu, gem5::BaseISA *isa,
-                iris::IrisConnectionInterface *iris_if,
+    CortexR52TC(gem5::BaseCPU *cpu, int id, System *system, gem5::BaseMMU *mmu,
+                gem5::BaseISA *isa, iris::IrisConnectionInterface *iris_if,
                 const std::string &iris_path);
 
     bool translateAddress(Addr &paddr, Addr vaddr) override;
@@ -74,31 +73,27 @@ class CortexR52TC : public Iris::ThreadContext
     // many of the registers since it doesn't support aarch64. We may need to
     // just return dummy values on reads and throw away writes, throw an
     // error, or some combination of the two.
-    RegVal
-    readMiscRegNoEffect(RegIndex idx) const override
+    RegVal readMiscRegNoEffect(RegIndex idx) const override
     {
         panic_if(miscRegIdxNameMap.find(idx) == miscRegIdxNameMap.end(),
-                "No mapping for index %#x.", idx);
+                 "No mapping for index %#x.", idx);
         return Iris::ThreadContext::readMiscRegNoEffect(idx);
     }
 
-    void
-    setMiscRegNoEffect(RegIndex idx, const RegVal val) override
+    void setMiscRegNoEffect(RegIndex idx, const RegVal val) override
     {
         panic_if(miscRegIdxNameMap.find(idx) == miscRegIdxNameMap.end(),
-                "No mapping for index %#x.", idx);
+                 "No mapping for index %#x.", idx);
         Iris::ThreadContext::setMiscRegNoEffect(idx, val);
     }
 
     // Like the Misc regs, not currently supported and a little complicated.
-    RegVal
-    readIntRegFlat(RegIndex idx) const override
+    RegVal readIntRegFlat(RegIndex idx) const override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
 
-    void
-    setIntRegFlat(RegIndex idx, RegVal val) override
+    void setIntRegFlat(RegIndex idx, RegVal val) override
     {
         panic("%s not implemented.", __FUNCTION__);
     }
@@ -106,8 +101,7 @@ class CortexR52TC : public Iris::ThreadContext
     // Not supported by the CPU. There isn't anything to set up here as far
     // as mapping, but the question still remains what to do about registers
     // that don't exist in the CPU.
-    const ArmISA::VecRegContainer &
-    readVecReg(const RegId &) const override
+    const ArmISA::VecRegContainer &readVecReg(const RegId &) const override
     {
         panic("%s not implemented.", __FUNCTION__);
     }

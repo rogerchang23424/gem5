@@ -84,8 +84,7 @@ class ActivityRecorder
     /** Sets the count to a starting value.  Can be used to disable
      * the idling option.
      */
-    void setActivityCount(int count)
-    { activityCount = count; }
+    void setActivityCount(int count) { activityCount = count; }
 
     /** Returns if the CPU should be active. */
     bool active() { return activityCount; }

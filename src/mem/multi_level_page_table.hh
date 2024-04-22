@@ -101,9 +101,10 @@ namespace gem5
  * @see MultiLevelPageTable
  */
 
-namespace {
+namespace
+{
 
-template <class First, class ...Rest>
+template <class First, class... Rest>
 Addr
 prepTopTable(System *system, Addr pageSize)
 {
@@ -115,10 +116,10 @@ prepTopTable(System *system, Addr pageSize)
     return addr;
 }
 
-template <class ...Types>
+template <class... Types>
 struct LastType;
 
-template <class First, class Second, class ...Rest>
+template <class First, class Second, class... Rest>
 struct LastType<First, Second, Rest...>
 {
     typedef typename LastType<Second, Rest...>::type type;
@@ -130,59 +131,54 @@ struct LastType<Only>
     typedef Only type;
 };
 
-
-template <class ...Types>
+template <class... Types>
 struct WalkWrapper;
 
 template <class Final, class Only>
 struct WalkWrapper<Final, Only>
 {
-    static void
-    walk(System *system, Addr pageSize, Addr table, Addr vaddr,
-         bool allocate, Final *entry)
+    static void walk(System *system, Addr pageSize, Addr table, Addr vaddr,
+                     bool allocate, Final *entry)
     {
         entry->read(system->physProxy, table, vaddr);
     }
 };
 
-template <class Final, class First, class Second, class ...Rest>
+template <class Final, class First, class Second, class... Rest>
 struct WalkWrapper<Final, First, Second, Rest...>
 {
-    static void
-    walk(System *system, Addr pageSize, Addr table, Addr vaddr,
-         bool allocate, Final *entry)
+    static void walk(System *system, Addr pageSize, Addr table, Addr vaddr,
+                     bool allocate, Final *entry)
     {
         First first;
         first.read(system->physProxy, table, vaddr);
 
         Addr next;
         if (!first.present()) {
-            fatal_if(!allocate,
-                     "Page fault while walking the page table.");
+            fatal_if(!allocate, "Page fault while walking the page table.");
             next = prepTopTable<Second>(system, pageSize);
             first.reset(next);
             first.write(system->physProxy);
         } else {
             next = first.paddr();
         }
-        WalkWrapper<Final, Second, Rest...>::walk(
-                system, pageSize, next, vaddr, allocate, entry);
+        WalkWrapper<Final, Second, Rest...>::walk(system, pageSize, next,
+                                                  vaddr, allocate, entry);
     }
 };
 
-template <class ...EntryTypes>
+template <class... EntryTypes>
 void
-walk(System *system, Addr pageSize, Addr table, Addr vaddr,
-     bool allocate, typename LastType<EntryTypes...>::type *entry)
+walk(System *system, Addr pageSize, Addr table, Addr vaddr, bool allocate,
+     typename LastType<EntryTypes...>::type *entry)
 {
     WalkWrapper<typename LastType<EntryTypes...>::type, EntryTypes...>::walk(
-            system, pageSize, table, vaddr, allocate, entry);
+        system, pageSize, table, vaddr, allocate, entry);
 }
 
-}
+} // namespace
 
-
-template <class ...EntryTypes>
+template <class... EntryTypes>
 class MultiLevelPageTable : public EmulationPageTable
 {
     typedef typename LastType<EntryTypes...>::type Final;
@@ -197,16 +193,15 @@ class MultiLevelPageTable : public EmulationPageTable
      */
     Addr _basePtr;
 
-public:
-    MultiLevelPageTable(const std::string &__name, uint64_t _pid,
-                        System *_sys, Addr _pageSize) :
-            EmulationPageTable(__name, _pid, _pageSize), system(_sys)
+  public:
+    MultiLevelPageTable(const std::string &__name, uint64_t _pid, System *_sys,
+                        Addr _pageSize)
+        : EmulationPageTable(__name, _pid, _pageSize), system(_sys)
     {}
 
     ~MultiLevelPageTable() {}
 
-    void
-    initState() override
+    void initState() override
     {
         if (shared)
             return;
@@ -216,28 +211,26 @@ public:
 
     Addr basePtr() { return _basePtr; }
 
-    void
-    map(Addr vaddr, Addr paddr, int64_t size, uint64_t flags = 0) override
+    void map(Addr vaddr, Addr paddr, int64_t size, uint64_t flags = 0) override
     {
         EmulationPageTable::map(vaddr, paddr, size, flags);
 
         Final entry;
 
         for (int64_t offset = 0; offset < size; offset += _pageSize) {
-            walk<EntryTypes...>(system, _pageSize, _basePtr,
-                                vaddr + offset, true, &entry);
+            walk<EntryTypes...>(system, _pageSize, _basePtr, vaddr + offset,
+                                true, &entry);
 
             entry.reset(paddr + offset, true, flags & Uncacheable,
                         flags & ReadOnly);
             entry.write(system->physProxy);
 
-            DPRINTF(MMU, "New mapping: %#x-%#x\n",
-                    vaddr + offset, paddr + offset);
+            DPRINTF(MMU, "New mapping: %#x-%#x\n", vaddr + offset,
+                    paddr + offset);
         }
     }
 
-    void
-    remap(Addr vaddr, int64_t size, Addr new_vaddr) override
+    void remap(Addr vaddr, int64_t size, Addr new_vaddr) override
     {
         EmulationPageTable::remap(vaddr, size, new_vaddr);
 
@@ -259,16 +252,15 @@ public:
         }
     }
 
-    void
-    unmap(Addr vaddr, int64_t size) override
+    void unmap(Addr vaddr, int64_t size) override
     {
         EmulationPageTable::unmap(vaddr, size);
 
         Final entry;
 
         for (int64_t offset = 0; offset < size; offset += _pageSize) {
-            walk<EntryTypes...>(system, _pageSize, _basePtr,
-                                vaddr + offset, false, &entry);
+            walk<EntryTypes...>(system, _pageSize, _basePtr, vaddr + offset,
+                                false, &entry);
             fatal_if(!entry.present(),
                      "PageTable::unmap: Address %#x not mapped.", vaddr);
             entry.present(false);
@@ -277,8 +269,7 @@ public:
         }
     }
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         EmulationPageTable::serialize(cp);
         /** Since, the page table is stored in system memory
@@ -288,8 +279,7 @@ public:
         paramOut(cp, "ptable.pointer", _basePtr);
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         EmulationPageTable::unserialize(cp);
         paramIn(cp, "ptable.pointer", _basePtr);

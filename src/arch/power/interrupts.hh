@@ -39,7 +39,8 @@ namespace gem5
 class BaseCPU;
 class ThreadContext;
 
-namespace PowerISA {
+namespace PowerISA
+{
 
 class Interrupts : public BaseInterrupts
 {
@@ -48,39 +49,30 @@ class Interrupts : public BaseInterrupts
 
     Interrupts(const Params &p) : BaseInterrupts(p) {}
 
-    void
-    post(int int_num, int index)
+    void post(int int_num, int index)
     {
         panic("Interrupts::post not implemented.\n");
     }
 
-    void
-    clear(int int_num, int index)
+    void clear(int int_num, int index)
     {
         panic("Interrupts::clear not implemented.\n");
     }
 
-    void
-    clearAll()
-    {
-        panic("Interrupts::clearAll not implemented.\n");
-    }
+    void clearAll() { panic("Interrupts::clearAll not implemented.\n"); }
 
-    bool
-    checkInterrupts() const
+    bool checkInterrupts() const
     {
         panic("Interrupts::checkInterrupts not implemented.\n");
     }
 
-    Fault
-    getInterrupt()
+    Fault getInterrupt()
     {
         assert(checkInterrupts());
         panic("Interrupts::getInterrupt not implemented.\n");
     }
 
-    void
-    updateIntrInfo()
+    void updateIntrInfo()
     {
         panic("Interrupts::updateIntrInfo not implemented.\n");
     }

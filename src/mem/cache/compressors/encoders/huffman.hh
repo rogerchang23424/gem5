@@ -91,16 +91,16 @@ class Huffman : public Base
       public:
         /** Initialize node as a leaf node. */
         Node(uint64_t value, uint64_t frequency)
-          : _frequency(frequency), _value(value), _left(), _right()
-        {
-        }
+            : _frequency(frequency), _value(value), _left(), _right()
+        {}
 
         /** Initialize node as an internal node. */
-        Node(Node* left, Node* right)
-          : _frequency(left->getFrequency() + right->getFrequency()),
-            _value(0), _left(left), _right(right)
-        {
-        }
+        Node(Node *left, Node *right)
+            : _frequency(left->getFrequency() + right->getFrequency()),
+              _value(0),
+              _left(left),
+              _right(right)
+        {}
 
         /** Getter for the frequency counter. */
         uint64_t getFrequency() const { return _frequency; }
@@ -111,8 +111,7 @@ class Huffman : public Base
          *
          * @return Wether the node is a leaf node.
          */
-        bool
-        isLeaf() const
+        bool isLeaf() const
         {
             return (_left == nullptr) && (_right == nullptr);
         }
@@ -122,15 +121,15 @@ class Huffman : public Base
          *
          * @return The leaf's value.
          */
-        uint64_t
-        getValue() const
+        uint64_t getValue() const
         {
             assert(isLeaf());
             return _value;
         }
 
-        const Node* getLeftSubTree() const { return _left.get(); }
-        const Node* getRightSubTree() const { return _right.get(); }
+        const Node *getLeftSubTree() const { return _left.get(); }
+
+        const Node *getRightSubTree() const { return _right.get(); }
     };
 
     /**
@@ -152,13 +151,13 @@ class Huffman : public Base
      */
     struct NodeComparator
     {
-        bool
-        operator()(const Node* lhs, const Node* rhs) const
+        bool operator()(const Node *lhs, const Node *rhs) const
         {
             return lhs->getFrequency() > rhs->getFrequency();
         }
     };
-    std::priority_queue<Node*, std::vector<Node*>, NodeComparator> trees;
+
+    std::priority_queue<Node *, std::vector<Node *>, NodeComparator> trees;
 
     /**
      * Build a Huffman tree using the values and their respective
@@ -177,7 +176,7 @@ class Huffman : public Base
      * @param node The node being analyzed.
      * @param current_code The code so far.
      */
-    void generateCodes(const Node* node, const Code& current_code);
+    void generateCodes(const Node *node, const Code &current_code);
 };
 
 } // namespace encoder

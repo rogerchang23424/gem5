@@ -111,102 +111,73 @@ class Shader : public ClockedObject
 
   public:
     typedef ShaderParams Params;
-    enum hsail_mode_e {SIMT,VECTOR_SCALAR};
+
+    enum hsail_mode_e
+    {
+        SIMT,
+        VECTOR_SCALAR
+    };
 
     GPUDispatcher &dispatcher();
     void sampleLoad(const Tick accessTime);
     void sampleStore(const Tick accessTime);
     void sampleInstRoundTrip(std::vector<Tick> roundTripTime);
-    void sampleLineRoundTrip(const std::map<Addr,
-        std::vector<Tick>> &roundTripTime);
+    void sampleLineRoundTrip(
+        const std::map<Addr, std::vector<Tick>> &roundTripTime);
 
     SimpleThread *cpuThread;
     ThreadContext *gpuTc;
     BaseCPU *cpuPointer;
 
-    void
-    setHwReg(int regIdx, uint32_t val)
-    {
-        hwRegs[regIdx] = val;
-    }
+    void setHwReg(int regIdx, uint32_t val) { hwRegs[regIdx] = val; }
 
-    uint32_t
-    getHwReg(int regIdx)
-    {
-        return hwRegs[regIdx];
-    }
+    uint32_t getHwReg(int regIdx) { return hwRegs[regIdx]; }
 
-    const ApertureRegister&
-    gpuVmApe() const
-    {
-        return _gpuVmApe;
-    }
+    const ApertureRegister &gpuVmApe() const { return _gpuVmApe; }
 
-    const ApertureRegister&
-    ldsApe() const
-    {
-        return _ldsApe;
-    }
+    const ApertureRegister &ldsApe() const { return _ldsApe; }
 
-    void
-    setLdsApe(Addr base, Addr limit)
+    void setLdsApe(Addr base, Addr limit)
     {
         _ldsApe.base = base;
         _ldsApe.limit = limit;
     }
 
-    const ApertureRegister&
-    scratchApe() const
-    {
-        return _scratchApe;
-    }
+    const ApertureRegister &scratchApe() const { return _scratchApe; }
 
-    void
-    setScratchApe(Addr base, Addr limit)
+    void setScratchApe(Addr base, Addr limit)
     {
         _scratchApe.base = base;
         _scratchApe.limit = limit;
     }
 
-    bool
-    isGpuVmApe(Addr addr) const
+    bool isGpuVmApe(Addr addr) const
     {
         bool is_gpu_vm = addr >= _gpuVmApe.base && addr <= _gpuVmApe.limit;
 
         return is_gpu_vm;
     }
 
-    bool
-    isLdsApe(Addr addr) const
+    bool isLdsApe(Addr addr) const
     {
         bool is_lds = addr >= _ldsApe.base && addr <= _ldsApe.limit;
 
         return is_lds;
     }
 
-    bool
-    isScratchApe(Addr addr) const
+    bool isScratchApe(Addr addr) const
     {
-        bool is_scratch
-            = addr >= _scratchApe.base && addr <= _scratchApe.limit;
+        bool is_scratch =
+            addr >= _scratchApe.base && addr <= _scratchApe.limit;
 
         return is_scratch;
     }
 
-    Addr
-    getScratchBase()
-    {
-        return _scratchApe.base;
-    }
+    Addr getScratchBase() { return _scratchApe.base; }
 
-    Addr
-    getHiddenPrivateBase()
-    {
-        return shHiddenPrivateBaseVmid;
-    }
+    Addr getHiddenPrivateBase() { return shHiddenPrivateBaseVmid; }
 
-    void
-    initShHiddenPrivateBase(Addr queueBase, uint32_t offset)
+    void initShHiddenPrivateBase(Addr queueBase, uint32_t offset)
     {
         Addr sh_hidden_base_new = queueBase - offset;
 
@@ -245,7 +216,7 @@ class Shader : public ClockedObject
     int n_cu;
     // Number of wavefront slots per SIMD per CU
     int n_wf;
-    //Number of cu units per sqc in the shader
+    // Number of cu units per sqc in the shader
     int n_cu_per_sqc;
 
     // The size of global memory
@@ -258,14 +229,14 @@ class Shader : public ClockedObject
     uint32_t sa_n;
 
     // Pointer to value to be increments
-    std::vector<int*> sa_val;
+    std::vector<int *> sa_val;
     // When to do the increment
     std::vector<uint64_t> sa_when;
     // Amount to increment by
     std::vector<int32_t> sa_x;
 
     // List of Compute Units (CU's)
-    std::vector<ComputeUnit*> cuList;
+    std::vector<ComputeUnit *> cuList;
 
     GPUCommandProcessor &gpuCmdProc;
     GPUDispatcher &_dispatcher;
@@ -301,8 +272,7 @@ class Shader : public ClockedObject
     void doFunctionalAccess(const RequestPtr &req, MemCmd cmd, void *data,
                             bool suppress_func_errors, int cu_id);
 
-    void
-    registerCU(int cu_id, ComputeUnit *compute_unit)
+    void registerCU(int cu_id, ComputeUnit *compute_unit)
     {
         cuList[cu_id] = compute_unit;
     }
@@ -316,27 +286,26 @@ class Shader : public ClockedObject
     void updateContext(int cid);
     void notifyCuSleep();
 
-    void
-    incVectorInstSrcOperand(int num_operands)
+    void incVectorInstSrcOperand(int num_operands)
     {
         stats.vectorInstSrcOperand[num_operands]++;
     }
 
-    void
-    incVectorInstDstOperand(int num_operands)
+    void incVectorInstDstOperand(int num_operands)
     {
         stats.vectorInstDstOperand[num_operands]++;
     }
 
-    void
-    requestKernelExitEvent(bool is_blit_kernel)
+    void requestKernelExitEvent(bool is_blit_kernel)
     {
         kernelExitRequested = true;
         blitKernel = is_blit_kernel;
     }
 
     void decNumOutstandingInvL2s();
+
     void incNumOutstandingInvL2s() { num_outstanding_invl2s++; };
+
     int getNumOutstandingInvL2s() const { return num_outstanding_invl2s; };
 
     void addDeferredDispatch(void *raw_pkt, uint32_t queue_id,

@@ -68,9 +68,13 @@ class DMASequencer : public RubyPort
 
     /* external interface */
     RequestStatus makeRequest(PacketPtr pkt) override;
+
     bool busy() { return m_outstanding_count > 0; }
+
     int outstandingCount() const override { return m_outstanding_count; }
+
     bool isDeadlockEventScheduled() const override { return false; }
+
     void descheduleDeadlockEvent() override {}
 
     /* SLICC callback */

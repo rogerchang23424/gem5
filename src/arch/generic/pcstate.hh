@@ -62,39 +62,39 @@ class PCStateBase : public Serializable
     MicroPC _upc = 0;
 
     PCStateBase(const PCStateBase &other) : _pc(other._pc), _upc(other._upc) {}
+
     PCStateBase &operator=(const PCStateBase &other) = default;
+
     PCStateBase() {}
 
   public:
     virtual ~PCStateBase() = default;
 
-    template<class Target>
-    Target &
-    as()
+    template <class Target>
+    Target &as()
     {
         return static_cast<Target &>(*this);
     }
 
-    template<class Target>
-    const Target &
-    as() const
+    template <class Target>
+    const Target &as() const
     {
         return static_cast<const Target &>(*this);
     }
 
     virtual PCStateBase *clone() const = 0;
-    virtual void
-    update(const PCStateBase &other)
+
+    virtual void update(const PCStateBase &other)
     {
         _pc = other._pc;
         _upc = other._upc;
     }
+
     void update(const PCStateBase *ptr) { update(*ptr); }
 
     virtual void output(std::ostream &os) const = 0;
 
-    virtual bool
-    equals(const PCStateBase &other) const
+    virtual bool equals(const PCStateBase &other) const
     {
         return _pc == other._pc && _upc == other._upc;
     }
@@ -104,31 +104,18 @@ class PCStateBase : public Serializable
      *
      * @return Memory address of the instruction this PC points to.
      */
-    Addr
-    instAddr() const
-    {
-        return _pc;
-    }
+    Addr instAddr() const { return _pc; }
 
     /**
      * Returns the current micropc.
      *
      * @return The current micropc.
      */
-    MicroPC
-    microPC() const
-    {
-        return _upc;
-    }
+    MicroPC microPC() const { return _upc; }
 
-    virtual void
-    uReset()
-    {
-        _upc = 0;
-    }
+    virtual void uReset() { _upc = 0; }
 
-    virtual void
-    set(Addr val)
+    virtual void set(Addr val)
     {
         _pc = val;
         _upc = 0;
@@ -137,15 +124,13 @@ class PCStateBase : public Serializable
     virtual void advance() = 0;
     virtual bool branching() const = 0;
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         SERIALIZE_SCALAR(_pc);
         SERIALIZE_SCALAR(_upc);
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         UNSERIALIZE_SCALAR(_pc);
         UNSERIALIZE_SCALAR(_upc);
@@ -153,7 +138,7 @@ class PCStateBase : public Serializable
 };
 
 static inline std::ostream &
-operator<<(std::ostream & os, const PCStateBase &pc)
+operator<<(std::ostream &os, const PCStateBase &pc)
 {
     pc.output(os);
     return os;
@@ -213,7 +198,7 @@ set(PCStateBase *&dest, const std::unique_ptr<PCStateBase> &src)
 
 inline void
 set(std::unique_ptr<PCStateBase> &dest,
-        const std::unique_ptr<PCStateBase> &src)
+    const std::unique_ptr<PCStateBase> &src)
 {
     PCStateBase *dest_ptr = dest.get();
     const PCStateBase *src_ptr = src.get();
@@ -261,47 +246,46 @@ class PCStateWithNext : public PCStateBase
 
     MicroPC _nupc = 1;
 
-    PCStateWithNext(const PCStateWithNext &other) : PCStateBase(other),
-        _npc(other._npc), _nupc(other._nupc)
+    PCStateWithNext(const PCStateWithNext &other)
+        : PCStateBase(other), _npc(other._npc), _nupc(other._nupc)
     {}
+
     PCStateWithNext &operator=(const PCStateWithNext &other) = default;
+
     PCStateWithNext() {}
 
   public:
     Addr pc() const { return _pc; }
+
     void pc(Addr val) { _pc = val; }
 
     Addr npc() const { return _npc; }
+
     void npc(Addr val) { _npc = val; }
 
     MicroPC upc() const { return _upc; }
+
     void upc(MicroPC val) { _upc = val; }
 
     MicroPC nupc() const { return _nupc; }
+
     void nupc(MicroPC val) { _nupc = val; }
 
     // Reset the macroop's upc without advancing the regular pc.
-    void
-    uReset() override
+    void uReset() override
     {
         PCStateBase::uReset();
         _nupc = 1;
     }
 
-    void
-    setNPC(Addr val)
-    {
-        npc(val);
-    }
+    void setNPC(Addr val) { npc(val); }
 
-    void
-    output(std::ostream &os) const override
+    void output(std::ostream &os) const override
     {
         ccprintf(os, "(%#x=>%#x)", this->pc(), this->npc());
     }
 
-    void
-    update(const PCStateBase &other) override
+    void update(const PCStateBase &other) override
     {
         PCStateBase::update(other);
         auto &pcstate = other.as<PCStateWithNext>();
@@ -309,39 +293,34 @@ class PCStateWithNext : public PCStateBase
         _nupc = pcstate._nupc;
     }
 
-    bool
-    equals(const PCStateBase &other) const override
+    bool equals(const PCStateBase &other) const override
     {
         auto &ps = other.as<PCStateWithNext>();
-        return PCStateBase::equals(other) &&
-            _npc == ps._npc && _nupc == ps._nupc;
+        return PCStateBase::equals(other) && _npc == ps._npc &&
+               _nupc == ps._nupc;
     }
 
-    void
-    set(Addr val) override
+    void set(Addr val) override
     {
         PCStateBase::set(val);
         _npc = 0;
         _nupc = 1;
     }
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         PCStateBase::serialize(cp);
         SERIALIZE_SCALAR(_npc);
         SERIALIZE_SCALAR(_nupc);
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         PCStateBase::unserialize(cp);
         UNSERIALIZE_SCALAR(_npc);
         UNSERIALIZE_SCALAR(_nupc);
     }
 };
-
 
 /*
  * Different flavors of PC state. Only ISA specific code should rely on
@@ -358,12 +337,14 @@ class SimplePCState : public PCStateWithNext
 
   public:
     SimplePCState(const SimplePCState &other) : Base(other) {}
+
     SimplePCState &operator=(const SimplePCState &other) = default;
+
     SimplePCState() {}
+
     explicit SimplePCState(Addr val) { set(val); }
 
-    PCStateBase *
-    clone() const override
+    PCStateBase *clone() const override
     {
         return new SimplePCState<InstWidth>(*this);
     }
@@ -374,22 +355,19 @@ class SimplePCState : public PCStateWithNext
      *
      * @param val The value to set the PC to.
      */
-    void
-    set(Addr val) override
+    void set(Addr val) override
     {
         Base::set(val);
         this->npc(val + InstWidth);
     };
 
-    bool
-    branching() const override
+    bool branching() const override
     {
         return this->npc() != this->pc() + InstWidth;
     }
 
     // Advance the PC.
-    void
-    advance() override
+    void advance() override
     {
         this->_pc = this->_npc;
         this->_npc += InstWidth;
@@ -404,21 +382,18 @@ class UPCState : public SimplePCState<InstWidth>
     typedef SimplePCState<InstWidth> Base;
 
   public:
-    void
-    output(std::ostream &os) const override
+    void output(std::ostream &os) const override
     {
         Base::output(os);
         ccprintf(os, ".(%d=>%d)", this->upc(), this->nupc());
     }
 
-    PCStateBase *
-    clone() const override
+    PCStateBase *clone() const override
     {
         return new UPCState<InstWidth>(*this);
     }
 
-    void
-    set(Addr val) override
+    void set(Addr val) override
     {
         Base::set(val);
         this->upc(0);
@@ -426,28 +401,28 @@ class UPCState : public SimplePCState<InstWidth>
     }
 
     UPCState(const UPCState &other) : Base(other) {}
+
     UPCState &operator=(const UPCState &other) = default;
+
     UPCState() {}
+
     explicit UPCState(Addr val) { set(val); }
 
-    bool
-    branching() const override
+    bool branching() const override
     {
         return this->npc() != this->pc() + InstWidth ||
                this->nupc() != this->upc() + 1;
     }
 
     // Advance the upc within the instruction.
-    void
-    uAdvance()
+    void uAdvance()
     {
         this->upc(this->nupc());
         this->nupc(this->nupc() + 1);
     }
 
     // End the macroop by resetting the upc and advancing the regular pc.
-    void
-    uEnd()
+    void uEnd()
     {
         this->advance();
         this->upc(0);
@@ -465,20 +440,17 @@ class DelaySlotPCState : public SimplePCState<InstWidth>
     Addr _nnpc;
 
   public:
-    void
-    output(std::ostream &os) const override
+    void output(std::ostream &os) const override
     {
         ccprintf(os, "(%#x=>%#x=>%#x)", this->pc(), this->npc(), nnpc());
     }
 
-    PCStateBase *
-    clone() const override
+    PCStateBase *clone() const override
     {
         return new DelaySlotPCState<InstWidth>(*this);
     }
 
-    void
-    update(const PCStateBase &other) override
+    void update(const PCStateBase &other) override
     {
         Base::update(other);
         auto &pcstate = other.as<DelaySlotPCState<InstWidth>>();
@@ -486,24 +458,26 @@ class DelaySlotPCState : public SimplePCState<InstWidth>
     }
 
     Addr nnpc() const { return _nnpc; }
+
     void nnpc(Addr val) { _nnpc = val; }
 
-    void
-    set(Addr val) override
+    void set(Addr val) override
     {
         Base::set(val);
         nnpc(val + 2 * InstWidth);
     }
 
-    DelaySlotPCState(const DelaySlotPCState &other) :
-        Base(other), _nnpc(other._nnpc)
+    DelaySlotPCState(const DelaySlotPCState &other)
+        : Base(other), _nnpc(other._nnpc)
     {}
+
     DelaySlotPCState &operator=(const DelaySlotPCState &other) = default;
+
     DelaySlotPCState() {}
+
     explicit DelaySlotPCState(Addr val) { set(val); }
 
-    bool
-    branching() const override
+    bool branching() const override
     {
         return !(this->nnpc() == this->npc() + InstWidth &&
                  (this->npc() == this->pc() + InstWidth ||
@@ -511,30 +485,26 @@ class DelaySlotPCState : public SimplePCState<InstWidth>
     }
 
     // Advance the PC.
-    void
-    advance() override
+    void advance() override
     {
         this->_pc = this->_npc;
         this->_npc = this->_nnpc;
         this->_nnpc += InstWidth;
     }
 
-    bool
-    equals(const PCStateBase &other) const override
+    bool equals(const PCStateBase &other) const override
     {
         auto &ps = other.as<DelaySlotPCState<InstWidth>>();
         return Base::equals(other) && ps._nnpc == this->_nnpc;
     }
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         Base::serialize(cp);
         SERIALIZE_SCALAR(_nnpc);
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         Base::unserialize(cp);
         UNSERIALIZE_SCALAR(_nnpc);
@@ -549,21 +519,18 @@ class DelaySlotUPCState : public DelaySlotPCState<InstWidth>
     typedef DelaySlotPCState<InstWidth> Base;
 
   public:
-    void
-    output(std::ostream &os) const override
+    void output(std::ostream &os) const override
     {
         Base::output(os);
         ccprintf(os, ".(%d=>%d)", this->upc(), this->nupc());
     }
 
-    PCStateBase *
-    clone() const override
+    PCStateBase *clone() const override
     {
         return new DelaySlotUPCState<InstWidth>(*this);
     }
 
-    void
-    set(Addr val) override
+    void set(Addr val) override
     {
         Base::set(val);
         this->upc(0);
@@ -571,27 +538,27 @@ class DelaySlotUPCState : public DelaySlotPCState<InstWidth>
     }
 
     DelaySlotUPCState(const DelaySlotUPCState &other) : Base(other) {}
+
     DelaySlotUPCState &operator=(const DelaySlotUPCState &other) = default;
+
     DelaySlotUPCState() {}
+
     explicit DelaySlotUPCState(Addr val) { set(val); }
 
-    bool
-    branching() const override
+    bool branching() const override
     {
         return Base::branching() || this->nupc() != this->upc() + 1;
     }
 
     // Advance the upc within the instruction.
-    void
-    uAdvance()
+    void uAdvance()
     {
         this->_upc = this->_nupc;
         this->_nupc++;
     }
 
     // End the macroop by resetting the upc and advancing the regular pc.
-    void
-    uEnd()
+    void uEnd()
     {
         this->advance();
         this->_upc = 0;
@@ -599,7 +566,7 @@ class DelaySlotUPCState : public DelaySlotPCState<InstWidth>
     }
 };
 
-}
+} // namespace GenericISA
 
 } // namespace gem5
 

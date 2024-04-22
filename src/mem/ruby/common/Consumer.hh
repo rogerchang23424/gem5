@@ -61,28 +61,21 @@ namespace ruby
 class Consumer
 {
   public:
-    Consumer(ClockedObject *em,
-             Event::Priority ev_prio = Event::Default_Pri);
+    Consumer(ClockedObject *em, Event::Priority ev_prio = Event::Default_Pri);
 
-    virtual
-    ~Consumer()
-    { }
+    virtual ~Consumer() {}
 
     virtual void wakeup() = 0;
-    virtual void print(std::ostream& out) const = 0;
+    virtual void print(std::ostream &out) const = 0;
+
     virtual void storeEventInfo(int info) {}
 
-    bool
-    alreadyScheduled(Tick time)
+    bool alreadyScheduled(Tick time)
     {
         return m_wakeup_ticks.find(time) != m_wakeup_ticks.end();
     }
 
-    ClockedObject *
-    getObject()
-    {
-        return em;
-    }
+    ClockedObject *getObject() { return em; }
 
     void scheduleEventAbsolute(Tick timeAbs);
     void scheduleEvent(Cycles timeDelta);
@@ -96,9 +89,8 @@ class Consumer
     void processCurrentEvent();
 };
 
-
-inline std::ostream&
-operator<<(std::ostream& out, const Consumer& obj)
+inline std::ostream &
+operator<<(std::ostream &out, const Consumer &obj)
 {
     obj.print(out);
     out << std::flush;

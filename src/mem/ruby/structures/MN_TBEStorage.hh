@@ -66,13 +66,11 @@ class MN_TBEStorage
   public:
     MN_TBEStorage(statistics::Group *parent,
                   std::initializer_list<TBEStorage *> _partitions)
-      : m_stats(parent),
-        partitions(_partitions)
+        : m_stats(parent), partitions(_partitions)
     {}
 
     // Returns the current number of slots allocated
-    int
-    size() const
+    int size() const
     {
         int total = 0;
         for (auto part : partitions) {
@@ -82,8 +80,7 @@ class MN_TBEStorage
     }
 
     // Returns the total capacity of this TBEStorage table
-    int
-    capacity() const
+    int capacity() const
     {
         int total = 0;
         for (auto part : partitions) {
@@ -93,8 +90,7 @@ class MN_TBEStorage
     }
 
     // Returns number of slots currently reserved
-    int
-    reserved() const
+    int reserved() const
     {
         int total = 0;
         for (auto part : partitions) {
@@ -104,13 +100,11 @@ class MN_TBEStorage
     }
 
     // Returns the number of slots available for objects of a certain type;
-    int
-    slotsAvailable(int partition) const
+    int slotsAvailable(int partition) const
     {
         auto generic_slots = partitions[0]->slotsAvailable();
         if (partition) {
-            return partitions[partition]->slotsAvailable() +
-                generic_slots;
+            return partitions[partition]->slotsAvailable() + generic_slots;
         } else {
             return generic_slots;
         }
@@ -123,20 +117,16 @@ class MN_TBEStorage
     //     current_time is always ignored
     // This allows this class to be used with check_allocate in SLICC to
     // trigger resource stalls when there are no slots available
-    bool
-    areNSlotsAvailable(int n, int partition,
-                       Tick current_time = 0) const
+    bool areNSlotsAvailable(int n, int partition, Tick current_time = 0) const
     {
         return slotsAvailable(partition) >= n;
     }
 
     // Increase/decrease the number of reserved slots. Having reserved slots
     // reduces the number of slots available for allocation
-    void
-    incrementReserved(int partition)
+    void incrementReserved(int partition)
     {
-        if (partition &&
-            partitions[partition]->areNSlotsAvailable(1)) {
+        if (partition && partitions[partition]->areNSlotsAvailable(1)) {
             partitions[partition]->incrementReserved();
         } else {
             partitions[0]->incrementReserved();
@@ -144,8 +134,7 @@ class MN_TBEStorage
         m_stats.avg_reserved = reserved();
     }
 
-    void
-    decrementReserved(int partition)
+    void decrementReserved(int partition)
     {
         if (partition && (partitions[partition]->reserved() > 0)) {
             partitions[partition]->decrementReserved();
@@ -159,8 +148,7 @@ class MN_TBEStorage
     // Notice we don't need any info from TBETable and just track the number
     // of entries assigned to each slot.
     // This funcion requires slotsAvailable() > 0
-    int
-    addEntryToNewSlot(int partition)
+    int addEntryToNewSlot(int partition)
     {
         if (partition && partitions[partition]->areNSlotsAvailable(1)) {
             int part_slot = partitions[partition]->addEntryToNewSlot();
@@ -183,15 +171,13 @@ class MN_TBEStorage
 
     // Remove an entry from an existing non-empty slot. The slot becomes
     // available again when the number of assigned entries == 0
-    void
-    removeEntryFromSlot(int slot, int partition)
+    void removeEntryFromSlot(int slot, int partition)
     {
         auto part_capacity = partitions[partition]->capacity();
         if (slot < part_capacity) {
             partitions[partition]->removeEntryFromSlot(slot);
         } else {
-            partitions[0]->removeEntryFromSlot(
-                slot - part_capacity);
+            partitions[0]->removeEntryFromSlot(slot - part_capacity);
         }
 
         m_stats.avg_size = size();
@@ -199,15 +185,13 @@ class MN_TBEStorage
     }
 
     // Insert a "retry entry" into the queue
-    void
-    emplaceRetryEntry(RetryEntry entry)
+    void emplaceRetryEntry(RetryEntry entry)
     {
         m_retryEntries.push_back(entry);
     }
 
     // Check if a retry is possible
-    bool
-    hasPossibleRetry()
+    bool hasPossibleRetry()
     {
         auto retry_iter = getNextRetryEntryIter();
         return retry_iter != m_retryEntries.end();
@@ -215,8 +199,7 @@ class MN_TBEStorage
 
     // Peek what the next thing to retry should be
     // Should only be called if hasPossibleRetry() returns true
-    RetryEntry
-    popNextRetryEntry()
+    RetryEntry popNextRetryEntry()
     {
         auto retry_iter = getNextRetryEntryIter();
         assert(retry_iter != m_retryEntries.end());
@@ -232,10 +215,10 @@ class MN_TBEStorage
     struct MN_TBEStorageStats : public statistics::Group
     {
         MN_TBEStorageStats(statistics::Group *parent)
-          : statistics::Group(parent),
-            ADD_STAT(avg_size, "Avg. number of slots allocated"),
-            ADD_STAT(avg_util, "Avg. utilization"),
-            ADD_STAT(avg_reserved, "Avg. number of slots reserved")
+            : statistics::Group(parent),
+              ADD_STAT(avg_size, "Avg. number of slots allocated"),
+              ADD_STAT(avg_util, "Avg. utilization"),
+              ADD_STAT(avg_reserved, "Avg. number of slots reserved")
         {}
 
         // Statistical variables
@@ -248,8 +231,7 @@ class MN_TBEStorage
 
     std::list<RetryEntry> m_retryEntries;
 
-    typename std::list<RetryEntry>::iterator
-    getNextRetryEntryIter()
+    typename std::list<RetryEntry>::iterator getNextRetryEntryIter()
     {
         auto begin_it = m_retryEntries.begin();
         auto end_it = m_retryEntries.end();

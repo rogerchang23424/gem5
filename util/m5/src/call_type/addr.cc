@@ -50,27 +50,26 @@ class AddrCallType : public CallType
     AddrCallType() : CallType("addr") {}
 
     bool isDefault() const override { return CALL_TYPE_IS_DEFAULT; }
+
     const DispatchTable &getDispatch() const override { return addr_dispatch; }
 
-    void
-    printBrief(std::ostream &os) const override
+    void printBrief(std::ostream &os) const override
     {
-        os << "--" << name << (DefaultAddrDefined ? " [address override]" :
-                                                    " <address override>");
+        os << "--" << name
+           << (DefaultAddrDefined ? " [address override]" :
+                                    " <address override>");
     }
 
-    void
-    printDesc(std::ostream &os) const override
+    void printDesc(std::ostream &os) const override
     {
         os << "Use the address based invocation method.";
         if (DefaultAddrDefined) {
-            os << " The default address is 0x" <<
-                std::hex << DefaultAddress << std::dec << ".";
+            os << " The default address is 0x" << std::hex << DefaultAddress
+               << std::dec << ".";
         }
     }
 
-    CheckArgsResult
-    checkArgs(Args &args) override
+    CheckArgsResult checkArgs(Args &args) override
     {
         const std::string prefix = "--" + name;
         uint64_t addr_override;

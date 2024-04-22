@@ -55,16 +55,15 @@ class ISA : public BaseISA
 {
   private:
     RegVal regVal[misc_reg::NumRegs];
-    void updateHandyM5Reg(Efer efer, CR0 cr0,
-            SegAttr csAttr, SegAttr ssAttr, RFLAGS rflags);
+    void updateHandyM5Reg(Efer efer, CR0 cr0, SegAttr csAttr, SegAttr ssAttr,
+                          RFLAGS rflags);
 
     std::string vendorString;
 
   public:
     void clear() override;
 
-    PCStateBase *
-    newPCState(Addr new_inst_addr=0) const override
+    PCStateBase *newPCState(Addr new_inst_addr = 0) const override
     {
         return new PCState(new_inst_addr);
     }
@@ -79,8 +78,7 @@ class ISA : public BaseISA
     void setMiscRegNoEffect(RegIndex idx, RegVal val) override;
     void setMiscReg(RegIndex idx, RegVal val) override;
 
-    bool
-    inUserMode() const override
+    bool inUserMode() const override
     {
         HandyM5Reg m5reg = readMiscRegNoEffect(misc_reg::M5Reg);
         return m5reg.cpl == 3;

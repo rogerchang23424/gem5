@@ -107,15 +107,15 @@ class SysBridge : public SimObject
         // Replace the requestor ID in pkt, and return any scratch data we'll
         // need going back the other way.
         PacketData replaceReqID(PacketPtr pkt);
+
         // Restore pkt to use its original requestor ID.
-        static void
-        restoreReqID(PacketPtr pkt, const PacketData &data)
+        static void restoreReqID(PacketPtr pkt, const PacketData &data)
         {
             pkt->req = data.req;
         }
 
-        static void
-        restoreReqID(PacketPtr pkt, const PacketData &data, PacketData &backup)
+        static void restoreReqID(PacketPtr pkt, const PacketData &data,
+                                 PacketData &backup)
         {
             backup.req = pkt->req;
             restoreReqID(pkt, data);
@@ -131,22 +131,16 @@ class SysBridge : public SimObject
 
       public:
         SysBridgeTargetPort(const std::string &_name,
-                SysBridgeSourcePort *source_port, RequestorID _id) :
-            RequestPort(_name), BridgingPort(_id),
-            sourcePort(source_port)
+                            SysBridgeSourcePort *source_port, RequestorID _id)
+            : RequestPort(_name), BridgingPort(_id), sourcePort(source_port)
         {
             DPRINTF(SysBridge, "Target side requestor ID = %s.\n", _id);
         }
 
       private:
-        void
-        recvRangeChange() override
-        {
-            sourcePort->sendRangeChange();
-        }
+        void recvRangeChange() override { sourcePort->sendRangeChange(); }
 
-        Tick
-        recvAtomicSnoop(PacketPtr pkt) override
+        Tick recvAtomicSnoop(PacketPtr pkt) override
         {
             DPRINTF(SysBridge, "recvAtomicSnoop incoming ID %d.\n",
                     pkt->requestorId());
@@ -160,11 +154,10 @@ class SysBridge : public SimObject
             return tick;
         }
 
-        bool
-        recvTimingResp(PacketPtr pkt) override
+        bool recvTimingResp(PacketPtr pkt) override
         {
-            auto *state = dynamic_cast<SysBridgeSenderState *>(
-                    pkt->popSenderState());
+            auto *state =
+                dynamic_cast<SysBridgeSenderState *>(pkt->popSenderState());
             PacketData backup;
             DPRINTF(SysBridge, "recvTimingResp incoming ID %d.\n",
                     pkt->requestorId());
@@ -183,8 +176,7 @@ class SysBridge : public SimObject
             }
         }
 
-        void
-        recvTimingSnoopReq(PacketPtr pkt) override
+        void recvTimingSnoopReq(PacketPtr pkt) override
         {
             DPRINTF(SysBridge, "recvTimingSnoopReq incoming ID %d.\n",
                     pkt->requestorId());
@@ -196,14 +188,13 @@ class SysBridge : public SimObject
         }
 
         void recvReqRetry() override { sourcePort->sendRetryReq(); }
-        void
-        recvRetrySnoopResp() override
+
+        void recvRetrySnoopResp() override
         {
             sourcePort->sendRetrySnoopResp();
         }
 
-        void
-        recvFunctionalSnoop(PacketPtr pkt) override
+        void recvFunctionalSnoop(PacketPtr pkt) override
         {
             DPRINTF(SysBridge, "recvFunctionalSnoop incoming ID %d.\n",
                     pkt->requestorId());
@@ -224,16 +215,14 @@ class SysBridge : public SimObject
 
       public:
         SysBridgeSourcePort(const std::string &_name,
-                SysBridgeTargetPort *target_port, RequestorID _id) :
-            ResponsePort(_name), BridgingPort(_id),
-            targetPort(target_port)
+                            SysBridgeTargetPort *target_port, RequestorID _id)
+            : ResponsePort(_name), BridgingPort(_id), targetPort(target_port)
         {
             DPRINTF(SysBridge, "Source side requestor ID = %s.\n", _id);
         }
 
       private:
-        bool
-        recvTimingReq(PacketPtr pkt) override
+        bool recvTimingReq(PacketPtr pkt) override
         {
             DPRINTF(SysBridge, "recvTimingReq incoming ID %d.\n",
                     pkt->requestorId());
@@ -253,8 +242,7 @@ class SysBridge : public SimObject
             }
         }
 
-        bool
-        tryTiming(PacketPtr pkt) override
+        bool tryTiming(PacketPtr pkt) override
         {
             // Since tryTiming shouldn't actually send the packet, we should
             // be able to clean up inline like we would for atomic methods.
@@ -272,11 +260,10 @@ class SysBridge : public SimObject
             return ret;
         }
 
-        bool
-        recvTimingSnoopResp(PacketPtr pkt) override
+        bool recvTimingSnoopResp(PacketPtr pkt) override
         {
-            auto *state = dynamic_cast<SysBridgeSenderState *>(
-                    pkt->popSenderState());
+            auto *state =
+                dynamic_cast<SysBridgeSenderState *>(pkt->popSenderState());
             DPRINTF(SysBridge, "recvTimingSnoopResp incoming ID %d.\n",
                     pkt->requestorId());
             restoreReqID(pkt, state->data());
@@ -287,8 +274,7 @@ class SysBridge : public SimObject
 
         void recvRespRetry() override { targetPort->sendRetryResp(); }
 
-        Tick
-        recvAtomic(PacketPtr pkt) override
+        Tick recvAtomic(PacketPtr pkt) override
         {
             DPRINTF(SysBridge, "recvAtomic incoming ID %d.\n",
                     pkt->requestorId());
@@ -302,8 +288,8 @@ class SysBridge : public SimObject
             return tick;
         }
 
-        Tick
-        recvAtomicBackdoor(PacketPtr pkt, MemBackdoorPtr &backdoor) override
+        Tick recvAtomicBackdoor(PacketPtr pkt,
+                                MemBackdoorPtr &backdoor) override
         {
             DPRINTF(SysBridge, "recvAtomicBackdoor incoming ID %d.\n",
                     pkt->requestorId());
@@ -317,8 +303,7 @@ class SysBridge : public SimObject
             return tick;
         }
 
-        void
-        recvFunctional(PacketPtr pkt) override
+        void recvFunctional(PacketPtr pkt) override
         {
             DPRINTF(SysBridge, "recvFunctional incoming ID %d.\n",
                     pkt->requestorId());
@@ -331,15 +316,13 @@ class SysBridge : public SimObject
                     pkt->requestorId());
         }
 
-        void
-        recvMemBackdoorReq(const MemBackdoorReq &req,
-                MemBackdoorPtr &backdoor) override
+        void recvMemBackdoorReq(const MemBackdoorReq &req,
+                                MemBackdoorPtr &backdoor) override
         {
             targetPort->sendMemBackdoorReq(req, backdoor);
         }
 
-        AddrRangeList
-        getAddrRanges() const override
+        AddrRangeList getAddrRanges() const override
         {
             return targetPort->getAddrRanges();
         }
@@ -350,7 +333,7 @@ class SysBridge : public SimObject
 
   public:
     Port &getPort(const std::string &if_name,
-            PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 
     SysBridge(const SysBridgeParams &p);
 };

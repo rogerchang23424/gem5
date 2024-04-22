@@ -80,13 +80,21 @@ class Process : public SimObject
     virtual void syscall(ThreadContext *tc) { numSyscalls++; }
 
     inline uint64_t uid() { return _uid; }
+
     inline uint64_t euid() { return _euid; }
+
     inline uint64_t gid() { return _gid; }
+
     inline uint64_t egid() { return _egid; }
+
     inline uint64_t pid() { return _pid; }
+
     inline uint64_t ppid() { return _ppid; }
+
     inline uint64_t pgid() { return _pgid; }
+
     inline void pgid(uint64_t pgid) { _pgid = pgid; }
+
     inline uint64_t tgid() { return _tgid; }
 
     const char *progName() const { return executable.c_str(); }
@@ -118,7 +126,7 @@ class Process : public SimObject
     // align to page boundaries, it will be expanded in either direction until
     // it does. This function will therefore set up *at least* the range
     // requested, and may configure more if necessary.
-    void allocateMem(Addr vaddr, int64_t size, bool clobber=false);
+    void allocateMem(Addr vaddr, int64_t size, bool clobber = false);
 
     /// Attempt to fix up a fault at vaddr by allocating a page on the stack.
     /// @return Whether the fault has been fixed.
@@ -126,8 +134,7 @@ class Process : public SimObject
 
     // After getting registered with system object, tell process which
     // system-wide context id it is assigned.
-    void
-    assignThreadContext(ContextID context_id)
+    void assignThreadContext(ContextID context_id)
     {
         contextIds.push_back(context_id);
     }

@@ -68,7 +68,7 @@ class Decoder : public InstDecoder
     const bool dvmEnabled;
 
   protected:
-    //The extended machine instruction being generated
+    // The extended machine instruction being generated
     ExtMachInst emi;
     uint32_t data;
     bool bigThumb;
@@ -132,12 +132,11 @@ class Decoder : public InstDecoder
      * @param mach_inst A pre-decoded instruction
      * @retval A pointer to the corresponding StaticInst object.
      */
-    StaticInstPtr
-    decode(ExtMachInst mach_inst, Addr addr)
+    StaticInstPtr decode(ExtMachInst mach_inst, Addr addr)
     {
         StaticInstPtr si = defaultCache.decode(this, mach_inst, addr);
-        DPRINTF(Decode, "Decode: Decoded %s instruction: %#x\n",
-                si->getName(), mach_inst);
+        DPRINTF(Decode, "Decode: Decoded %s instruction: %#x\n", si->getName(),
+                mach_inst);
         si->size((!emi.thumb || emi.bigThumb) ? 4 : 2);
         return si;
     }
@@ -153,24 +152,15 @@ class Decoder : public InstDecoder
     StaticInstPtr decode(PCStateBase &pc) override;
 
   public: // ARM-specific decoder state manipulation
-    void
-    setContext(FPSCR fpscr)
+    void setContext(FPSCR fpscr)
     {
         fpscrLen = fpscr.len;
         fpscrStride = fpscr.stride;
     }
 
-    void
-    setSveLen(uint8_t len)
-    {
-        sveLen = len;
-    }
+    void setSveLen(uint8_t len) { sveLen = len; }
 
-    void
-    setSmeLen(uint8_t len)
-    {
-        smeLen = len;
-    }
+    void setSmeLen(uint8_t len) { smeLen = len; }
 };
 
 } // namespace ArmISA

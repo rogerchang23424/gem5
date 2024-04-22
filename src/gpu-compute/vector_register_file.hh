@@ -50,7 +50,8 @@ class VectorRegisterFile : public RegisterFile
     using VecRegContainer = TheGpuISA::VecRegContainerU32;
 
     VectorRegisterFile(const VectorRegisterFileParams &p);
-    ~VectorRegisterFile() { }
+
+    ~VectorRegisterFile() {}
 
     virtual bool operandsReady(Wavefront *w, GPUDynInstPtr ii) const override;
     virtual void scheduleWriteOperands(Wavefront *w,
@@ -59,35 +60,24 @@ class VectorRegisterFile : public RegisterFile
                                                GPUDynInstPtr ii) override;
     virtual void waveExecuteInst(Wavefront *w, GPUDynInstPtr ii) override;
 
-    void
-    setParent(ComputeUnit *_computeUnit) override
+    void setParent(ComputeUnit *_computeUnit) override
     {
         RegisterFile::setParent(_computeUnit);
     }
 
     // Read a register that is writeable (e.g., a DST operand)
-    VecRegContainer&
-    readWriteable(int regIdx)
-    {
-        return regFile[regIdx];
-    }
+    VecRegContainer &readWriteable(int regIdx) { return regFile[regIdx]; }
 
     // Read a register that is not writeable (e.g., src operand)
-    const VecRegContainer&
-    read(int regIdx) const
-    {
-        return regFile[regIdx];
-    }
+    const VecRegContainer &read(int regIdx) const { return regFile[regIdx]; }
 
     // Write a register
-    void
-    write(int regIdx, const VecRegContainer &value)
+    void write(int regIdx, const VecRegContainer &value)
     {
         regFile[regIdx] = value;
     }
 
-    void
-    printReg(Wavefront *wf, int regIdx) const
+    void printReg(Wavefront *wf, int regIdx) const
     {
 #ifndef NDEBUG
         const auto &vec_reg_cont = regFile[regIdx];
@@ -96,8 +86,8 @@ class VectorRegisterFile : public RegisterFile
         for (int lane = 0; lane < TheGpuISA::NumVecElemPerVecReg; ++lane) {
             if (wf->execMask(lane)) {
                 DPRINTF(GPUVRF, "WF[%d][%d]: WV[%d] v[%d][%d] = %#x\n",
-                    wf->simdId, wf->wfSlotId, wf->wfDynId, regIdx, lane,
-                    vgpr[lane]);
+                        wf->simdId, wf->wfSlotId, wf->wfDynId, regIdx, lane,
+                        vgpr[lane]);
             }
         }
 #endif

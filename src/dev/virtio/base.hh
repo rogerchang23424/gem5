@@ -130,8 +130,8 @@ class VirtDescriptor
      * @param queue Queue owning this descriptor.
      * @param index Index within the queue.
      */
-    VirtDescriptor(PortProxy &memProxy, ByteOrder bo,
-            VirtQueue &queue, Index index);
+    VirtDescriptor(PortProxy &memProxy, ByteOrder bo, VirtQueue &queue,
+                   Index index);
     // WORKAROUND: The noexcept declaration works around a bug where
     // gcc 4.7 tries to call the wrong constructor when emplacing
     // something into a vector.
@@ -163,7 +163,6 @@ class VirtDescriptor
      */
     void dumpChain() const;
     /** @} */
-
 
     /** @{
      * @name Device Model Interfaces
@@ -198,6 +197,7 @@ class VirtDescriptor
      * @param size Amount of data to read (in bytes).
      */
     void write(size_t offset, const uint8_t *src, size_t size);
+
     /**
      * Retrieve the size of this descriptor.
      *
@@ -218,6 +218,7 @@ class VirtDescriptor
      * @return true if there is a next pointer, false otherwise.
      */
     bool hasNext() const { return desc.flags & VRING_DESC_F_NEXT; }
+
     /**
      * Get the pointer to the next descriptor in a chain.
      *
@@ -228,9 +229,9 @@ class VirtDescriptor
 
     /** Check if this is a read-only descriptor (incoming data). */
     bool isIncoming() const { return !isOutgoing(); }
+
     /** Check if this is a write-only descriptor (outgoing data). */
     bool isOutgoing() const { return desc.flags & VRING_DESC_F_WRITE; }
-
 
     /**
      * Read the contents of a descriptor chain.
@@ -302,7 +303,7 @@ class VirtDescriptor
 class VirtQueue : public Serializable
 {
   public:
-    virtual ~VirtQueue() {};
+    virtual ~VirtQueue(){};
 
     /** @{
      * @name Checkpointing Interface
@@ -327,6 +328,7 @@ class VirtQueue : public Serializable
      * @param address Guest physical base address of the queue.
      */
     void setAddress(Addr address);
+
     /**
      * Get the guest physical address of this queue.
      *
@@ -339,7 +341,7 @@ class VirtQueue : public Serializable
      *
      * @return Size of queue in descriptors.
      */
-     uint16_t getSize() const { return _size; }
+    uint16_t getSize() const { return _size; }
 
     /**
      * Get a pointer to a specific descriptor in the queue.
@@ -350,9 +352,11 @@ class VirtQueue : public Serializable
      *
      * @return Pointer to a VirtDescriptor.
      */
-    VirtDescriptor *getDescriptor(VirtDescriptor::Index index) {
+    VirtDescriptor *getDescriptor(VirtDescriptor::Index index)
+    {
         return &descriptors[index];
     }
+
     /** @} */
 
     /** @{
@@ -412,7 +416,7 @@ class VirtQueue : public Serializable
      * Device models should normally overload one of onNotify() and
      * onNotifyDescriptor().
      */
-    virtual void onNotifyDescriptor(VirtDescriptor *desc) {};
+    virtual void onNotifyDescriptor(VirtDescriptor *desc){};
     /** @} */
 
     /** @{
@@ -464,7 +468,7 @@ class VirtQueue : public Serializable
      * is used to select the data type for the items in the ring (used
      * or available descriptors).
      */
-    template<typename T>
+    template <typename T>
     class VirtRing
     {
       public:
@@ -477,15 +481,18 @@ class VirtQueue : public Serializable
             Index index;
         };
 
-        VirtRing<T>(PortProxy &proxy, ByteOrder bo, uint16_t size) :
-            header{0, 0}, ring(size), _proxy(proxy), _base(0), byteOrder(bo)
+        VirtRing<T>(PortProxy &proxy, ByteOrder bo, uint16_t size)
+            : header{ 0, 0 },
+              ring(size),
+              _proxy(proxy),
+              _base(0),
+              byteOrder(bo)
         {}
 
         /** Reset any state in the ring buffer. */
-        void
-        reset()
+        void reset()
         {
-            header = {0, 0};
+            header = { 0, 0 };
             _base = 0;
         };
 
@@ -497,8 +504,7 @@ class VirtQueue : public Serializable
         void setAddress(Addr addr) { _base = addr; }
 
         /** Update the ring buffer header with data from the guest. */
-        void
-        readHeader()
+        void readHeader()
         {
             assert(_base != 0);
             _proxy.readBlob(_base, &header, sizeof(header));
@@ -506,8 +512,7 @@ class VirtQueue : public Serializable
             header.index = gtoh(header.index, byteOrder);
         }
 
-        void
-        writeHeader()
+        void writeHeader()
         {
             Header out;
             assert(_base != 0);
@@ -516,21 +521,19 @@ class VirtQueue : public Serializable
             _proxy.writeBlob(_base, &out, sizeof(out));
         }
 
-        void
-        read()
+        void read()
         {
             readHeader();
 
             /* Read and byte-swap the elements in the ring */
             T temp[ring.size()];
-            _proxy.readBlob(_base + sizeof(header),
-                            temp, sizeof(T) * ring.size());
+            _proxy.readBlob(_base + sizeof(header), temp,
+                            sizeof(T) * ring.size());
             for (int i = 0; i < ring.size(); ++i)
                 ring[i] = gtoh(temp[i], byteOrder);
         }
 
-        void
-        write()
+        void write()
         {
             assert(_base != 0);
             /* Create a byte-swapped copy of the ring and write it to
@@ -538,8 +541,8 @@ class VirtQueue : public Serializable
             T temp[ring.size()];
             for (int i = 0; i < ring.size(); ++i)
                 temp[i] = htog(ring[i], byteOrder);
-            _proxy.writeBlob(_base + sizeof(header),
-                             temp, sizeof(T) * ring.size());
+            _proxy.writeBlob(_base + sizeof(header), temp,
+                             sizeof(T) * ring.size());
             writeHeader();
         }
 
@@ -618,7 +621,6 @@ class VirtIODeviceBase : public SimObject
     void unserialize(CheckpointIn &cp) override;
     /** @} */
 
-
   protected:
     /** @{
      * @name Device Model Interfaces
@@ -634,8 +636,7 @@ class VirtIODeviceBase : public SimObject
      * typically through an interrupt. Device models call this method
      * to tell the transport interface to notify the guest.
      */
-    void
-    kick()
+    void kick()
     {
         assert(transKick);
         transKick();
@@ -653,7 +654,6 @@ class VirtIODeviceBase : public SimObject
      * constructor.
      */
     void registerQueue(VirtQueue &queue);
-
 
     /**
      * Feature set accepted by the guest.
@@ -752,19 +752,17 @@ class VirtIODeviceBase : public SimObject
     /** @{
      * @name VirtIO Transport Interfaces
      */
-     /**
-      * Register a callback to kick the guest through the transport
-      * interface.
-      *
-      * @param callback Callback into transport interface.
-      */
-    void
-    registerKickCallback(const std::function<void()> &callback)
+    /**
+     * Register a callback to kick the guest through the transport
+     * interface.
+     *
+     * @param callback Callback into transport interface.
+     */
+    void registerKickCallback(const std::function<void()> &callback)
     {
         assert(!transKick);
         transKick = callback;
     }
-
 
     /**
      * Driver is requesting service.
@@ -777,7 +775,6 @@ class VirtIODeviceBase : public SimObject
      */
     void onNotify(QueueID index);
 
-
     /**
      * Change currently active queue.
      *
@@ -788,6 +785,7 @@ class VirtIODeviceBase : public SimObject
      * @param idx ID of the queue to select.
      */
     void setQueueSelect(QueueID idx) { _queueSelect = idx; }
+
     /**
      * Get the currently active queue.
      *

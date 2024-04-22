@@ -57,12 +57,11 @@ class FailUnimplemented : public SparcStaticInst
 {
   public:
     /// Constructor
-    FailUnimplemented(const char *_mnemonic, ExtMachInst _machInst) :
-            SparcStaticInst(_mnemonic, _machInst, No_OpClass)
+    FailUnimplemented(const char *_mnemonic, ExtMachInst _machInst)
+        : SparcStaticInst(_mnemonic, _machInst, No_OpClass)
     {}
 
-    Fault
-    execute(ExecContext *xc, trace::InstRecord *traceData) const override
+    Fault execute(ExecContext *xc, trace::InstRecord *traceData) const override
     {
         return std::make_shared<GenericISA::M5PanicFault>(
             "attempt to execute unimplemented instruction '%s' (inst %#08x)",
@@ -70,8 +69,8 @@ class FailUnimplemented : public SparcStaticInst
     }
 
     std::string
-    generateDisassembly(
-            Addr pc, const loader::SymbolTable *symtab) const override
+    generateDisassembly(Addr pc,
+                        const loader::SymbolTable *symtab) const override
     {
         return csprintf("%-10s (unimplemented)", mnemonic);
     }
@@ -94,12 +93,11 @@ class WarnUnimplemented : public SparcStaticInst
 
   public:
     /// Constructor
-    WarnUnimplemented(const char *_mnemonic, ExtMachInst _machInst) :
-            SparcStaticInst(_mnemonic, _machInst, No_OpClass), warned(false)
+    WarnUnimplemented(const char *_mnemonic, ExtMachInst _machInst)
+        : SparcStaticInst(_mnemonic, _machInst, No_OpClass), warned(false)
     {}
 
-    Fault
-    execute(ExecContext *xc, trace::InstRecord *traceData) const override
+    Fault execute(ExecContext *xc, trace::InstRecord *traceData) const override
     {
         if (!warned) {
             return std::make_shared<GenericISA::M5WarnFault>(
@@ -110,8 +108,8 @@ class WarnUnimplemented : public SparcStaticInst
     }
 
     std::string
-    generateDisassembly(
-            Addr pc, const loader::SymbolTable *symtab) const override
+    generateDisassembly(Addr pc,
+                        const loader::SymbolTable *symtab) const override
     {
         return csprintf("%-10s (unimplemented)", mnemonic);
     }

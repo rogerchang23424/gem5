@@ -56,11 +56,10 @@ class MhuDoorbell : public Doorbell
   public:
     friend class MHU;
 
-    MhuDoorbell(const DoorbellParams &p)
-      : Doorbell(p), channel(0)
-    {}
+    MhuDoorbell(const DoorbellParams &p) : Doorbell(p), channel(0) {}
 
     void set(uint32_t val) { update(channel | val); }
+
     void clear(uint32_t val) { update(channel & ~val); }
 
   protected:

@@ -56,10 +56,12 @@ class MemBackdoor
 
     // The range in the guest address space covered by this back door.
     const AddrRange &range() const { return _range; }
+
     void range(const AddrRange &r) { _range = r; }
 
     // A pointer to the data accessible through this back door.
     uint8_t *ptr() const { return _ptr; }
+
     void ptr(uint8_t *p) { _ptr = p; }
 
     /*
@@ -67,8 +69,8 @@ class MemBackdoor
      */
 
     bool readable() const { return _flags & Readable; }
-    void
-    readable(bool r)
+
+    void readable(bool r)
     {
         if (r)
             _flags = (Flags)(_flags | Readable);
@@ -77,8 +79,8 @@ class MemBackdoor
     }
 
     bool writeable() const { return _flags & Writeable; }
-    void
-    writeable(bool w)
+
+    void writeable(bool w)
     {
         if (w)
             _flags = (Flags)(_flags | Writeable);
@@ -87,30 +89,28 @@ class MemBackdoor
     }
 
     Flags flags() const { return _flags; }
+
     void flags(Flags f) { _flags = f; }
 
-    MemBackdoor(AddrRange r, uint8_t *p, Flags flags) :
-        _range(r), _ptr(p), _flags(flags)
+    MemBackdoor(AddrRange r, uint8_t *p, Flags flags)
+        : _range(r), _ptr(p), _flags(flags)
     {}
 
-    MemBackdoor() : MemBackdoor(AddrRange(), nullptr, NoAccess)
-    {}
+    MemBackdoor() : MemBackdoor(AddrRange(), nullptr, NoAccess) {}
 
     // Set up a callable to be called when this back door is invalidated. This
     // lets holders update their bookkeeping to remove any references to it,
     // and/or to propogate that invalidation to other interested parties.
-    void
-    addInvalidationCallback(CbFunction func)
+    void addInvalidationCallback(CbFunction func)
     {
-        invalidationCallbacks.push_back([this,func](){ func(*this); });
+        invalidationCallbacks.push_back([this, func]() { func(*this); });
     }
 
     // Notify and clear invalidation callbacks when the data in the backdoor
     // structure is no longer valid/current. The backdoor might then be
     // updated or even deleted without having to worry about stale data being
     // used.
-    void
-    invalidate()
+    void invalidate()
     {
         invalidationCallbacks.process();
         invalidationCallbacks.clear();
@@ -133,13 +133,14 @@ class MemBackdoorReq
     MemBackdoor::Flags _flags;
 
   public:
-    MemBackdoorReq(AddrRange r, MemBackdoor::Flags new_flags) :
-        _range(r), _flags(new_flags)
+    MemBackdoorReq(AddrRange r, MemBackdoor::Flags new_flags)
+        : _range(r), _flags(new_flags)
     {}
 
     const AddrRange &range() const { return _range; }
 
     bool readable() const { return _flags & MemBackdoor::Readable; }
+
     bool writeable() const { return _flags & MemBackdoor::Writeable; }
 
     MemBackdoor::Flags flags() const { return _flags; }
@@ -147,4 +148,4 @@ class MemBackdoorReq
 
 } // namespace gem5
 
-#endif  //__MEM_BACKDOOR_HH__
+#endif //__MEM_BACKDOOR_HH__

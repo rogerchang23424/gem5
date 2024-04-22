@@ -67,32 +67,27 @@ namespace o3
 class ThreadContext : public gem5::ThreadContext
 {
   public:
-   /** Pointer to the CPU. */
+    /** Pointer to the CPU. */
     CPU *cpu;
 
-    bool
-    schedule(PCEvent *e) override
+    bool schedule(PCEvent *e) override
     {
         return thread->pcEventQueue.schedule(e);
     }
-    bool
-    remove(PCEvent *e) override
-    {
-        return thread->pcEventQueue.remove(e);
-    }
 
-    void
-    scheduleInstCountEvent(Event *event, Tick count) override
+    bool remove(PCEvent *e) override { return thread->pcEventQueue.remove(e); }
+
+    void scheduleInstCountEvent(Event *event, Tick count) override
     {
         thread->comInstEventQueue.schedule(event, count);
     }
-    void
-    descheduleInstCountEvent(Event *event) override
+
+    void descheduleInstCountEvent(Event *event) override
     {
         thread->comInstEventQueue.deschedule(event);
     }
-    Tick
-    getCurrentInstCount() override
+
+    Tick getCurrentInstCount() override
     {
         return thread->comInstEventQueue.getCurTick();
     }
@@ -105,14 +100,12 @@ class ThreadContext : public gem5::ThreadContext
 
     CheckerCPU *getCheckerCpuPtr() override { return NULL; }
 
-    BaseISA *
-    getIsaPtr() const override
+    BaseISA *getIsaPtr() const override
     {
         return cpu->isa[thread->threadId()];
     }
 
-    InstDecoder *
-    getDecoderPtr() override
+    InstDecoder *getDecoderPtr() override
     {
         return cpu->fetch.decoder[thread->threadId()];
     }
@@ -132,6 +125,7 @@ class ThreadContext : public gem5::ThreadContext
 
     /** Returns this thread's ID number. */
     int threadId() const override { return thread->threadId(); }
+
     void setThreadId(int id) override { return thread->setThreadId(id); }
 
     /** Returns a pointer to the system. */
@@ -146,8 +140,7 @@ class ThreadContext : public gem5::ThreadContext
     Status status() const override { return thread->status(); }
 
     /** Sets this thread's status. */
-    void
-    setStatus(Status new_status) override
+    void setStatus(Status new_status) override
     {
         thread->setStatus(new_status);
     }
@@ -176,8 +169,7 @@ class ThreadContext : public gem5::ThreadContext
     void clearArchRegs() override;
 
     /** Reads this thread's PC state. */
-    const PCStateBase &
-    pcState() const override
+    const PCStateBase &pcState() const override
     {
         return cpu->pcState(thread->threadId());
     }
@@ -188,16 +180,14 @@ class ThreadContext : public gem5::ThreadContext
     void pcStateNoRecord(const PCStateBase &val) override;
 
     /** Reads a miscellaneous register. */
-    RegVal
-    readMiscRegNoEffect(RegIndex misc_reg) const override
+    RegVal readMiscRegNoEffect(RegIndex misc_reg) const override
     {
         return cpu->readMiscRegNoEffect(misc_reg, thread->threadId());
     }
 
     /** Reads a misc. register, including any side-effects the
      * read might have as defined by the architecture. */
-    RegVal
-    readMiscReg(RegIndex misc_reg) override
+    RegVal readMiscReg(RegIndex misc_reg) override
     {
         return cpu->readMiscReg(misc_reg, thread->threadId());
     }
@@ -211,15 +201,13 @@ class ThreadContext : public gem5::ThreadContext
 
     /** Returns the number of consecutive store conditional failures. */
     // @todo: Figure out where these store cond failures should go.
-    unsigned
-    readStCondFailures() const override
+    unsigned readStCondFailures() const override
     {
         return thread->storeCondFailures;
     }
 
     /** Sets the number of consecutive store conditional failures. */
-    void
-    setStCondFailures(unsigned sc_failures) override
+    void setStCondFailures(unsigned sc_failures) override
     {
         thread->storeCondFailures = sc_failures;
     }
@@ -229,8 +217,7 @@ class ThreadContext : public gem5::ThreadContext
      * similar is currently writing to the thread context and doesn't want
      * reset all the state (see noSquashFromTC).
      */
-    void
-    conditionalSquash()
+    void conditionalSquash()
     {
         if (!thread->trapPending && !thread->noSquashFromTC)
             cpu->squashFromTC(thread->threadId());
@@ -246,7 +233,7 @@ class ThreadContext : public gem5::ThreadContext
     // hardware transactional memory
     void htmAbortTransaction(uint64_t htm_uid,
                              HtmFailureFaultCause cause) override;
-    BaseHTMCheckpointPtr& getHtmCheckpointPtr() override;
+    BaseHTMCheckpointPtr &getHtmCheckpointPtr() override;
     void setHtmCheckpointPtr(BaseHTMCheckpointPtr new_cpt) override;
 };
 

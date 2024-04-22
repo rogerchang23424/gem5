@@ -49,18 +49,16 @@ namespace MipsISA
 class Decoder : public InstDecoder
 {
   protected:
-    //The extended machine instruction being generated
+    // The extended machine instruction being generated
     ExtMachInst emi;
     uint32_t machInst;
 
   public:
-    Decoder(const MipsDecoderParams &p) : InstDecoder(p, &machInst)
-    {}
+    Decoder(const MipsDecoderParams &p) : InstDecoder(p, &machInst) {}
 
-    //Use this to give data to the decoder. This should be used
-    //when there is control flow.
-    void
-    moreBytes(const PCStateBase &pc, Addr fetchPC) override
+    // Use this to give data to the decoder. This should be used
+    // when there is control flow.
+    void moreBytes(const PCStateBase &pc, Addr fetchPC) override
     {
         emi = letoh(machInst);
         instDone = true;
@@ -76,18 +74,16 @@ class Decoder : public InstDecoder
     /// Decode a machine instruction.
     /// @param mach_inst The binary instruction to decode.
     /// @retval A pointer to the corresponding StaticInst object.
-    StaticInstPtr
-    decode(ExtMachInst mach_inst, Addr addr)
+    StaticInstPtr decode(ExtMachInst mach_inst, Addr addr)
     {
         StaticInstPtr si = defaultCache.decode(this, mach_inst, addr);
-        DPRINTF(Decode, "Decode: Decoded %s instruction: %#x\n",
-                si->getName(), mach_inst);
+        DPRINTF(Decode, "Decode: Decoded %s instruction: %#x\n", si->getName(),
+                mach_inst);
         return si;
     }
 
   public:
-    StaticInstPtr
-    decode(PCStateBase &next_pc) override
+    StaticInstPtr decode(PCStateBase &next_pc) override
     {
         if (!instDone)
             return NULL;

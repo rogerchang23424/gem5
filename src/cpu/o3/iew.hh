@@ -283,7 +283,8 @@ class IEW
     /** Removes instructions from rename from a thread's instruction list. */
     void emptyRenameInsts(ThreadID tid);
 
-    /** Sorts instructions coming from rename into lists separated by thread. */
+    /** Sorts instructions coming from rename into lists separated by thread.
+     */
     void sortInsts();
 
   public:
@@ -336,7 +337,7 @@ class IEW
     std::queue<DynInstPtr> skidBuffer[MaxThreads];
 
     /** Scoreboard pointer. */
-    Scoreboard* scoreboard;
+    Scoreboard *scoreboard;
 
   private:
     /** CPU pointer. */
@@ -413,7 +414,6 @@ class IEW
 
     /** Maximum size of the skid buffer. */
     unsigned skidBufferMax;
-
 
     struct IEWStats : public statistics::Group
     {

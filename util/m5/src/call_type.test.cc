@@ -35,21 +35,27 @@
 
 // Simple substitute definitions for Args and DispatchTable, with an int so
 // we can tell instances apart.
-class DispatchTable { public: int i; };
+class DispatchTable
+{
+  public:
+    int i;
+};
 
 class TestCallType : public CallType
 {
   protected:
     bool isDefault() const override { return testIsDefault; }
-    void
-    init() override
+
+    void init() override
     {
         testInitHappened = true;
         CallType::init();
     }
 
     void printBrief(std::ostream &os) const override { os << testBrief; }
+
     void printDesc(std::ostream &os) const override { os << testDesc; }
+
   public:
     TestCallType(const std::string &_name) : CallType(_name) {}
 
@@ -61,6 +67,7 @@ class TestCallType : public CallType
 
     // Return this dispatch table when requested.
     DispatchTable testDt = { 0 };
+
     const DispatchTable &getDispatch() const override { return testDt; }
 
     // Whether this call type should be considered default.
@@ -102,7 +109,7 @@ TEST(CallTypeTest, DetectOne)
 
     EXPECT_EQ(map.size(), 1);
 
-    Args args1({"--option1"});
+    Args args1({ "--option1" });
 
     EXPECT_FALSE(option1.testInitHappened);
 
@@ -116,7 +123,7 @@ TEST(CallTypeTest, DetectOne)
     option1.testInitHappened = false;
 
     // Args will not match.
-    Args args2({"--option2"});
+    Args args2({ "--option2" });
 
     auto *def_ct = CallType::detect(args2);
 
@@ -141,7 +148,7 @@ TEST(CallTypeTest, DetectTwo)
     EXPECT_EQ(map.size(), 2);
 
     // Select the first option.
-    Args args1({"--option1"});
+    Args args1({ "--option1" });
 
     EXPECT_FALSE(option1.testInitHappened);
     EXPECT_FALSE(option2.testInitHappened);
@@ -157,7 +164,7 @@ TEST(CallTypeTest, DetectTwo)
     option2.testInitHappened = false;
 
     // Select the second option.
-    Args args2({"--option2"});
+    Args args2({ "--option2" });
 
     auto *ct2 = CallType::detect(args2);
 
@@ -170,7 +177,7 @@ TEST(CallTypeTest, DetectTwo)
     option2.testInitHappened = false;
 
     // Default to the first option.
-    Args args3({"--option3"});
+    Args args3({ "--option3" });
 
     auto *def_ct1 = CallType::detect(args3);
 
@@ -208,7 +215,7 @@ TEST(CallTypeTest, Usage)
     TestCallType ct2("ct2");
     ct2.testBrief = "short 2";
     ct2.testDesc = "Very verbose text saying what call type 2 is, "
-        "and is different from 1.";
+                   "and is different from 1.";
 
     EXPECT_EQ(map.size(), 2);
 
