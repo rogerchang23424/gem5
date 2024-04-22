@@ -64,28 +64,24 @@ class Set
                   NUMBER_BITS_PER_SET, size);
     }
 
-    Set(const Set& obj) : m_nSize(obj.m_nSize), bits(obj.bits) {}
+    Set(const Set &obj) : m_nSize(obj.m_nSize), bits(obj.bits) {}
+
     ~Set() {}
 
-    Set& operator=(const Set& obj)
+    Set &operator=(const Set &obj)
     {
         m_nSize = obj.m_nSize;
         bits = obj.bits;
         return *this;
     }
 
-    void
-    add(NodeID index)
-    {
-        bits.set(index);
-    }
+    void add(NodeID index) { bits.set(index); }
 
     /*
      * This function should set all the bits in the current set that are
      * already set in the parameter set
      */
-    void
-    addSet(const Set& obj)
+    void addSet(const Set &obj)
     {
         assert(m_nSize == obj.m_nSize);
         bits |= obj.bits;
@@ -94,17 +90,12 @@ class Set
     /*
      * This function clears bits that are =1 in the parameter set
      */
-    void
-    remove(NodeID index)
-    {
-        bits.reset(index);
-    }
+    void remove(NodeID index) { bits.reset(index); }
 
     /*
      * This function clears bits that are =1 in the parameter set
      */
-    void
-    removeSet(const Set& obj)
+    void removeSet(const Set &obj)
     {
         assert(m_nSize == obj.m_nSize);
         bits &= (~obj.bits);
@@ -131,16 +122,14 @@ class Set
     /*
      * This function checks for set equality
      */
-    bool
-    isEqual(const Set& obj) const
+    bool isEqual(const Set &obj) const
     {
         assert(m_nSize == obj.m_nSize);
         return bits == obj.bits;
     }
 
     // return the logical OR of this set and orSet
-    Set
-    OR(const Set& obj) const
+    Set OR(const Set &obj) const
     {
         assert(m_nSize == obj.m_nSize);
         Set r(m_nSize);
@@ -149,8 +138,7 @@ class Set
     };
 
     // return the logical AND of this set and andSet
-    Set
-    AND(const Set& obj) const
+    Set AND(const Set &obj) const
     {
         assert(m_nSize == obj.m_nSize);
         Set r(m_nSize);
@@ -159,8 +147,7 @@ class Set
     }
 
     // Returns true if the intersection of the two sets is empty
-    bool
-    intersectionIsEmpty(const Set& obj) const
+    bool intersectionIsEmpty(const Set &obj) const
     {
         std::bitset<NUMBER_BITS_PER_SET> r = bits & obj.bits;
         return r.none();
@@ -170,26 +157,21 @@ class Set
      * Returns false if a bit is set in the parameter set that is NOT set
      * in this set
      */
-    bool
-    isSuperset(const Set& test) const
+    bool isSuperset(const Set &test) const
     {
         assert(m_nSize == test.m_nSize);
         std::bitset<NUMBER_BITS_PER_SET> r = bits | test.bits;
         return (r == bits);
     }
 
-    bool isSubset(const Set& test) const { return test.isSuperset(*this); }
+    bool isSubset(const Set &test) const { return test.isSuperset(*this); }
 
     bool isElement(NodeID element) const { return bits.test(element); }
 
     /*
      * this function returns true iff all bits in use are set
      */
-    bool
-    isBroadcast() const
-    {
-        return (bits.count() == m_nSize);
-    }
+    bool isBroadcast() const { return (bits.count() == m_nSize); }
 
     bool isEmpty() const { return bits.none(); }
 
@@ -207,8 +189,7 @@ class Set
 
     int getSize() const { return m_nSize; }
 
-    void
-    setSize(int size)
+    void setSize(int size)
     {
         if (size > NUMBER_BITS_PER_SET)
             fatal("Number of bits(%d) < size specified(%d). "
@@ -218,14 +199,14 @@ class Set
         bits.reset();
     }
 
-    void print(std::ostream& out) const
+    void print(std::ostream &out) const
     {
         out << "[Set (" << m_nSize << "): " << bits << "]";
     }
 };
 
-inline std::ostream&
-operator<<(std::ostream& out, const Set& obj)
+inline std::ostream &
+operator<<(std::ostream &out, const Set &obj)
 {
     obj.print(out);
     out << std::flush;

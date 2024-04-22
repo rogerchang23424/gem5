@@ -54,8 +54,10 @@ class EtherInt : public Port
     EtherInt *peer;
 
   public:
-    EtherInt(const std::string &name, int idx=InvalidPortID)
-        : Port(name, idx), portName(name), peer(NULL) {}
+    EtherInt(const std::string &name, int idx = InvalidPortID)
+        : Port(name, idx), portName(name), peer(NULL)
+    {}
+
     virtual ~EtherInt() {}
 
     /** Return port name (for DPRINTF). */
@@ -65,16 +67,22 @@ class EtherInt : public Port
     void unbind() override;
 
     void setPeer(EtherInt *p);
-    EtherInt* getPeer() { return peer; }
+
+    EtherInt *getPeer() { return peer; }
 
     void recvDone() { peer->sendDone(); }
+
     virtual void sendDone() = 0;
 
     bool sendPacket(EthPacketPtr packet)
-    { return peer ? peer->recvPacket(packet) : true; }
+    {
+        return peer ? peer->recvPacket(packet) : true;
+    }
+
     virtual bool recvPacket(EthPacketPtr packet) = 0;
 
-    bool askBusy() {return peer->isBusy(); }
+    bool askBusy() { return peer->isBusy(); }
+
     virtual bool isBusy() { return false; }
 };
 

@@ -47,33 +47,25 @@ class PCState : public GenericISA::SimplePCState<4>
   public:
     using GenericISA::SimplePCState<4>::SimplePCState;
 
-    PCState(const PCState &other) :
-        GenericISA::SimplePCState<4>(other),
-        guestByteOrder(other.guestByteOrder)
+    PCState(const PCState &other)
+        : GenericISA::SimplePCState<4>(other),
+          guestByteOrder(other.guestByteOrder)
     {}
+
     PCState &operator=(const PCState &other) = default;
 
     PCStateBase *clone() const override { return new PCState(*this); }
 
-    void
-    update(const PCStateBase &other) override
+    void update(const PCStateBase &other) override
     {
         GenericISA::SimplePCState<4>::update(other);
         auto &pcstate = other.as<PCState>();
         guestByteOrder = pcstate.guestByteOrder;
     }
 
-    ByteOrder
-    byteOrder() const
-    {
-        return guestByteOrder;
-    }
+    ByteOrder byteOrder() const { return guestByteOrder; }
 
-    void
-    byteOrder(ByteOrder order)
-    {
-        guestByteOrder = order;
-    }
+    void byteOrder(ByteOrder order) { guestByteOrder = order; }
 };
 
 } // namespace PowerISA

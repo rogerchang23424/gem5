@@ -52,7 +52,6 @@ namespace memory
 class MemInterface;
 class DRAMInterface;
 
-
 /**
  * HBM2 is divided into two pseudo channels which have independent data buses
  * but share a command bus (separate row and column command bus). Therefore,
@@ -63,16 +62,13 @@ class DRAMInterface;
  */
 class HBMCtrl : public MemCtrl
 {
-
   protected:
-
     bool respQEmpty() override
     {
         return (respQueue.empty() && respQueuePC1.empty());
     }
 
   private:
-
     /**
      * Remember if we have to retry a request for second pseudo channel.
      */
@@ -107,7 +103,7 @@ class HBMCtrl : public MemCtrl
      * @return tick for command issue without contention
      */
     Tick verifySingleCmd(Tick cmd_tick, Tick max_cmds_per_burst,
-                        bool row_cmd) override;
+                         bool row_cmd) override;
 
     /**
      * Check for command bus contention for multi-cycle (2 currently)
@@ -170,7 +166,7 @@ class HBMCtrl : public MemCtrl
      * Response queue for pkts sent to second pseudo channel
      * The first pseudo channel uses MemCtrl::respQueue
      */
-    std::deque<MemPacket*> respQueuePC1;
+    std::deque<MemPacket *> respQueuePC1;
 
     /**
      * Holds count of row commands issued in burst window starting at
@@ -191,8 +187,8 @@ class HBMCtrl : public MemCtrl
      * pc0Int is same as MemCtrl::dram (it will be pointing to
      * the DRAM interface defined in base MemCtrl)
      */
-    DRAMInterface* pc0Int;
-    DRAMInterface* pc1Int;
+    DRAMInterface *pc0Int;
+    DRAMInterface *pc1Int;
 
     /**
      * This indicates if the R/W queues will be partitioned among
@@ -201,7 +197,6 @@ class HBMCtrl : public MemCtrl
     bool partitionedQ;
 
   public:
-
     /**
      * Is there a respondEvent scheduled?
      *
@@ -248,20 +243,17 @@ class HBMCtrl : public MemCtrl
         }
     }
 
-
     virtual void init() override;
     virtual void startup() override;
     virtual void drainResume() override;
-
 
   protected:
     Tick recvAtomic(PacketPtr pkt) override;
     Tick recvAtomicBackdoor(PacketPtr pkt, MemBackdoorPtr &backdoor) override;
     void recvFunctional(PacketPtr pkt) override;
     void recvMemBackdoorReq(const MemBackdoorReq &req,
-            MemBackdoorPtr &_backdoor) override;
+                            MemBackdoorPtr &_backdoor) override;
     bool recvTimingReq(PacketPtr pkt) override;
-
 };
 
 } // namespace memory

@@ -63,6 +63,7 @@ class PrimaryFiber : public Fiber
 {
   public:
     PrimaryFiber() : Fiber(nullptr, 0) { setStarted(); }
+
     void main() { panic("PrimaryFiber main executed.\n"); }
 };
 
@@ -82,17 +83,21 @@ Fiber::entryTrampoline()
     startingFiber->start();
 }
 
-Fiber::Fiber(size_t stack_size) : Fiber(primaryFiber(), stack_size)
-{}
+Fiber::Fiber(size_t stack_size) : Fiber(primaryFiber(), stack_size) {}
 
-Fiber::Fiber(Fiber *link, size_t stack_size) :
-    link(link), stack(nullptr), stackSize(stack_size), guardPage(nullptr),
-    guardPageSize(sysconf(_SC_PAGE_SIZE)), _started(false), _finished(false)
+Fiber::Fiber(Fiber *link, size_t stack_size)
+    : link(link),
+      stack(nullptr),
+      stackSize(stack_size),
+      guardPage(nullptr),
+      guardPageSize(sysconf(_SC_PAGE_SIZE)),
+      _started(false),
+      _finished(false)
 {
     if (stack_size) {
-        guardPage = mmap(nullptr, guardPageSize + stack_size,
-                         PROT_READ | PROT_WRITE,
-                         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+        guardPage =
+            mmap(nullptr, guardPageSize + stack_size, PROT_READ | PROT_WRITE,
+                 MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
         if (guardPage == (void *)MAP_FAILED) {
             perror("mmap");
             fatal("Could not mmap %d byte fiber stack.\n", stack_size);
@@ -104,8 +109,8 @@ Fiber::Fiber(Fiber *link, size_t stack_size) :
         }
     }
 #if HAVE_VALGRIND
-    valgrindStackId = VALGRIND_STACK_REGISTER(
-            stack, (uint8_t *)stack + stack_size);
+    valgrindStackId =
+        VALGRIND_STACK_REGISTER(stack, (uint8_t *)stack + stack_size);
 #endif
 }
 
@@ -182,7 +187,16 @@ Fiber::run()
         _longjmp(next->jmp, 1);
 }
 
-Fiber *Fiber::currentFiber() { return _currentFiber; }
-Fiber *Fiber::primaryFiber() { return &_primaryFiber; }
+Fiber *
+Fiber::currentFiber()
+{
+    return _currentFiber;
+}
+
+Fiber *
+Fiber::primaryFiber()
+{
+    return &_primaryFiber;
+}
 
 } // namespace gem5

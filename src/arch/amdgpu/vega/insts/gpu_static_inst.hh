@@ -44,49 +44,46 @@ namespace gem5
 
 namespace VegaISA
 {
-    class VEGAGPUStaticInst : public GPUStaticInst
+class VEGAGPUStaticInst : public GPUStaticInst
+{
+  public:
+    VEGAGPUStaticInst(const std::string &opcode);
+    ~VEGAGPUStaticInst();
+
+    void generateDisassembly() override { disassembly = _opcode; }
+
+    bool isFlatScratchRegister(int opIdx) override
     {
-      public:
-        VEGAGPUStaticInst(const std::string &opcode);
-        ~VEGAGPUStaticInst();
+        return isFlatScratchReg(opIdx);
+    }
 
-        void generateDisassembly() override { disassembly = _opcode; }
+    bool isExecMaskRegister(int opIdx) override { return isExecMask(opIdx); }
 
-        bool
-        isFlatScratchRegister(int opIdx) override
-        {
-            return isFlatScratchReg(opIdx);
-        }
+    void initOperandInfo() override { return; }
 
-        bool
-        isExecMaskRegister(int opIdx) override
-        {
-            return isExecMask(opIdx);
-        }
+    int getOperandSize(int opIdx) override { return 0; }
 
-        void initOperandInfo() override { return; }
-        int getOperandSize(int opIdx) override { return 0; }
+    /**
+     * Return the number of tokens needed by the coalescer. In VEGA there
+     * is generally one packet per memory request per lane generated. In
+     * HSAIL, the number of dest operands is used for loads and src
+     * operands for stores. This method should be overriden on a per-inst
+     * basis when this value differs.
+     */
+    int coalescerTokenCount() const override { return 1; }
 
-        /**
-          * Return the number of tokens needed by the coalescer. In VEGA there
-          * is generally one packet per memory request per lane generated. In
-          * HSAIL, the number of dest operands is used for loads and src
-          * operands for stores. This method should be overriden on a per-inst
-          * basis when this value differs.
-          */
-        int coalescerTokenCount() const override { return 1; }
-        ScalarRegU32 srcLiteral() const override { return _srcLiteral; }
+    ScalarRegU32 srcLiteral() const override { return _srcLiteral; }
 
-      protected:
-        void panicUnimplemented() const;
+  protected:
+    void panicUnimplemented() const;
 
-        /**
-         * if the instruction has a src literal - an immediate
-         * value that is part of the instruction stream - we
-         * store that here
-         */
-        ScalarRegU32 _srcLiteral;
-    }; // class VEGAGPUStaticInst
+    /**
+     * if the instruction has a src literal - an immediate
+     * value that is part of the instruction stream - we
+     * store that here
+     */
+    ScalarRegU32 _srcLiteral;
+}; // class VEGAGPUStaticInst
 
 } // namespace VegaISA
 } // namespace gem5

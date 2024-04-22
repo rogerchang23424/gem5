@@ -70,12 +70,12 @@ class VirtIORng : public VirtIODeviceBase
     /**
      * Virtqueue for data going from the host to the guest.
      */
-    class RngQueue
-        : public VirtQueue
+    class RngQueue : public VirtQueue
     {
       public:
         RngQueue(PortProxy &proxy, ByteOrder bo, uint16_t size,
                  VirtIORng &_parent);
+
         virtual ~RngQueue() {}
 
         void onNotify() { trySend(); }
@@ -88,6 +88,7 @@ class VirtIORng : public VirtIODeviceBase
       protected:
         VirtIORng &parent;
     };
+
     /** Receive queue for port 0 */
     RngQueue qReq;
 };

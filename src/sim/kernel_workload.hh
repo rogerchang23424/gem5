@@ -77,28 +77,27 @@ class KernelWorkload : public Workload
     PARAMS(KernelWorkload);
 
     Addr start() const { return _start; }
+
     Addr end() const { return _end; }
+
     Addr loadAddrMask() const { return _loadAddrMask; }
+
     Addr loadAddrOffset() const { return _loadAddrOffset; }
 
     KernelWorkload(const Params &p);
 
     Addr getEntry() const override { return kernelObj->entryPoint(); }
-    ByteOrder byteOrder() const override { return kernelObj->getByteOrder(); }
-    loader::Arch
-    getArch() const override
-    {
-        return kernelObj->getArch();
-    }
 
-    const loader::SymbolTable &
-    symtab(ThreadContext *tc) override
+    ByteOrder byteOrder() const override { return kernelObj->getByteOrder(); }
+
+    loader::Arch getArch() const override { return kernelObj->getArch(); }
+
+    const loader::SymbolTable &symtab(ThreadContext *tc) override
     {
         return kernelSymtab;
     }
 
-    bool
-    insertSymbol(const loader::Symbol &symbol) override
+    bool insertSymbol(const loader::Symbol &symbol) override
     {
         return kernelSymtab.insert(symbol);
     }
@@ -124,20 +123,19 @@ class KernelWorkload : public Workload
      * @param args Arguments to be passed to addFuncEvent
      */
     template <class T, typename... Args>
-    T *
-    addKernelFuncEvent(const char *lbl, Args... args)
+    T *addKernelFuncEvent(const char *lbl, Args... args)
     {
         return addFuncEvent<T>(kernelSymtab, lbl, std::forward<Args>(args)...);
     }
 
     template <class T, typename... Args>
-    T *
-    addKernelFuncEventOrPanic(const char *lbl, Args... args)
+    T *addKernelFuncEventOrPanic(const char *lbl, Args... args)
     {
         T *e = addFuncEvent<T>(kernelSymtab, lbl, std::forward<Args>(args)...);
         panic_if(!e, "Failed to find kernel symbol '%s'", lbl);
         return e;
     }
+
     /** @} */
 };
 

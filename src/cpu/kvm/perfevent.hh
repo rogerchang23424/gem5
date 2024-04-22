@@ -85,7 +85,8 @@ class PerfKvmCounterConfig
      * @param period Number of counter events before the counter
      * overflows
      */
-    PerfKvmCounterConfig &samplePeriod(uint64_t period) {
+    PerfKvmCounterConfig &samplePeriod(uint64_t period)
+    {
         attr.freq = 0;
         attr.sample_period = period;
         return *this;
@@ -98,7 +99,8 @@ class PerfKvmCounterConfig
      *
      * @param events Number of overflows before signaling a wake up
      */
-    PerfKvmCounterConfig &wakeupEvents(uint32_t events) {
+    PerfKvmCounterConfig &wakeupEvents(uint32_t events)
+    {
         attr.watermark = 0;
         attr.wakeup_events = events;
         return *this;
@@ -110,7 +112,8 @@ class PerfKvmCounterConfig
      *
      * @param val true to disable, false to enable the counter
      */
-    PerfKvmCounterConfig &disabled(bool val) {
+    PerfKvmCounterConfig &disabled(bool val)
+    {
         attr.disabled = val;
         return *this;
     }
@@ -123,7 +126,8 @@ class PerfKvmCounterConfig
      *
      * @param val true to pin the counter
      */
-    PerfKvmCounterConfig &pinned(bool val) {
+    PerfKvmCounterConfig &pinned(bool val)
+    {
         attr.pinned = val;
         return *this;
     }
@@ -141,7 +145,8 @@ class PerfKvmCounterConfig
      *
      * @param val true to exclude host events
      */
-    PerfKvmCounterConfig &exclude_host(bool val) {
+    PerfKvmCounterConfig &exclude_host(bool val)
+    {
 #if HAVE_PERF_ATTR_EXCLUDE_HOST == 1
         attr.exclude_host = val;
 #endif
@@ -156,7 +161,8 @@ class PerfKvmCounterConfig
      *
      * @param val true to exclude host events
      */
-    PerfKvmCounterConfig &exclude_hv(bool val) {
+    PerfKvmCounterConfig &exclude_hv(bool val)
+    {
         attr.exclude_hv = val;
         return *this;
     }
@@ -170,7 +176,7 @@ class PerfKvmCounterConfig
  */
 class PerfKvmCounter
 {
-public:
+  public:
     /**
      * Create and attach a new counter group.
      *
@@ -186,14 +192,13 @@ public:
      * @param tid Thread to sample (0 indicates current thread)
      * @param parent Group leader
      */
-    PerfKvmCounter(PerfKvmCounterConfig &config,
-                pid_t tid, const PerfKvmCounter &parent);
+    PerfKvmCounter(PerfKvmCounterConfig &config, pid_t tid,
+                   const PerfKvmCounter &parent);
     /**
      * Create a new counter, but don't attach it.
      */
     PerfKvmCounter();
     ~PerfKvmCounter();
-
 
     /**
      * Attach a counter.
@@ -204,7 +209,8 @@ public:
      * @param config Counter configuration
      * @param tid Thread to sample (0 indicates current thread)
      */
-    void attach(PerfKvmCounterConfig &config, pid_t tid) {
+    void attach(PerfKvmCounterConfig &config, pid_t tid)
+    {
         attach(config, tid, -1);
     }
 
@@ -219,8 +225,9 @@ public:
      * @param tid Thread to sample (0 indicates current thread)
      * @param parent Group leader
      */
-    void attach(PerfKvmCounterConfig &config,
-                pid_t tid, const PerfKvmCounter &parent) {
+    void attach(PerfKvmCounterConfig &config, pid_t tid,
+                const PerfKvmCounter &parent)
+    {
         attach(config, tid, parent.fd);
     }
 
@@ -300,7 +307,7 @@ public:
      */
     void enableSignals(int signal) { enableSignals(sysGettid(), signal); }
 
-private:
+  private:
     // Disallow copying
     PerfKvmCounter(const PerfKvmCounter &that);
     // Disallow assignment
@@ -340,7 +347,9 @@ private:
      * value otherwise.
      */
     int fcntl(int cmd, long p1);
+
     int fcntl(int cmd, void *p1) { return fcntl(cmd, (long)p1); }
+
     /** @} */
 
     /** @{ */
@@ -354,8 +363,11 @@ private:
      * value otherwise.
      */
     int ioctl(int request, long p1);
+
     int ioctl(int request, void *p1) { return ioctl(request, (long)p1); }
+
     int ioctl(int request) { return ioctl(request, 0L); }
+
     /** @} */
 
     /**

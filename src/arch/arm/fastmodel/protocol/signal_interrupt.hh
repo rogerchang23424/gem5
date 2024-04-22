@@ -35,12 +35,15 @@
 namespace gem5
 {
 
-struct SignalInterruptDummyProtocolType {};
+struct SignalInterruptDummyProtocolType
+{
+};
 
 class SignalInterruptFwIf : public virtual sc_core::sc_interface
 {
   public:
     virtual ~SignalInterruptFwIf() {}
+
     virtual void ppi(uint8_t cpu, uint32_t num, bool state) = 0;
     virtual void spi(uint32_t num, bool state) = 0;
 };
@@ -66,7 +69,8 @@ class SignalInterruptInitiatorSocket :
 
   public:
     typedef tlm::tlm_base_initiator_socket<64, SignalInterruptFwIf,
-                                           SignalInterruptBwIf> Base;
+                                           SignalInterruptBwIf>
+        Base;
 
     using Base::bind;
     using Base::operator();
@@ -75,19 +79,18 @@ class SignalInterruptInitiatorSocket :
     {
         get_base_export().bind(dummyBwIf);
     }
+
     SignalInterruptInitiatorSocket(const char *name) : Base(name)
     {
         get_base_export().bind(dummyBwIf);
     }
 
-    const char *
-    kind() const override
+    const char *kind() const override
     {
         return "SignalInterruptInitiatorSocket";
     }
 
-    std::type_index
-    get_protocol_types() const override
+    std::type_index get_protocol_types() const override
     {
         return typeid(SignalInterruptDummyProtocolType);
     }
@@ -99,21 +102,20 @@ class SignalInterruptTargetSocket :
 {
   public:
     typedef tlm::tlm_base_target_socket<64, SignalInterruptFwIf,
-                                        SignalInterruptBwIf> Base;
+                                        SignalInterruptBwIf>
+        Base;
 
     using Base::bind;
     using Base::operator();
 
     using Base::Base;
 
-    const char *
-    kind() const override
+    const char *kind() const override
     {
         return "SignalInterruptInitiatorSocket";
     }
 
-    std::type_index
-    get_protocol_types() const override
+    std::type_index get_protocol_types() const override
     {
         return typeid(SignalInterruptDummyProtocolType);
     }

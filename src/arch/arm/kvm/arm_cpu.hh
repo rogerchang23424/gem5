@@ -97,8 +97,8 @@ class ArmKvmCPU : public BaseKvmCPU
 
     void updateKvmState();
     void updateThreadContext();
-    void
-    stutterPC(PCStateBase &pc) const
+
+    void stutterPC(PCStateBase &pc) const
     {
         pc.as<ArmISA::PCState>().setNPC(pc->instAddr());
     }
@@ -153,7 +153,6 @@ class ArmKvmCPU : public BaseKvmCPU
     void updateTCStateMisc();
     void updateTCStateCoProc(uint64_t id, bool show_warnings);
     void updateTCStateVFP(uint64_t id, bool show_warnings);
-
 
     /** Cached state of the IRQ line */
     bool irqAsserted;

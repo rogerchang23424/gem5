@@ -63,9 +63,7 @@ class Process;
 ///
 class FreeBSD : public OperatingSystem
 {
-
   public:
-
     //@{
     /// Basic FreeBSD types.
     typedef uint64_t size_t;
@@ -81,26 +79,26 @@ class FreeBSD : public OperatingSystem
 
     //@{
     /// ioctl() command codes.
-    static const unsigned TGT_TIOCGETA   = 0x402c7413;
-    static const unsigned TGT_TIOCSETA   = 0x802c7414;
-    static const unsigned TGT_TIOCSETAW  = 0x802c7415;
-    static const unsigned TGT_FIONREAD   = 0x4004667f;
+    static const unsigned TGT_TIOCGETA = 0x402c7413;
+    static const unsigned TGT_TIOCSETA = 0x802c7414;
+    static const unsigned TGT_TIOCSETAW = 0x802c7415;
+    static const unsigned TGT_FIONREAD = 0x4004667f;
+
     //@}
 
     /// Return true for the ioctl codes for which we return ENOTTY
     /// *without* printing a warning, since we know that ENOTTY is the
     /// correct thing to return (and not just a sign that we don't
     /// recognize the ioctl code.
-    static bool
-    isTtyReq(unsigned req)
+    static bool isTtyReq(unsigned req)
     {
         switch (req) {
-          case TGT_TIOCGETA:
-          case TGT_TIOCSETA:
-          case TGT_TIOCSETAW:
-          case TGT_FIONREAD:
+        case TGT_TIOCGETA:
+        case TGT_TIOCSETA:
+        case TGT_TIOCSETAW:
+        case TGT_FIONREAD:
             return true;
-          default:
+        default:
             return false;
         }
     }
@@ -123,15 +121,15 @@ class FreeBSD : public OperatingSystem
     static const unsigned TGT_RLIMIT_KQUEUES = 13;
 
     /// For getrusage().
-    static const int TGT_RUSAGE_SELF     = 0;
+    static const int TGT_RUSAGE_SELF = 0;
     static const int TGT_RUSAGE_CHILDREN = -1;
-    static const int TGT_RUSAGE_THREAD   = 1;
+    static const int TGT_RUSAGE_THREAD = 1;
 
     // for *at syscalls
-    static const int TGT_AT_FDCWD     = -100;
+    static const int TGT_AT_FDCWD = -100;
     static const int TGT_AT_REMOVEDIR = 0x800;
 
-};  // class FreeBSD
+}; // class FreeBSD
 
 } // namespace gem5
 

@@ -53,7 +53,6 @@ namespace gem5
 class GUPSGen : public ClockedObject
 {
   private:
-
     /**
      * @brief definition of the GenPort class which is of the type RequestPort.
      * It defines the functionalities required for outside communication of
@@ -63,7 +62,6 @@ class GUPSGen : public ClockedObject
     class GenPort : public RequestPort
     {
       private:
-
         /**
          * @brief Pointer to the GUPSGen this port belongs to
          */
@@ -85,10 +83,11 @@ class GUPSGen : public ClockedObject
         PacketPtr blockedPacket;
 
       public:
-
-        GenPort(const std::string& name, GUPSGen *owner) :
-            RequestPort(name), owner(owner), _blocked(false),
-            blockedPacket(nullptr)
+        GenPort(const std::string &name, GUPSGen *owner)
+            : RequestPort(name),
+              owner(owner),
+              _blocked(false),
+              blockedPacket(nullptr)
         {}
 
         /**
@@ -97,9 +96,7 @@ class GUPSGen : public ClockedObject
          * @return true if the port is blocked.
          * @return false if the port is free.
          */
-        bool blocked(){
-            return _blocked;
-        }
+        bool blocked() { return _blocked; }
 
         /**
          * @brief This function send a timing request to the port's peer
@@ -116,7 +113,6 @@ class GUPSGen : public ClockedObject
         void sendFunctionalPacket(PacketPtr pkt);
 
       protected:
-
         bool recvTimingResp(PacketPtr pkt) override;
 
         void recvReqRetry() override;
@@ -132,7 +128,7 @@ class GUPSGen : public ClockedObject
      * @param index Index of the element in the array
      * @return Addr Physical address corresponding to the index.
      */
-    Addr indexToAddr (uint64_t index);
+    Addr indexToAddr(uint64_t index);
 
     /**
      * @brief Generate a read request to be sent to the outside.
@@ -153,7 +149,7 @@ class GUPSGen : public ClockedObject
      * @return Pointer to the generated packet. This packet includes
      * the request to the outside.
      */
-    PacketPtr getWritePacket(Addr addr, unsigned int size, uint8_t* data);
+    PacketPtr getWritePacket(Addr addr, unsigned int size, uint8_t *data);
 
     /**
      * @brief Handles the incoming responses from the outside.
@@ -303,7 +299,7 @@ class GUPSGen : public ClockedObject
 
     struct GUPSGenStat : public statistics::Group
     {
-        GUPSGenStat(GUPSGen* parent);
+        GUPSGenStat(GUPSGen *parent);
         void regStats() override;
 
         statistics::Scalar totalUpdates;
@@ -323,13 +319,12 @@ class GUPSGen : public ClockedObject
     } stats;
 
   public:
-
     GUPSGen(const GUPSGenParams &params);
 
     Port &getPort(const std::string &if_name,
-                PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 };
 
-}
+} // namespace gem5
 
 #endif // __CPU_TESTERS_TRAFFIC_GEN_GUPS_GEN_HH__

@@ -67,19 +67,18 @@ class SkipUDelay : public Base
 
   public:
     SkipUDelay(PCEventScope *s, const std::string &desc, Addr addr,
-               uint64_t mult, uint64_t div) :
-        Base(s, desc, addr), argDivToNs(div), argMultToNs(mult)
+               uint64_t mult, uint64_t div)
+        : Base(s, desc, addr), argDivToNs(div), argMultToNs(mult)
     {}
 
-    void
-    process(ThreadContext *tc) override
+    void process(ThreadContext *tc) override
     {
         // Use Addr since it's handled specially and will act as a natively
         // sized data type.
         std::function<void(ThreadContext *, Addr)> call_udelay =
             [this](ThreadContext *tc, Addr time) {
-            onUDelay(tc, argDivToNs, argMultToNs, time);
-        };
+                onUDelay(tc, argDivToNs, argMultToNs, time);
+            };
         invokeSimcall<ABI>(tc, call_udelay);
         Base::process(tc);
     }

@@ -52,7 +52,8 @@ class ScalarRegisterFile : public RegisterFile
     using ScalarRegU32 = TheGpuISA::ScalarRegU32;
 
     ScalarRegisterFile(const ScalarRegisterFileParams &p);
-    ~ScalarRegisterFile() { }
+
+    ~ScalarRegisterFile() {}
 
     virtual bool operandsReady(Wavefront *w, GPUDynInstPtr ii) const override;
     virtual void scheduleWriteOperands(Wavefront *w,
@@ -61,38 +62,24 @@ class ScalarRegisterFile : public RegisterFile
                                                GPUDynInstPtr ii) override;
     virtual void waveExecuteInst(Wavefront *w, GPUDynInstPtr ii) override;
 
-    void
-    setParent(ComputeUnit *_computeUnit) override
+    void setParent(ComputeUnit *_computeUnit) override
     {
         RegisterFile::setParent(_computeUnit);
     }
 
     // Read a register that is writeable (e.g., a DST operand)
-    ScalarRegU32&
-    readWriteable(int regIdx)
-    {
-        return regFile[regIdx];
-    }
+    ScalarRegU32 &readWriteable(int regIdx) { return regFile[regIdx]; }
 
     // Read a register that is not writeable (e.g., src operand)
-    ScalarRegU32
-    read(int regIdx) const
-    {
-        return regFile[regIdx];
-    }
+    ScalarRegU32 read(int regIdx) const { return regFile[regIdx]; }
 
     // Write a register
-    void
-    write(int regIdx, ScalarRegU32 value)
-    {
-        regFile[regIdx] = value;
-    }
+    void write(int regIdx, ScalarRegU32 value) { regFile[regIdx] = value; }
 
-    void
-    printReg(Wavefront *wf, int regIdx) const
+    void printReg(Wavefront *wf, int regIdx) const
     {
         DPRINTF(GPUSRF, "WF[%d][%d]: Id%d s[%d] = %#x\n", wf->simdId,
-            wf->wfSlotId, wf->wfDynId, regIdx, regFile[regIdx]);
+                wf->wfSlotId, wf->wfDynId, regIdx, regFile[regIdx]);
     }
 
   private:

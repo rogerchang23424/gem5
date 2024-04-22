@@ -63,8 +63,7 @@ class BaseArmKvmCPU : public BaseKvmCPU
   protected:
     Tick kvmRun(Tick ticks) override;
 
-    void
-    stutterPC(PCStateBase &pc) const override
+    void stutterPC(PCStateBase &pc) const override
     {
         pc.as<ArmISA::PCState>().setNPC(pc.instAddr());
     }

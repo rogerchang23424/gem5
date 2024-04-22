@@ -62,7 +62,8 @@ class FetchStage
     void fetch(PacketPtr pkt, Wavefront *wave);
 
     // Stats related variables and methods
-    const std::string& name() const { return _name; }
+    const std::string &name() const { return _name; }
+
     FetchUnit &fetchUnit(int simdId) { return _fetchUnit.at(simdId); }
 
   private:

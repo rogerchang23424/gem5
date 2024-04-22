@@ -210,7 +210,6 @@ class PciHost : public PioDevice
      */
     virtual Addr memAddr(const PciBusAddr &bus_addr, Addr pci_addr) const = 0;
 
-
     /**
      * Calculate the physical address of a prefetchable memory
      * location in the PCI address space.
@@ -286,15 +285,18 @@ class GenericPciHost : public PciHost
     AddrRangeList getAddrRanges() const override;
 
   protected: // PciHost
-    Addr pioAddr(const PciBusAddr &bus_addr, Addr pci_addr) const override {
+    Addr pioAddr(const PciBusAddr &bus_addr, Addr pci_addr) const override
+    {
         return pciPioBase + pci_addr;
     }
 
-    Addr memAddr(const PciBusAddr &bus_addr, Addr pci_addr) const override {
+    Addr memAddr(const PciBusAddr &bus_addr, Addr pci_addr) const override
+    {
         return pciMemBase + pci_addr;
     }
 
-    Addr dmaAddr(const PciBusAddr &bus_addr, Addr pci_addr) const override {
+    Addr dmaAddr(const PciBusAddr &bus_addr, Addr pci_addr) const override
+    {
         return pciDmaBase + pci_addr;
     }
 

@@ -78,8 +78,13 @@ class Base : public ClockedObject
                          const std::string &name, bool _isFill = false,
                          bool _miss = false)
             : ProbeListenerArgBase(pm, name),
-              parent(_parent), isFill(_isFill), miss(_miss) {}
+              parent(_parent),
+              isFill(_isFill),
+              miss(_miss)
+        {}
+
         void notify(const CacheAccessProbeArg &arg) override;
+
       protected:
         Base &parent;
         const bool isFill;
@@ -93,8 +98,11 @@ class Base : public ClockedObject
       public:
         PrefetchEvictListener(Base &_parent, ProbeManager *pm,
                               const std::string &name)
-            : ProbeListenerArgBase(pm, name), parent(_parent) {}
+            : ProbeListenerArgBase(pm, name), parent(_parent)
+        {}
+
         void notify(const EvictionInfo &info) override;
+
       protected:
         Base &parent;
     };
@@ -102,7 +110,6 @@ class Base : public ClockedObject
     std::vector<ProbeListener *> listeners;
 
   public:
-
     /**
      * Class containing the information needed by the prefetch to train and
      * generate new prefetch requests.
@@ -135,19 +142,13 @@ class Base : public ClockedObject
          * Obtains the address value of this Prefetcher address.
          * @return the addres value.
          */
-        Addr getAddr() const
-        {
-            return address;
-        }
+        Addr getAddr() const { return address; }
 
         /**
          * Returns true if the address targets the secure memory space.
          * @return true if the address targets the secure memory space.
          */
-        bool isSecure() const
-        {
-            return secure;
-        }
+        bool isSecure() const { return secure; }
 
         /**
          * Returns the program counter that generated this request.
@@ -163,56 +164,38 @@ class Base : public ClockedObject
          * Returns true if the associated program counter is valid
          * @return true if the program counter has a valid value
          */
-        bool hasPC() const
-        {
-            return validPC;
-        }
+        bool hasPC() const { return validPC; }
 
         /**
          * Gets the requestor ID that generated this address
          * @return the requestor ID that generated this address
          */
-        RequestorID getRequestorId() const
-        {
-            return requestorId;
-        }
+        RequestorID getRequestorId() const { return requestorId; }
 
         /**
          * Gets the size of the request triggering this event
          * @return the size in bytes of the request triggering this event
          */
-        unsigned int getSize() const
-        {
-            return size;
-        }
+        unsigned int getSize() const { return size; }
 
         /**
          * Checks if the request that caused this prefetch event was a write
          * request
          * @return true if the request causing this event is a write request
          */
-        bool isWrite() const
-        {
-            return write;
-        }
+        bool isWrite() const { return write; }
 
         /**
          * Gets the physical address of the request
          * @return physical address of the request
          */
-        Addr getPaddr() const
-        {
-            return paddress;
-        }
+        Addr getPaddr() const { return paddress; }
 
         /**
          * Check if this event comes from a cache miss
          * @result true if this event comes from a cache miss
          */
-        bool isCacheMiss() const
-        {
-            return cacheMiss;
-        }
+        bool isCacheMiss() const { return cacheMiss; }
 
         /**
          * Gets the associated data of the request triggering the event
@@ -220,21 +203,20 @@ class Base : public ClockedObject
          * @return the data
          */
         template <typename T>
-        inline T
-        get(ByteOrder endian) const
+        inline T get(ByteOrder endian) const
         {
             if (data == nullptr) {
                 panic("PrefetchInfo::get called with a request with no data.");
             }
             switch (endian) {
-                case ByteOrder::big:
-                    return betoh(*(T*)data);
+            case ByteOrder::big:
+                return betoh(*(T *)data);
 
-                case ByteOrder::little:
-                    return letoh(*(T*)data);
+            case ByteOrder::little:
+                return letoh(*(T *)data);
 
-                default:
-                    panic("Illegal byte order in PrefetchInfo::get()\n");
+            default:
+                panic("Illegal byte order in PrefetchInfo::get()\n");
             };
         }
 
@@ -246,7 +228,7 @@ class Base : public ClockedObject
         bool sameAddr(PrefetchInfo const &pfi) const
         {
             return this->getAddr() == pfi.getAddr() &&
-                this->isSecure() == pfi.isSecure();
+                   this->isSecure() == pfi.isSecure();
         }
 
         /**
@@ -266,18 +248,14 @@ class Base : public ClockedObject
          */
         PrefetchInfo(PrefetchInfo const &pfi, Addr addr);
 
-        ~PrefetchInfo()
-        {
-            delete[] data;
-        }
+        ~PrefetchInfo() { delete[] data; }
     };
 
   protected:
-
     // PARAMETERS
 
     /** Pointer to the parent system. */
-    System* system;
+    System *system;
 
     /** Pointer to the parent cache's probe manager. */
     ProbeManager *probeManager;
@@ -337,6 +315,7 @@ class Base : public ClockedObject
     Addr pageOffset(Addr a) const;
     /** Build the address of the i-th block inside the page */
     Addr pageIthBlockAddress(Addr page, uint32_t i) const;
+
     struct StatGroup : public statistics::Group
     {
         StatGroup(statistics::Group *parent);
@@ -374,63 +353,41 @@ class Base : public ClockedObject
     uint64_t usefulPrefetches;
 
     /** Registered mmu for address translations */
-    BaseMMU * mmu;
+    BaseMMU *mmu;
 
   public:
     Base(const BasePrefetcherParams &p);
     virtual ~Base() = default;
 
-    virtual void
-    setParentInfo(System *sys, ProbeManager *pm, unsigned blk_size);
+    virtual void setParentInfo(System *sys, ProbeManager *pm,
+                               unsigned blk_size);
 
     /**
      * Notify prefetcher of cache access (may be any access or just
      * misses, depending on cache parameters.)
      */
-    virtual void
-    notify(const CacheAccessProbeArg &acc, const PrefetchInfo &pfi) = 0;
+    virtual void notify(const CacheAccessProbeArg &acc,
+                        const PrefetchInfo &pfi) = 0;
 
     /** Notify prefetcher of cache fill */
-    virtual void notifyFill(const CacheAccessProbeArg &acc)
-    {}
+    virtual void notifyFill(const CacheAccessProbeArg &acc) {}
 
     /** Notify prefetcher of cache eviction */
-    virtual void notifyEvict(const EvictionInfo &info)
-    {}
+    virtual void notifyEvict(const EvictionInfo &info) {}
 
     virtual PacketPtr getPacket() = 0;
 
     virtual Tick nextPrefetchReadyTime() const = 0;
 
-    void
-    prefetchUnused()
-    {
-        prefetchStats.pfUnused++;
-    }
+    void prefetchUnused() { prefetchStats.pfUnused++; }
 
-    void
-    incrDemandMhsrMisses()
-    {
-        prefetchStats.demandMshrMisses++;
-    }
+    void incrDemandMhsrMisses() { prefetchStats.demandMshrMisses++; }
 
-    void
-    pfHitInCache()
-    {
-        prefetchStats.pfHitInCache++;
-    }
+    void pfHitInCache() { prefetchStats.pfHitInCache++; }
 
-    void
-    pfHitInMSHR()
-    {
-        prefetchStats.pfHitInMSHR++;
-    }
+    void pfHitInMSHR() { prefetchStats.pfHitInMSHR++; }
 
-    void
-    pfHitInWB()
-    {
-        prefetchStats.pfHitInWB++;
-    }
+    void pfHitInWB() { prefetchStats.pfHitInWB++; }
 
     /**
      * Register probe points for this object.

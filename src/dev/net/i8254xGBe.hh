@@ -94,7 +94,8 @@ class IGbE : public EtherDevice
     Tick rxWriteDelay, txReadDelay;
 
     // Event and function to deal with RDTR timer expiring
-    void rdtrProcess() {
+    void rdtrProcess()
+    {
         rxDescCache.writeback(0);
         DPRINTF(EthernetIntr,
                 "Posting RXT interrupt because RDTR timer expired\n");
@@ -104,7 +105,8 @@ class IGbE : public EtherDevice
     EventFunctionWrapper rdtrEvent;
 
     // Event and function to deal with RADV timer expiring
-    void radvProcess() {
+    void radvProcess()
+    {
         rxDescCache.writeback(0);
         DPRINTF(EthernetIntr,
                 "Posting RXT interrupt because RADV timer expired\n");
@@ -114,7 +116,8 @@ class IGbE : public EtherDevice
     EventFunctionWrapper radvEvent;
 
     // Event and function to deal with TADV timer expiring
-    void tadvProcess() {
+    void tadvProcess()
+    {
         txDescCache.writeback(0);
         DPRINTF(EthernetIntr,
                 "Posting TXDW interrupt because TADV timer expired\n");
@@ -124,18 +127,19 @@ class IGbE : public EtherDevice
     EventFunctionWrapper tadvEvent;
 
     // Event and function to deal with TIDV timer expiring
-    void tidvProcess() {
+    void tidvProcess()
+    {
         txDescCache.writeback(0);
         DPRINTF(EthernetIntr,
                 "Posting TXDW interrupt because TIDV timer expired\n");
         postInterrupt(igbreg::IT_TXDW);
     }
+
     EventFunctionWrapper tidvEvent;
 
     // Main event to tick the device
     void tick();
     EventFunctionWrapper tickEvent;
-
 
     uint64_t macAddr;
 
@@ -177,7 +181,7 @@ class IGbE : public EtherDevice
      */
     void checkDrain();
 
-    template<class T>
+    template <class T>
     class DescCache : public Serializable
     {
       protected:
@@ -187,7 +191,9 @@ class IGbE : public EtherDevice
         virtual long descLen() const = 0;
         virtual void updateHead(long h) = 0;
         virtual void enableSm() = 0;
+
         virtual void actionAfterWb() {}
+
         virtual void fetchAfterWb() = 0;
 
         typedef std::deque<T *> CacheType;
@@ -268,8 +274,7 @@ class IGbE : public EtherDevice
         /* Return the number of descriptors left in the ring, so the device has
          * a way to figure out if it needs to interrupt.
          */
-        unsigned
-        descLeft() const
+        unsigned descLeft() const
         {
             unsigned left = unusedCache.size();
             if (cachePnt > descTail())
@@ -291,27 +296,32 @@ class IGbE : public EtherDevice
          * changed */
         void reset();
 
-
         void serialize(CheckpointOut &cp) const override;
         void unserialize(CheckpointIn &cp) override;
 
-        virtual bool hasOutstandingEvents() {
+        virtual bool hasOutstandingEvents()
+        {
             return wbEvent.scheduled() || fetchEvent.scheduled();
         }
-
     };
-
 
     class RxDescCache : public DescCache<igbreg::RxDesc>
     {
       protected:
         Addr descBase() const override { return igbe->regs.rdba(); }
+
         long descHead() const override { return igbe->regs.rdh(); }
+
         long descLen() const override { return igbe->regs.rdlen() >> 4; }
+
         long descTail() const override { return igbe->regs.rdt(); }
+
         void updateHead(long h) override { igbe->regs.rdh(h); }
+
         void enableSm() override;
-        void fetchAfterWb() override {
+
+        void fetchAfterWb() override
+        {
             if (!igbe->rxTick && igbe->drainState() == DrainState::Running)
                 fetchDescriptors();
         }
@@ -363,22 +373,27 @@ class IGbE : public EtherDevice
 
     RxDescCache rxDescCache;
 
-    class TxDescCache  : public DescCache<igbreg::TxDesc>
+    class TxDescCache : public DescCache<igbreg::TxDesc>
     {
       protected:
         Addr descBase() const override { return igbe->regs.tdba(); }
+
         long descHead() const override { return igbe->regs.tdh(); }
+
         long descTail() const override { return igbe->regs.tdt(); }
+
         long descLen() const override { return igbe->regs.tdlen() >> 4; }
+
         void updateHead(long h) override { igbe->regs.tdh(h); }
+
         void enableSm() override;
         void actionAfterWb() override;
-        void fetchAfterWb() override {
+
+        void fetchAfterWb() override
+        {
             if (!igbe->txTick && igbe->drainState() == DrainState::Running)
                 fetchDescriptors();
         }
-
-
 
         bool pktDone;
         bool isTcp;
@@ -387,7 +402,6 @@ class IGbE : public EtherDevice
         Addr completionAddress;
         bool completionEnabled;
         uint32_t descEnd;
-
 
         // tso variables
         bool useTso;
@@ -418,8 +432,7 @@ class IGbE : public EtherDevice
         /** Return the number of dsecriptors in a cache block for threshold
          * operations.
          */
-        unsigned
-        descInBlock(unsigned num_desc)
+        unsigned descInBlock(unsigned num_desc)
         {
             return num_desc / igbe->cacheBlockSize() / sizeof(igbreg::TxDesc);
         }
@@ -441,7 +454,7 @@ class IGbE : public EtherDevice
          * @return packet can't be sent out because it's a multi-descriptor
          * packet
          */
-        bool packetMultiDesc() { return pktMultiDesc;}
+        bool packetMultiDesc() { return pktMultiDesc; }
 
         /** Called by event when dma to write packet is completed
          */
@@ -451,20 +464,22 @@ class IGbE : public EtherDevice
         void headerComplete();
         EventFunctionWrapper headerEvent;
 
-
-        void completionWriteback(Addr a, bool enabled) {
+        void completionWriteback(Addr a, bool enabled)
+        {
             DPRINTF(EthernetDesc,
-                    "Completion writeback Addr: %#x enabled: %d\n",
-                    a, enabled);
+                    "Completion writeback Addr: %#x enabled: %d\n", a,
+                    enabled);
             completionAddress = a;
             completionEnabled = enabled;
         }
 
         bool hasOutstandingEvents() override;
 
-        void nullCallback() {
+        void nullCallback()
+        {
             DPRINTF(EthernetDesc, "Completion writeback complete\n");
         }
+
         EventFunctionWrapper nullEvent;
 
         void serialize(CheckpointOut &cp) const override;
@@ -483,7 +498,7 @@ class IGbE : public EtherDevice
     void init() override;
 
     Port &getPort(const std::string &if_name,
-                  PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 
     Tick lastInterrupt;
 
@@ -500,7 +515,6 @@ class IGbE : public EtherDevice
 
     DrainState drain() override;
     void drainResume() override;
-
 };
 
 class IGbEInt : public EtherInt
@@ -509,11 +523,10 @@ class IGbEInt : public EtherInt
     IGbE *dev;
 
   public:
-    IGbEInt(const std::string &name, IGbE *d)
-        : EtherInt(name), dev(d)
-    { }
+    IGbEInt(const std::string &name, IGbE *d) : EtherInt(name), dev(d) {}
 
     virtual bool recvPacket(EthPacketPtr pkt) { return dev->ethRxPkt(pkt); }
+
     virtual void sendDone() { dev->ethTxDone(); }
 };
 

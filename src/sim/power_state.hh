@@ -69,8 +69,8 @@ class PowerState : public SimObject
     /** Parameters of PowerState object */
     PARAMS(PowerState);
 
-    virtual void addFollower(PowerState* pwr_obj) {};
-    void setControlledDomain(PowerDomain* pwr_dom);
+    virtual void addFollower(PowerState *pwr_obj){};
+    void setControlledDomain(PowerDomain *pwr_dom);
 
     void serialize(CheckpointOut &cp) const override;
     void unserialize(CheckpointIn &cp) override;
@@ -80,11 +80,7 @@ class PowerState : public SimObject
      */
     void set(enums::PwrState p);
 
-
-    inline enums::PwrState get() const
-    {
-        return _currState;
-    }
+    inline enums::PwrState get() const { return _currState; }
 
     inline std::string getName() const
     {
@@ -117,7 +113,6 @@ class PowerState : public SimObject
     }
 
   protected:
-
     /** To keep track of the current power state */
     enums::PwrState _currState;
 
@@ -131,7 +126,7 @@ class PowerState : public SimObject
      * The power domain that this power state leads, nullptr if it
      * doesn't lead any.
      */
-    PowerDomain* controlledDomain = nullptr;
+    PowerDomain *controlledDomain = nullptr;
 
     struct PowerStateStats : public statistics::Group
     {

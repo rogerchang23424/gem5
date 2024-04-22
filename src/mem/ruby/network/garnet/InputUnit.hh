@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef __MEM_RUBY_NETWORK_GARNET_0_INPUTUNIT_HH__
 #define __MEM_RUBY_NETWORK_GARNET_0_INPUTUNIT_HH__
 
@@ -59,98 +58,87 @@ class InputUnit : public Consumer
     ~InputUnit() = default;
 
     void wakeup();
-    void print(std::ostream& out) const {};
+    void print(std::ostream &out) const {};
 
     inline PortDirection get_direction() { return m_direction; }
 
-    inline void
-    set_vc_idle(int vc, Tick curTime)
+    inline void set_vc_idle(int vc, Tick curTime)
     {
         virtualChannels[vc].set_idle(curTime);
     }
 
-    inline void
-    set_vc_active(int vc, Tick curTime)
+    inline void set_vc_active(int vc, Tick curTime)
     {
         virtualChannels[vc].set_active(curTime);
     }
 
-    inline void
-    grant_outport(int vc, int outport)
+    inline void grant_outport(int vc, int outport)
     {
         virtualChannels[vc].set_outport(outport);
     }
 
-    inline void
-    grant_outvc(int vc, int outvc)
+    inline void grant_outvc(int vc, int outvc)
     {
         virtualChannels[vc].set_outvc(outvc);
     }
 
-    inline int
-    get_outport(int invc)
+    inline int get_outport(int invc)
     {
         return virtualChannels[invc].get_outport();
     }
 
-    inline int
-    get_outvc(int invc)
+    inline int get_outvc(int invc)
     {
         return virtualChannels[invc].get_outvc();
     }
 
-    inline Tick
-    get_enqueue_time(int invc)
+    inline Tick get_enqueue_time(int invc)
     {
         return virtualChannels[invc].get_enqueue_time();
     }
 
     void increment_credit(int in_vc, bool free_signal, Tick curTime);
 
-    inline flit*
-    peekTopFlit(int vc)
+    inline flit *peekTopFlit(int vc)
     {
         return virtualChannels[vc].peekTopFlit();
     }
 
-    inline flit*
-    getTopFlit(int vc)
+    inline flit *getTopFlit(int vc)
     {
         return virtualChannels[vc].getTopFlit();
     }
 
-    inline bool
-    need_stage(int vc, flit_stage stage, Tick time)
+    inline bool need_stage(int vc, flit_stage stage, Tick time)
     {
         return virtualChannels[vc].need_stage(stage, time);
     }
 
-    inline bool
-    isReady(int invc, Tick curTime)
+    inline bool isReady(int invc, Tick curTime)
     {
         return virtualChannels[invc].isReady(curTime);
     }
 
-    flitBuffer* getCreditQueue() { return &creditQueue; }
+    flitBuffer *getCreditQueue() { return &creditQueue; }
 
-    inline void
-    set_in_link(NetworkLink *link)
-    {
-        m_in_link = link;
-    }
+    inline void set_in_link(NetworkLink *link) { m_in_link = link; }
 
     inline int get_inlink_id() { return m_in_link->get_id(); }
 
-    inline void
-    set_credit_link(CreditLink *credit_link)
+    inline void set_credit_link(CreditLink *credit_link)
     {
         m_credit_link = credit_link;
     }
 
     double get_buf_read_activity(unsigned int vnet) const
-    { return m_num_buffer_reads[vnet]; }
+    {
+        return m_num_buffer_reads[vnet];
+    }
+
     double get_buf_write_activity(unsigned int vnet) const
-    { return m_num_buffer_writes[vnet]; }
+    {
+        return m_num_buffer_writes[vnet];
+    }
 
     bool functionalRead(Packet *pkt, WriteMask &mask);
     uint32_t functionalWrite(Packet *pkt);

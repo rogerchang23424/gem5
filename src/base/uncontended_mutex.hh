@@ -57,8 +57,7 @@ class UncontendedMutex
     std::mutex m;
     std::condition_variable cv;
 
-    bool
-    testAndSet(int expected, int desired)
+    bool testAndSet(int expected, int desired)
     {
         return flag.compare_exchange_strong(expected, desired);
     }
@@ -66,8 +65,7 @@ class UncontendedMutex
   public:
     UncontendedMutex() : flag(0) {}
 
-    void
-    lock()
+    void lock()
     {
         /*
          * Here we use 'flag' to check if we are the first thread to get the
@@ -91,8 +89,7 @@ class UncontendedMutex
         }
     }
 
-    void
-    unlock()
+    void unlock()
     {
         /* In case there are no other threads waiting, we will just clear the
          * flag and return.

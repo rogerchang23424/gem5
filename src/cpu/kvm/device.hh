@@ -74,8 +74,9 @@ class KvmDevice
      * @param attr Attribute ID within group
      * @return Attribute value
      */
-    template<typename T>
-    T getAttr(uint32_t group, uint64_t attr) const {
+    template <typename T>
+    T getAttr(uint32_t group, uint64_t attr) const
+    {
         T data;
         getAttrPtr(group, attr, &data);
         return data;
@@ -91,8 +92,9 @@ class KvmDevice
      * @param attr Attribute ID within group
      * @return Attribute value
      */
-    template<typename T>
-    void setAttr(uint32_t group, uint64_t attr, const T &data) const {
+    template <typename T>
+    void setAttr(uint32_t group, uint64_t attr, const T &data) const
+    {
         setAttrPtr(group, attr, &data);
     }
 
@@ -113,12 +115,10 @@ class KvmDevice
 
   protected:
     int ioctl(int request, long p1) const;
-    int ioctl(int request, void *p1) const {
-        return ioctl(request, (long)p1);
-    }
-    int ioctl(int request) const {
-        return ioctl(request, 0L);
-    }
+
+    int ioctl(int request, void *p1) const { return ioctl(request, (long)p1); }
+
+    int ioctl(int request) const { return ioctl(request, 0L); }
 
   private:
     int fd;

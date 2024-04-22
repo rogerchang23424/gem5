@@ -61,34 +61,27 @@ class Trie
         Key key;
         Key mask;
 
-        bool
-        matches(Key test)
-        {
-            return (test & mask) == key;
-        }
+        bool matches(Key test) { return (test & mask) == key; }
 
         Value *value;
 
         Node *parent;
         std::unique_ptr<Node> kids[2];
 
-        Node(Key _key, Key _mask, Value *_val) :
-            key(_key & _mask), mask(_mask), value(_val),
-            parent(NULL)
+        Node(Key _key, Key _mask, Value *_val)
+            : key(_key & _mask), mask(_mask), value(_val), parent(NULL)
         {
             kids[0] = NULL;
             kids[1] = NULL;
         }
 
-        void
-        clear()
+        void clear()
         {
             kids[1].reset();
             kids[0].reset();
         }
 
-        void
-        dump(std::ostream &os, int level)
+        void dump(std::ostream &os, int level)
         {
             for (int i = 1; i < level; i++) {
                 ccprintf(os, "|");
@@ -97,8 +90,8 @@ class Trie
                 ccprintf(os, "Root ");
             else
                 ccprintf(os, "+ ");
-            ccprintf(os, "(%p, %p, %#X, %#X, %p)\n",
-                     parent, this, key, mask, value);
+            ccprintf(os, "(%p, %p, %#X, %#X, %p)\n", parent, this, key, mask,
+                     value);
             if (kids[0])
                 kids[0]->dump(os, level + 1);
             if (kids[1])
@@ -118,8 +111,7 @@ class Trie
     /**
      * @ingroup api_base_utils
      */
-    Trie() : head(0, 0, NULL)
-    {}
+    Trie() : head(0, 0, NULL) {}
 
     /**
      * @ingroup api_base_utils
@@ -137,8 +129,7 @@ class Trie
      * @param new_mask The mask to use when matching against the key.
      * @return Whether the current Node was advanced.
      */
-    bool
-    goesAfter(Node **parent, Node *kid, Key key, Key new_mask)
+    bool goesAfter(Node **parent, Node *kid, Key key, Key new_mask)
     {
         if (kid && kid->matches(key) && (kid->mask & new_mask) == kid->mask) {
             *parent = kid;
@@ -156,8 +147,7 @@ class Trie
      * @param orig The original mask to extend.
      * @return The extended mask.
      */
-    Key
-    extendMask(Key orig)
+    Key extendMask(Key orig)
     {
         // Just in case orig was 0.
         const Key msb = 1ULL << (MaxBits - 1);
@@ -171,8 +161,7 @@ class Trie
      * @param key The key to look up.
      * @return The first Handle matching this key, or NULL if none was found.
      */
-    Handle
-    lookupHandle(Key key)
+    Handle lookupHandle(Key key)
     {
         Node *node = &head;
         while (node) {
@@ -200,8 +189,7 @@ class Trie
      *
      * @ingroup api_base_utils
      */
-    Handle
-    insert(Key key, unsigned width, Value *val)
+    Handle insert(Key key, unsigned width, Value *val)
     {
         // We use NULL value pointers to mark internal nodes of the trie, so
         // we don't allow inserting them as real values.
@@ -218,8 +206,7 @@ class Trie
         // can be ignored for the purposes of this function.
         Node *node = &head;
         while (goesAfter(&node, node->kids[0].get(), key, new_mask) ||
-               goesAfter(&node, node->kids[1].get(), key, new_mask))
-        {}
+               goesAfter(&node, node->kids[1].get(), key, new_mask)) {}
         assert(node);
 
         Key cur_mask = node->mask;
@@ -231,7 +218,7 @@ class Trie
         }
 
         for (unsigned int i = 0; i < 2; i++) {
-            auto& kid = node->kids[i];
+            auto &kid = node->kids[i];
             if (!kid) {
                 // No kid. Add a new one.
                 auto new_node = std::make_unique<Node>(key, new_mask, val);
@@ -248,7 +235,7 @@ class Trie
                 last_mask = cur_mask;
                 cur_mask = extendMask(cur_mask);
                 done = ((key & cur_mask) != (kid->key & cur_mask)) ||
-                    last_mask == new_mask;
+                       last_mask == new_mask;
             } while (!done);
             cur_mask = last_mask;
 
@@ -287,8 +274,7 @@ class Trie
      *
      * @ingroup api_base_utils
      */
-    Value *
-    lookup(Key key)
+    Value *lookup(Key key)
     {
         Node *node = lookupHandle(key);
         if (node)
@@ -304,8 +290,7 @@ class Trie
      *
      * @ingroup api_base_utils
      */
-    Value *
-    remove(Handle handle)
+    Value *remove(Handle handle)
     {
         Node *node = handle;
         Value *val = node->value;
@@ -349,8 +334,7 @@ class Trie
      *
      * @ingroup api_base_utils
      */
-    Value *
-    remove(Key key)
+    Value *remove(Key key)
     {
         Handle handle = lookupHandle(key);
         if (!handle)
@@ -364,18 +348,13 @@ class Trie
      *
      * @ingroup api_base_utils
      */
-    void
-    clear()
-    {
-        head.clear();
-    }
+    void clear() { head.clear(); }
 
     /**
      * A debugging method which prints the contents of this trie.
      * @param title An identifying title to put in the dump header.
      */
-    void
-    dump(const char *title, std::ostream &os=std::cout)
+    void dump(const char *title, std::ostream &os = std::cout)
     {
         ccprintf(os, "**************************************************\n");
         ccprintf(os, "*** Start of Trie: %s\n", title);

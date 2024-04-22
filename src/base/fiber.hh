@@ -84,8 +84,8 @@ class Fiber
      * @ingroup api_fiber
      * @{
      */
-    Fiber(size_t stack_size=DefaultStackSize);
-    Fiber(Fiber *link, size_t stack_size=DefaultStackSize);
+    Fiber(size_t stack_size = DefaultStackSize);
+    Fiber(Fiber *link, size_t stack_size = DefaultStackSize);
     /** @} */ // end of api_fiber
 
     /**

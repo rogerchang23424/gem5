@@ -97,14 +97,12 @@ class Interrupts : public BaseInterrupts
     bool onCpuTimerInterrupt() const;
     bool checkInterrupts() const override;
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         fatal("Serialization of Interrupts Unimplemented for MIPS");
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         fatal("Unserialization of Interrupts Unimplemented for MIPS");
     }

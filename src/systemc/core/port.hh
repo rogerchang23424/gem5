@@ -62,15 +62,13 @@ class Port
     void finalizeFinder(StaticSensitivityFinder *finder);
     void finalizeReset(Reset *reset);
 
-    void
-    addInterface(::sc_core::sc_interface *iface)
+    void addInterface(::sc_core::sc_interface *iface)
     {
         portBase->_gem5AddInterface(iface);
         _size++;
     }
 
-    void
-    addInterfaces(::sc_core::sc_port_base *pb)
+    void addInterfaces(::sc_core::sc_port_base *pb)
     {
         // Only the ports farthest from the interfaces call register_port.
         pb->_gem5Port->regPortNeeded = false;
@@ -78,20 +76,19 @@ class Port
             addInterface(pb->_gem5Interface(i));
     }
 
-    ::sc_core::sc_interface *
-    getInterface(int i)
+    ::sc_core::sc_interface *getInterface(int i)
     {
         return portBase->_gem5Interface(i);
     }
 
     struct Binding
     {
-        explicit Binding(::sc_core::sc_interface *interface) :
-            interface(interface), port(nullptr)
+        explicit Binding(::sc_core::sc_interface *interface)
+            : interface(interface), port(nullptr)
         {}
 
-        explicit Binding(::sc_core::sc_port_base *port) :
-            interface(nullptr), port(port)
+        explicit Binding(::sc_core::sc_port_base *port)
+            : interface(nullptr), port(port)
         {}
 
         ::sc_core::sc_interface *interface;
@@ -100,12 +97,11 @@ class Port
 
     struct Sensitivity
     {
-        Sensitivity(StaticSensitivityPort *port) :
-            port(port), finder(nullptr)
+        Sensitivity(StaticSensitivityPort *port) : port(port), finder(nullptr)
         {}
 
-        Sensitivity(StaticSensitivityFinder *finder) :
-            port(nullptr), finder(finder)
+        Sensitivity(StaticSensitivityFinder *finder)
+            : port(nullptr), finder(finder)
         {}
 
         StaticSensitivityPort *port;
@@ -117,25 +113,26 @@ class Port
     std::vector<Reset *> resets;
 
   public:
-    static Port *
-    fromPort(const ::sc_core::sc_port_base *pb)
+    static Port *fromPort(const ::sc_core::sc_port_base *pb)
     {
         return pb->_gem5Port;
     }
 
     ::sc_core::sc_port_base *sc_port_base() { return portBase; }
 
-    Port(::sc_core::sc_port_base *port_base, int max) :
-        portBase(port_base), finalized(false), _maxSize(max), _size(0),
-        regPortNeeded(true)
+    Port(::sc_core::sc_port_base *port_base, int max)
+        : portBase(port_base),
+          finalized(false),
+          _maxSize(max),
+          _size(0),
+          regPortNeeded(true)
     {
         allPorts.push_front(this);
     }
 
     ~Port() { allPorts.remove(this); }
 
-    void
-    bind(::sc_core::sc_interface *interface)
+    void bind(::sc_core::sc_interface *interface)
     {
         if (bindings.empty())
             addInterface(interface);
@@ -143,8 +140,7 @@ class Port
             bindings.push_back(new Binding(interface));
     }
 
-    void
-    bind(::sc_core::sc_port_base *port)
+    void bind(::sc_core::sc_port_base *port)
     {
         bindings.push_back(new Binding(port));
     }
@@ -157,6 +153,7 @@ class Port
     void regPort();
 
     int size() { return _size; }
+
     int maxSize() { return _maxSize ? _maxSize : _size; }
 };
 

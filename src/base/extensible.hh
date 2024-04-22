@@ -51,15 +51,13 @@ namespace gem5
 class ExtensionBase
 {
   public:
-    explicit ExtensionBase(const unsigned int id)
-        : extID(id) {}
+    explicit ExtensionBase(const unsigned int id) : extID(id) {}
 
     virtual ~ExtensionBase() = default;
 
     virtual std::unique_ptr<ExtensionBase> clone() const = 0;
 
-    static unsigned int
-    maxNumExtensions()
+    static unsigned int maxNumExtensions()
     {
         static unsigned int max_num = 0;
         return ++max_num;
@@ -113,22 +111,24 @@ class Extension : public ExtensionBase
 };
 
 template <typename Target, typename T>
-const unsigned int Extension<Target, T>::extensionID =
-        ExtensionBase::maxNumExtensions() - 1;
+const unsigned int
+    Extension<Target, T>::extensionID = ExtensionBase::maxNumExtensions() - 1;
 
 template <typename Target>
 class Extensible
 {
   public:
-     Extensible() = default;
-     Extensible(const Extensible& other)
-     {
+    Extensible() = default;
+
+    Extensible(const Extensible &other)
+    {
         // Clone every extension from other.
-        for (auto& ext : other.extensions) {
+        for (auto &ext : other.extensions) {
             extensions.emplace_back(ext->clone());
         }
-     }
-     virtual ~Extensible() = default;
+    }
+
+    virtual ~Extensible() = default;
 
     /**
      * Set a new extension to the packet and replace the old one, if there
@@ -138,8 +138,7 @@ class Extensible
      * @param ext Extension to set
      */
     template <typename T>
-    void
-    setExtension(std::shared_ptr<T> ext)
+    void setExtension(std::shared_ptr<T> ext)
     {
         static_assert(std::is_base_of<ExtensionBase, T>::value,
                       "Extension should inherit from ExtensionBase.");
@@ -163,8 +162,7 @@ class Extensible
      * @param ext Extension to remove
      */
     template <typename T>
-    void
-    removeExtension(void)
+    void removeExtension(void)
     {
         static_assert(std::is_base_of<ExtensionBase, T>::value,
                       "Extension should inherit from ExtensionBase.");
@@ -178,8 +176,7 @@ class Extensible
      * Get the extension pointer by linear search with the extensionID.
      */
     template <typename T>
-    std::shared_ptr<T>
-    getExtension()
+    std::shared_ptr<T> getExtension()
     {
         static_assert(std::is_base_of<ExtensionBase, T>::value,
                       "Extension should inherit from ExtensionBase.");
@@ -190,7 +187,6 @@ class Extensible
     }
 
   protected:
-
     /**
      * Go through the extension list and return the iterator to the instance of
      * the type of extension. If there is no such an extension, return the end
@@ -199,8 +195,7 @@ class Extensible
      *  @return The iterator to the extension type T if there exists.
      */
     template <typename T>
-    std::list<std::shared_ptr<ExtensionBase>>::iterator
-    findExtension()
+    std::list<std::shared_ptr<ExtensionBase>>::iterator findExtension()
     {
         auto it = extensions.begin();
         while (it != extensions.end()) {

@@ -208,27 +208,21 @@ class BaseTags : public ClockedObject
      * @param way The way of the block.
      * @return The block.
      */
-    virtual ReplaceableEntry* findBlockBySetAndWay(int set, int way) const;
+    virtual ReplaceableEntry *findBlockBySetAndWay(int set, int way) const;
 
     /**
      * Align an address to the block size.
      * @param addr the address to align.
      * @return The block address.
      */
-    Addr blkAlign(Addr addr) const
-    {
-        return addr & ~blkMask;
-    }
+    Addr blkAlign(Addr addr) const { return addr & ~blkMask; }
 
     /**
      * Calculate the block offset of an address.
      * @param addr the address to get the offset of.
      * @return the block offset.
      */
-    int extractBlkOffset(Addr addr) const
-    {
-        return (addr & blkMask);
-    }
+    int extractBlkOffset(Addr addr) const { return (addr & blkMask); }
 
     /**
      * Limit the allocation for the cache ways.
@@ -282,10 +276,10 @@ class BaseTags : public ClockedObject
      * @param partition_id Partition ID for resource management.
      * @return Cache block to be replaced.
      */
-    virtual CacheBlk* findVictim(Addr addr, const bool is_secure,
+    virtual CacheBlk *findVictim(Addr addr, const bool is_secure,
                                  const std::size_t size,
-                                 std::vector<CacheBlk*>& evict_blks,
-                                 const uint64_t partition_id=0) = 0;
+                                 std::vector<CacheBlk *> &evict_blks,
+                                 const uint64_t partition_id = 0) = 0;
 
     /**
      * Access block and update replacement data. May not succeed, in which case
@@ -297,7 +291,7 @@ class BaseTags : public ClockedObject
      * @param lat The latency of the tag lookup.
      * @return Pointer to the cache block if found.
      */
-    virtual CacheBlk* accessBlock(const PacketPtr pkt, Cycles &lat) = 0;
+    virtual CacheBlk *accessBlock(const PacketPtr pkt, Cycles &lat) = 0;
 
     /**
      * Generate the tag from the given address.
@@ -331,7 +325,7 @@ class BaseTags : public ClockedObject
      * @param block The block.
      * @return the block address.
      */
-    virtual Addr regenerateBlkAddr(const CacheBlk* blk) const = 0;
+    virtual Addr regenerateBlkAddr(const CacheBlk *blk) const = 0;
 
     /**
      * Visit each block in the tags and apply a visitor

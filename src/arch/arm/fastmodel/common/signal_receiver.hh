@@ -59,21 +59,21 @@ class SignalReceiver : public amba_pv::signal_slave_base<bool>
   public:
     amba_pv::signal_slave_export<bool> signal_in;
 
-    SignalReceiver(const std::string &name, OnChangeFunc on_change=nullptr) :
-        SignalReceiver(name.c_str(), on_change)
+    SignalReceiver(const std::string &name, OnChangeFunc on_change = nullptr)
+        : SignalReceiver(name.c_str(), on_change)
     {}
 
-    SignalReceiver(const char *name, OnChangeFunc on_change=nullptr) :
-        amba_pv::signal_slave_base<bool>(name),
-        _state(false), _onChange(on_change)
+    SignalReceiver(const char *name, OnChangeFunc on_change = nullptr)
+        : amba_pv::signal_slave_base<bool>(name),
+          _state(false),
+          _onChange(on_change)
     {
         signal_in.bind(*this);
     }
 
     void onChange(OnChangeFunc func) { _onChange = func; }
 
-    void
-    set_state(int export_id, const bool &new_state) override
+    void set_state(int export_id, const bool &new_state) override
     {
         if (new_state == _state)
             return;
@@ -88,8 +88,7 @@ class SignalReceiverInt : public SignalReceiver
   public:
     using IntPin = SignalSourcePort<bool>;
 
-    explicit SignalReceiverInt(const std::string &name)
-        : SignalReceiver(name)
+    explicit SignalReceiverInt(const std::string &name) : SignalReceiver(name)
     {
         onChange([this](bool status) {
             for (auto &signal : signalOut) {
@@ -99,8 +98,7 @@ class SignalReceiverInt : public SignalReceiver
         });
     }
 
-    IntPin &
-    getSignalOut(int idx)
+    IntPin &getSignalOut(int idx)
     {
         if (signalOut.size() <= idx) {
             signalOut.resize(idx + 1);

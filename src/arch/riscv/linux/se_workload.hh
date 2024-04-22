@@ -45,7 +45,6 @@ namespace RiscvISA
 class EmuLinux : public SEWorkload
 {
   protected:
-
     /// 64 bit syscall descriptors, indexed by call number.
     static SyscallDescTable<SEWorkload::SyscallABI64> syscallDescs64;
 

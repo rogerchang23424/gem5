@@ -106,6 +106,7 @@ class BaseKvmCPU : public BaseCPU
     void verifyMemoryMode() const override;
 
     Port &getDataPort() override { return dataPort; }
+
     Port &getInstPort() override { return instPort; }
 
     void wakeup(ThreadID tid = 0) override;
@@ -115,6 +116,7 @@ class BaseKvmCPU : public BaseCPU
     void haltContext(ThreadID thread_num) override;
 
     long getVCpuID() const { return vcpuID; }
+
     ThreadContext *getContext(int tn) override;
 
     Counter totalInsts() const override;
@@ -171,17 +173,19 @@ class BaseKvmCPU : public BaseCPU
      *     RunningMMIOPending;
      *
      *     Idle -> Idle;
-     *     Idle -> Running [label="activateContext()", URL="\ref activateContext"];
-     *     Running -> Running [label="tick()", URL="\ref tick"];
+     *     Idle -> Running [label="activateContext()", URL="\ref
+     * activateContext"]; Running -> Running [label="tick()", URL="\ref tick"];
      *     Running -> RunningService [label="tick()", URL="\ref tick"];
-     *     Running -> Idle [label="suspendContext()", URL="\ref suspendContext"];
-     *     Running -> Idle [label="drain()", URL="\ref drain"];
+     *     Running -> Idle [label="suspendContext()", URL="\ref
+     * suspendContext"]; Running -> Idle [label="drain()", URL="\ref drain"];
      *     Idle -> Running [label="drainResume()", URL="\ref drainResume"];
-     *     RunningService -> RunningServiceCompletion [label="handleKvmExit()", URL="\ref handleKvmExit"];
-     *     RunningService -> RunningMMIOPending [label="handleKvmExit()", URL="\ref handleKvmExit"];
-     *     RunningMMIOPending -> RunningServiceCompletion [label="finishMMIOPending()", URL="\ref finishMMIOPending"];
-     *     RunningServiceCompletion -> Running [label="tick()", URL="\ref tick"];
-     *     RunningServiceCompletion -> RunningService [label="tick()", URL="\ref tick"];
+     *     RunningService -> RunningServiceCompletion [label="handleKvmExit()",
+     * URL="\ref handleKvmExit"]; RunningService -> RunningMMIOPending
+     * [label="handleKvmExit()", URL="\ref handleKvmExit"]; RunningMMIOPending
+     * -> RunningServiceCompletion [label="finishMMIOPending()", URL="\ref
+     * finishMMIOPending"]; RunningServiceCompletion -> Running
+     * [label="tick()", URL="\ref tick"]; RunningServiceCompletion ->
+     * RunningService [label="tick()", URL="\ref tick"];
      *   }
      * @enddot
      */
@@ -324,7 +328,8 @@ class BaseKvmCPU : public BaseCPU
      * @param offset Offset as specified by the kvm_run structure
      * @return Pointer to guest data
      */
-    uint8_t *getGuestData(uint64_t offset) const {
+    uint8_t *getGuestData(uint64_t offset) const
+    {
         return (uint8_t *)_kvmRun + offset;
     };
 
@@ -384,19 +389,27 @@ class BaseKvmCPU : public BaseCPU
      * @note The presence of this call depends on Kvm::capOneReg().
      */
     void setOneReg(uint64_t id, const void *addr);
+
     void setOneReg(uint64_t id, uint64_t value) { setOneReg(id, &value); }
+
     void setOneReg(uint64_t id, uint32_t value) { setOneReg(id, &value); }
+
     void getOneReg(uint64_t id, void *addr) const;
-    uint64_t getOneRegU64(uint64_t id) const {
+
+    uint64_t getOneRegU64(uint64_t id) const
+    {
         uint64_t value;
         getOneReg(id, &value);
         return value;
     }
-    uint32_t getOneRegU32(uint64_t id) const {
+
+    uint32_t getOneRegU32(uint64_t id) const
+    {
         uint32_t value;
         getOneReg(id, &value);
         return value;
     }
+
     /** @} */
 
     /**
@@ -520,6 +533,7 @@ class BaseKvmCPU : public BaseCPU
      * @return Number of ticks delay the next CPU tick
      */
     virtual Tick handleKvmExitFailEntry();
+
     /** @} */
 
     /**
@@ -581,12 +595,11 @@ class BaseKvmCPU : public BaseCPU
      * value otherwise.
      */
     int ioctl(int request, long p1) const;
-    int ioctl(int request, void *p1) const {
-        return ioctl(request, (long)p1);
-    }
-    int ioctl(int request) const {
-        return ioctl(request, 0L);
-    }
+
+    int ioctl(int request, void *p1) const { return ioctl(request, (long)p1); }
+
+    int ioctl(int request) const { return ioctl(request, 0L); }
+
     /** @} */
 
     /** Execute the KVM_RUN ioctl */
@@ -598,11 +611,11 @@ class BaseKvmCPU : public BaseCPU
      */
     class KVMCpuPort : public RequestPort
     {
-
       public:
         KVMCpuPort(const std::string &_name, BaseKvmCPU *_cpu)
             : RequestPort(_name), cpu(_cpu), activeMMIOReqs(0)
-        { }
+        {}
+
         /**
          * Interface to send Atomic or Timing IO request.  Assumes that the pkt
          * and corresponding req have been dynamically allocated and deletes
@@ -626,7 +639,6 @@ class BaseKvmCPU : public BaseCPU
         bool recvTimingResp(PacketPtr pkt) override;
 
         void recvReqRetry() override;
-
     };
 
     /** Port for data requests */
@@ -817,6 +829,7 @@ class BaseKvmCPU : public BaseCPU
         statistics::Scalar numInterrupts;
         statistics::Scalar numHypercalls;
     } stats;
+
     /* @} */
 
     /** Number of instructions executed by the CPU */

@@ -69,7 +69,6 @@ EndBitUnion(ITSTATE)
 class PCState : public GenericISA::UPCState<4>
 {
   protected:
-
     typedef GenericISA::UPCState<4> Base;
 
     enum FlagBits
@@ -90,28 +89,33 @@ class PCState : public GenericISA::UPCState<4>
     bool _stepped = false;
 
   public:
-    void
-    set(Addr val) override
+    void set(Addr val) override
     {
         Base::set(val);
         npc(val + (thumb() ? 2 : 4));
     }
 
-    PCState(const PCState &other) : Base(other),
-        flags(other.flags), nextFlags(other.nextFlags),
-        _itstate(other._itstate), _nextItstate(other._nextItstate),
-        _size(other._size), _illegalExec(other._illegalExec),
-        _debugStep(other._debugStep), _stepped(other._stepped)
+    PCState(const PCState &other)
+        : Base(other),
+          flags(other.flags),
+          nextFlags(other.nextFlags),
+          _itstate(other._itstate),
+          _nextItstate(other._nextItstate),
+          _size(other._size),
+          _illegalExec(other._illegalExec),
+          _debugStep(other._debugStep),
+          _stepped(other._stepped)
     {}
+
     PCState &operator=(const PCState &other) = default;
 
     PCState() {}
+
     explicit PCState(Addr val) { set(val); }
 
     PCStateBase *clone() const override { return new PCState(*this); }
 
-    void
-    update(const PCStateBase &other) override
+    void update(const PCStateBase &other) override
     {
         Base::update(other);
         auto &pcstate = other.as<PCState>();
@@ -125,50 +129,21 @@ class PCState : public GenericISA::UPCState<4>
         _stepped = pcstate._stepped;
     }
 
-    bool
-    illegalExec() const
-    {
-        return _illegalExec;
-    }
+    bool illegalExec() const { return _illegalExec; }
 
-    void
-    illegalExec(bool val)
-    {
-        _illegalExec = val;
-    }
+    void illegalExec(bool val) { _illegalExec = val; }
 
-    bool
-    debugStep() const
-    {
-        return _debugStep;
-    }
+    bool debugStep() const { return _debugStep; }
 
-    void
-    debugStep(bool val)
-    {
-        _debugStep = val;
-    }
+    void debugStep(bool val) { _debugStep = val; }
 
-    bool
-    stepped() const
-    {
-        return _stepped;
-    }
+    bool stepped() const { return _stepped; }
 
-    void
-    stepped(bool val)
-    {
-        _stepped = val;
-    }
+    void stepped(bool val) { _stepped = val; }
 
-    bool
-    thumb() const
-    {
-        return flags & ThumbBit;
-    }
+    bool thumb() const { return flags & ThumbBit; }
 
-    void
-    thumb(bool val)
+    void thumb(bool val)
     {
         if (val)
             flags |= ThumbBit;
@@ -176,14 +151,9 @@ class PCState : public GenericISA::UPCState<4>
             flags &= ~ThumbBit;
     }
 
-    bool
-    nextThumb() const
-    {
-        return nextFlags & ThumbBit;
-    }
+    bool nextThumb() const { return nextFlags & ThumbBit; }
 
-    void
-    nextThumb(bool val)
+    void nextThumb(bool val)
     {
         if (val)
             nextFlags |= ThumbBit;
@@ -192,23 +162,17 @@ class PCState : public GenericISA::UPCState<4>
     }
 
     void size(uint8_t s) { _size = s; }
+
     uint8_t size() const { return _size; }
 
-    bool
-    branching() const override
+    bool branching() const override
     {
         return ((this->pc() + this->size()) != this->npc());
     }
 
+    bool aarch64() const { return flags & AArch64Bit; }
 
-    bool
-    aarch64() const
-    {
-        return flags & AArch64Bit;
-    }
-
-    void
-    aarch64(bool val)
+    void aarch64(bool val)
     {
         if (val)
             flags |= AArch64Bit;
@@ -216,14 +180,9 @@ class PCState : public GenericISA::UPCState<4>
             flags &= ~AArch64Bit;
     }
 
-    bool
-    nextAArch64() const
-    {
-        return nextFlags & AArch64Bit;
-    }
+    bool nextAArch64() const { return nextFlags & AArch64Bit; }
 
-    void
-    nextAArch64(bool val)
+    void nextAArch64(bool val)
     {
         if (val)
             nextFlags |= AArch64Bit;
@@ -231,33 +190,15 @@ class PCState : public GenericISA::UPCState<4>
             nextFlags &= ~AArch64Bit;
     }
 
+    uint8_t itstate() const { return _itstate; }
 
-    uint8_t
-    itstate() const
-    {
-        return _itstate;
-    }
+    void itstate(uint8_t value) { _itstate = value; }
 
-    void
-    itstate(uint8_t value)
-    {
-        _itstate = value;
-    }
+    uint8_t nextItstate() const { return _nextItstate; }
 
-    uint8_t
-    nextItstate() const
-    {
-        return _nextItstate;
-    }
+    void nextItstate(uint8_t value) { _nextItstate = value; }
 
-    void
-    nextItstate(uint8_t value)
-    {
-        _nextItstate = value;
-    }
-
-    void
-    advance() override
+    void advance() override
     {
         Base::advance();
         flags = nextFlags;
@@ -270,8 +211,8 @@ class PCState : public GenericISA::UPCState<4>
             ITSTATE it = _itstate;
             uint8_t cond_mask = it.mask;
             uint8_t thumb_cond = it.cond;
-            DPRINTF(Decoder, "Advancing ITSTATE from %#x,%#x.\n",
-                    thumb_cond, cond_mask);
+            DPRINTF(Decoder, "Advancing ITSTATE from %#x,%#x.\n", thumb_cond,
+                    cond_mask);
             cond_mask <<= 1;
             uint8_t new_bit = bits(cond_mask, 4);
             cond_mask &= mask(4);
@@ -279,49 +220,38 @@ class PCState : public GenericISA::UPCState<4>
                 thumb_cond = 0;
             else
                 replaceBits(thumb_cond, 0, new_bit);
-            DPRINTF(Decoder, "Advancing ITSTATE to %#x,%#x.\n",
-                    thumb_cond, cond_mask);
+            DPRINTF(Decoder, "Advancing ITSTATE to %#x,%#x.\n", thumb_cond,
+                    cond_mask);
             it.mask = cond_mask;
             it.cond = thumb_cond;
             _itstate = it;
         }
     }
 
-    void
-    uEnd()
+    void uEnd()
     {
         advance();
         upc(0);
         nupc(1);
     }
 
-    Addr
-    instPC() const
-    {
-        return pc() + (thumb() ? 4 : 8);
-    }
+    Addr instPC() const { return pc() + (thumb() ? 4 : 8); }
 
-    void
-    instNPC(Addr val)
+    void instNPC(Addr val)
     {
         // @todo: review this when AArch32/64 interprocessing is
         // supported
         if (aarch64())
-            npc(val);  // AArch64 doesn't force PC alignment, a PC
-                       // Alignment Fault can be raised instead
+            npc(val); // AArch64 doesn't force PC alignment, a PC
+                      // Alignment Fault can be raised instead
         else
-            npc(val &~ mask(nextThumb() ? 1 : 2));
+            npc(val & ~mask(nextThumb() ? 1 : 2));
     }
 
-    Addr
-    instNPC() const
-    {
-        return npc();
-    }
+    Addr instNPC() const { return npc(); }
 
     // Perform an interworking branch.
-    void
-    instIWNPC(Addr val)
+    void instIWNPC(Addr val)
     {
         if (bits(val, 0)) {
             nextThumb(true);
@@ -339,8 +269,7 @@ class PCState : public GenericISA::UPCState<4>
 
     // Perform an interworking branch in ARM mode, a regular branch
     // otherwise.
-    void
-    instAIWNPC(Addr val)
+    void instAIWNPC(Addr val)
     {
         if (!thumb())
             instIWNPC(val);
@@ -348,21 +277,17 @@ class PCState : public GenericISA::UPCState<4>
             instNPC(val);
     }
 
-    bool
-    equals(const PCStateBase &other) const override
+    bool equals(const PCStateBase &other) const override
     {
         auto &opc = other.as<PCState>();
-        return Base::equals(other) &&
-            flags == opc.flags && nextFlags == opc.nextFlags &&
-            _itstate == opc._itstate &&
-            _nextItstate == opc._nextItstate &&
-            _illegalExec == opc._illegalExec &&
-            _debugStep == opc._debugStep &&
-            _stepped == opc._stepped;
+        return Base::equals(other) && flags == opc.flags &&
+               nextFlags == opc.nextFlags && _itstate == opc._itstate &&
+               _nextItstate == opc._nextItstate &&
+               _illegalExec == opc._illegalExec &&
+               _debugStep == opc._debugStep && _stepped == opc._stepped;
     }
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         Base::serialize(cp);
         SERIALIZE_SCALAR(flags);
@@ -375,8 +300,7 @@ class PCState : public GenericISA::UPCState<4>
         SERIALIZE_SCALAR(_stepped);
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         Base::unserialize(cp);
         UNSERIALIZE_SCALAR(flags);

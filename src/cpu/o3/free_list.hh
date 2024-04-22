@@ -71,22 +71,20 @@ class UnifiedRenameMap;
 class SimpleFreeList
 {
   private:
-
     /** The actual free list */
     std::queue<PhysRegIdPtr> freeRegs;
 
   public:
-
-    SimpleFreeList() {};
+    SimpleFreeList(){};
 
     /** Add a physical register to the free list */
     void addReg(PhysRegIdPtr reg) { freeRegs.push(reg); }
 
     /** Add physical registers to the free list */
-    template<class InputIt>
-    void
-    addRegs(InputIt first, InputIt last) {
-        std::for_each(first, last, [this](typename InputIt::value_type& reg) {
+    template <class InputIt>
+    void addRegs(InputIt first, InputIt last)
+    {
+        std::for_each(first, last, [this](typename InputIt::value_type &reg) {
             freeRegs.push(&reg);
         });
     }
@@ -107,7 +105,6 @@ class SimpleFreeList
     bool hasFreeRegs() const { return !freeRegs.empty(); }
 };
 
-
 /**
  * FreeList class that simply holds the list of free integer and floating
  * point registers.  Can request for a free register of either type, and
@@ -124,7 +121,6 @@ class SimpleFreeList
 class UnifiedFreeList
 {
   private:
-
     /** The object name, for DPRINTF.  We have to declare this
      *  explicitly because Scoreboard is not a SimObject. */
     const std::string _name;
@@ -162,30 +158,26 @@ class UnifiedFreeList
     PhysRegIdPtr getReg(RegClassType type) { return freeLists[type].getReg(); }
 
     /** Adds a register back to the free list. */
-    template<class InputIt>
-    void
-    addRegs(InputIt first, InputIt last)
+    template <class InputIt>
+    void addRegs(InputIt first, InputIt last)
     {
         std::for_each(first, last, [this](auto &reg) { addReg(&reg); });
     }
 
     /** Adds a register back to the free list. */
-    void
-    addReg(PhysRegIdPtr freed_reg)
+    void addReg(PhysRegIdPtr freed_reg)
     {
         freeLists[freed_reg->classValue()].addReg(freed_reg);
     }
 
     /** Checks if there are any free registers of type type. */
-    bool
-    hasFreeRegs(RegClassType type) const
+    bool hasFreeRegs(RegClassType type) const
     {
         return freeLists[type].hasFreeRegs();
     }
 
     /** Returns the number of free registers of type type. */
-    unsigned
-    numFreeRegs(RegClassType type) const
+    unsigned numFreeRegs(RegClassType type) const
     {
         return freeLists[type].numFreeRegs();
     }

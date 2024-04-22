@@ -56,7 +56,8 @@ namespace gem5
 
 class ThreadContext;
 
-namespace trace {
+namespace trace
+{
 
 class InstRecord
 {
@@ -83,8 +84,8 @@ class InstRecord
      * Memory request information in the instruction accessed memory.
      * @see mem_valid
      */
-    Addr addr = 0; ///< The address that was accessed
-    Addr size = 0; ///< The size of the memory request
+    Addr addr = 0;      ///< The address that was accessed
+    Addr size = 0;      ///< The size of the memory request
     unsigned flags = 0; ///< The flags that were assigned to the request.
 
     /** @} */
@@ -100,7 +101,9 @@ class InstRecord
     union Data
     {
         ~Data() {}
+
         Data() {}
+
         uint64_t asInt = 0;
         double asDouble;
         InstResult asReg;
@@ -124,7 +127,7 @@ class InstRecord
     enum DataStatus
     {
         DataInvalid = 0,
-        DataInt8 = 1,   // set to equal number of bytes
+        DataInt8 = 1, // set to equal number of bytes
         DataInt16 = 2,
         DataInt32 = 4,
         DataInt64 = 8,
@@ -159,9 +162,12 @@ class InstRecord
   public:
     InstRecord(Tick _when, ThreadContext *_thread,
                const StaticInstPtr _staticInst, const PCStateBase &_pc,
-               const StaticInstPtr _macroStaticInst=nullptr)
-        : when(_when), thread(_thread), staticInst(_staticInst),
-        pc(_pc.clone()), macroStaticInst(_macroStaticInst)
+               const StaticInstPtr _macroStaticInst = nullptr)
+        : when(_when),
+          thread(_thread),
+          staticInst(_staticInst),
+          pc(_pc.clone()),
+          macroStaticInst(_macroStaticInst)
     {}
 
     virtual ~InstRecord()
@@ -171,8 +177,8 @@ class InstRecord
     }
 
     void setWhen(Tick new_when) { when = new_when; }
-    void
-    setMem(Addr a, Addr s, unsigned f)
+
+    void setMem(Addr a, Addr s, unsigned f)
     {
         addr = a;
         size = s;
@@ -181,76 +187,72 @@ class InstRecord
     }
 
     template <typename T, size_t N>
-    void
-    setData(std::array<T, N> d)
+    void setData(std::array<T, N> d)
     {
         data.asInt = d[0];
         dataStatus = (DataStatus)sizeof(T);
         static_assert(sizeof(T) == DataInt8 || sizeof(T) == DataInt16 ||
-                      sizeof(T) == DataInt32 || sizeof(T) == DataInt64,
+                          sizeof(T) == DataInt32 || sizeof(T) == DataInt64,
                       "Type T has an unrecognized size.");
     }
 
-    void
-    setData(uint64_t d)
+    void setData(uint64_t d)
     {
         data.asInt = d;
         dataStatus = DataInt64;
     }
-    void
-    setData(uint32_t d)
+
+    void setData(uint32_t d)
     {
         data.asInt = d;
         dataStatus = DataInt32;
     }
-    void
-    setData(uint16_t d)
+
+    void setData(uint16_t d)
     {
         data.asInt = d;
         dataStatus = DataInt16;
     }
-    void
-    setData(uint8_t d)
+
+    void setData(uint8_t d)
     {
         data.asInt = d;
         dataStatus = DataInt8;
     }
 
     void setData(int64_t d) { setData((uint64_t)d); }
-    void setData(int32_t d) { setData((uint32_t)d); }
-    void setData(int16_t d) { setData((uint16_t)d); }
-    void setData(int8_t d)  { setData((uint8_t)d); }
 
-    void
-    setData(double d)
+    void setData(int32_t d) { setData((uint32_t)d); }
+
+    void setData(int16_t d) { setData((uint16_t)d); }
+
+    void setData(int8_t d) { setData((uint8_t)d); }
+
+    void setData(double d)
     {
         data.asDouble = d;
         dataStatus = DataDouble;
     }
 
-    void
-    setData(const RegClass &reg_class, RegVal val)
+    void setData(const RegClass &reg_class, RegVal val)
     {
-        new(&data.asReg) InstResult(reg_class, val);
+        new (&data.asReg) InstResult(reg_class, val);
         dataStatus = DataReg;
     }
 
-    void
-    setData(const RegClass &reg_class, const void *val)
+    void setData(const RegClass &reg_class, const void *val)
     {
-        new(&data.asReg) InstResult(reg_class, val);
+        new (&data.asReg) InstResult(reg_class, val);
         dataStatus = DataReg;
     }
 
-    void
-    setFetchSeq(InstSeqNum seq)
+    void setFetchSeq(InstSeqNum seq)
     {
         fetch_seq = seq;
         fetch_seq_valid = true;
     }
 
-    void
-    setCPSeq(InstSeqNum seq)
+    void setCPSeq(InstSeqNum seq)
     {
         cp_seq = seq;
         cp_seq_valid = true;
@@ -264,24 +266,35 @@ class InstRecord
 
   public:
     Tick getWhen() const { return when; }
+
     ThreadContext *getThread() const { return thread; }
+
     StaticInstPtr getStaticInst() const { return staticInst; }
+
     const PCStateBase &getPCState() const { return *pc; }
+
     StaticInstPtr getMacroStaticInst() const { return macroStaticInst; }
 
     Addr getAddr() const { return addr; }
+
     Addr getSize() const { return size; }
+
     unsigned getFlags() const { return flags; }
+
     bool getMemValid() const { return mem_valid; }
 
     uint64_t getIntData() const { return data.asInt; }
+
     double getFloatData() const { return data.asDouble; }
+
     int getDataStatus() const { return dataStatus; }
 
     InstSeqNum getFetchSeq() const { return fetch_seq; }
+
     bool getFetchSeqValid() const { return fetch_seq_valid; }
 
     InstSeqNum getCpSeq() const { return cp_seq; }
+
     bool getCpSeqValid() const { return cp_seq_valid; }
 
     bool getFaulting() const { return faulting; }
@@ -298,14 +311,10 @@ class InstRecord
 class InstDisassembler : public SimObject
 {
   public:
-    InstDisassembler(const SimObjectParams &params)
-      : SimObject(params)
-    {}
+    InstDisassembler(const SimObjectParams &params) : SimObject(params) {}
 
-    virtual std::string
-    disassemble(StaticInstPtr inst,
-                const PCStateBase &pc,
-                const loader::SymbolTable *symtab) const
+    virtual std::string disassemble(StaticInstPtr inst, const PCStateBase &pc,
+                                    const loader::SymbolTable *symtab) const
     {
         return inst->disassemble(pc.instAddr(), symtab);
     }
@@ -315,21 +324,18 @@ class InstTracer : public SimObject
 {
   public:
     PARAMS(InstTracer);
-    InstTracer(const Params &p)
-      : SimObject(p), disassembler(p.disassembler)
-    {}
+
+    InstTracer(const Params &p) : SimObject(p), disassembler(p.disassembler) {}
 
     virtual ~InstTracer() {}
 
     virtual InstRecord *
-        getInstRecord(Tick when, ThreadContext *tc,
-                const StaticInstPtr staticInst, const PCStateBase &pc,
-                const StaticInstPtr macroStaticInst=nullptr) = 0;
+    getInstRecord(Tick when, ThreadContext *tc, const StaticInstPtr staticInst,
+                  const PCStateBase &pc,
+                  const StaticInstPtr macroStaticInst = nullptr) = 0;
 
-    std::string
-    disassemble(StaticInstPtr inst,
-                const PCStateBase &pc,
-                const loader::SymbolTable *symtab=nullptr) const
+    std::string disassemble(StaticInstPtr inst, const PCStateBase &pc,
+                            const loader::SymbolTable *symtab = nullptr) const
     {
         return disassembler->disassemble(inst, pc, symtab);
     }

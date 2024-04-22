@@ -48,10 +48,10 @@ class TokenRequestPort : public RequestPort
     TokenManager *tokenManager;
 
   public:
-    TokenRequestPort(const std::string& name, SimObject* owner,
-                    PortID id = InvalidPortID) :
-        RequestPort(name, id), tokenManager(nullptr)
-    { }
+    TokenRequestPort(const std::string &name, SimObject *owner,
+                     PortID id = InvalidPortID)
+        : RequestPort(name, id), tokenManager(nullptr)
+    {}
 
     /**
      * Bind this request port to response port. Called by the response port in
@@ -98,11 +98,11 @@ class TokenResponsePort : public ResponsePort
     void recvRespRetry() override;
 
   public:
-    TokenResponsePort(const std::string& name,
-                   PortID id = InvalidPortID) :
-        ResponsePort(name, id), tokenRequestPort(nullptr)
-    { }
-    ~TokenResponsePort() { }
+    TokenResponsePort(const std::string &name, PortID id = InvalidPortID)
+        : ResponsePort(name, id), tokenRequestPort(nullptr)
+    {}
+
+    ~TokenResponsePort() {}
 
     /**
      * Bind this response port to a request port. This also does the mirror
@@ -138,7 +138,8 @@ class TokenManager
 
   public:
     TokenManager(int init_tokens);
-    ~TokenManager() { }
+
+    ~TokenManager() {}
 
     /**
      * Return the maximum possible tokens.

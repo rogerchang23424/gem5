@@ -45,7 +45,8 @@ namespace gem5
 
 class ThreadContext;
 
-namespace PowerISA {
+namespace PowerISA
+{
 
 // This is copied from the ARM ISA and has not been checked against the
 // Power at all.
@@ -53,12 +54,10 @@ struct TlbEntry
 {
     Addr _pageStart;
 
-    TlbEntry()
-    {
-    }
+    TlbEntry() {}
 
-    TlbEntry(Addr asn, Addr vaddr, Addr paddr,
-             bool uncacheable, bool read_only)
+    TlbEntry(Addr asn, Addr vaddr, Addr paddr, bool uncacheable,
+             bool read_only)
         : _pageStart(paddr)
     {
         if (uncacheable || read_only)
@@ -66,43 +65,26 @@ struct TlbEntry
                  " or read-only mappings\n");
     }
 
-    void
-    updateVaddr(Addr new_vaddr)
-    {
-        panic("unimplemented");
-    }
+    void updateVaddr(Addr new_vaddr) { panic("unimplemented"); }
 
-    Addr
-    pageStart()
-    {
-        return _pageStart;
-    }
+    Addr pageStart() { return _pageStart; }
 
-    void
-    serialize(CheckpointOut &cp) const
-    {
-        SERIALIZE_SCALAR(_pageStart);
-    }
+    void serialize(CheckpointOut &cp) const { SERIALIZE_SCALAR(_pageStart); }
 
-    void
-    unserialize(CheckpointIn &cp)
-    {
-        UNSERIALIZE_SCALAR(_pageStart);
-    }
+    void unserialize(CheckpointIn &cp) { UNSERIALIZE_SCALAR(_pageStart); }
 };
 
 class TLB : public BaseTLB
 {
   protected:
     typedef std::multimap<Addr, int> PageTable;
-    PageTable lookupTable;      // Quick lookup into page table
+    PageTable lookupTable; // Quick lookup into page table
 
-    PowerISA::PTE *table;       // the Page Table
-    int size;                   // TLB Size
-    int nlu;                    // not last used entry (for replacement)
+    PowerISA::PTE *table; // the Page Table
+    int size;             // TLB Size
+    int nlu;              // not last used entry (for replacement)
 
-    void
-    nextnlu()
+    void nextnlu()
     {
         if (++nlu >= size) {
             nlu = 0;
@@ -118,24 +100,19 @@ class TLB : public BaseTLB
 
     void takeOverFrom(BaseTLB *otlb) override {}
 
-    int probeEntry(Addr vpn,uint8_t) const;
+    int probeEntry(Addr vpn, uint8_t) const;
     PowerISA::PTE *getEntry(unsigned) const;
 
     int smallPages;
 
-    int
-    getsize() const
-    {
-        return size;
-    }
+    int getsize() const { return size; }
 
     PowerISA::PTE &index(bool advance = true);
     void insert(Addr vaddr, PowerISA::PTE &pte);
     void insertAt(PowerISA::PTE &pte, unsigned Index, int _smallPages);
     void flushAll() override;
 
-    void
-    demapPage(Addr vaddr, uint64_t asn) override
+    void demapPage(Addr vaddr, uint64_t asn) override
     {
         panic("demapPage unimplemented.\n");
     }
@@ -145,16 +122,15 @@ class TLB : public BaseTLB
     static Fault checkCacheability(const RequestPtr &req);
     Fault translateInst(const RequestPtr &req, ThreadContext *tc);
     Fault translateData(const RequestPtr &req, ThreadContext *tc, bool write);
-    Fault translateAtomic(
-        const RequestPtr &req, ThreadContext *tc, BaseMMU::Mode mode) override;
-    void translateTiming(
-        const RequestPtr &req, ThreadContext *tc,
-        BaseMMU::Translation *translation, BaseMMU::Mode mode) override;
-    Fault translateFunctional(
-        const RequestPtr &req, ThreadContext *tc, BaseMMU::Mode mode) override;
-    Fault finalizePhysical(
-        const RequestPtr &req,
-        ThreadContext *tc, BaseMMU::Mode mode) const override;
+    Fault translateAtomic(const RequestPtr &req, ThreadContext *tc,
+                          BaseMMU::Mode mode) override;
+    void translateTiming(const RequestPtr &req, ThreadContext *tc,
+                         BaseMMU::Translation *translation,
+                         BaseMMU::Mode mode) override;
+    Fault translateFunctional(const RequestPtr &req, ThreadContext *tc,
+                              BaseMMU::Mode mode) override;
+    Fault finalizePhysical(const RequestPtr &req, ThreadContext *tc,
+                           BaseMMU::Mode mode) const override;
 
     // Checkpointing
     void serialize(CheckpointOut &cp) const override;

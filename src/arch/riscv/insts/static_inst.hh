@@ -53,33 +53,35 @@ class RiscvStaticInst : public StaticInst
 {
   protected:
     RiscvStaticInst(const char *_mnemonic, ExtMachInst _machInst,
-            OpClass __opClass) :
-        StaticInst(_mnemonic, __opClass), machInst(_machInst)
+                    OpClass __opClass)
+        : StaticInst(_mnemonic, __opClass), machInst(_machInst)
     {}
 
     template <typename T>
-    T
-    rvSelect(T v32, T v64) const
+    T rvSelect(T v32, T v64) const
     {
         return (machInst.rv_type == RV32) ? v32 : v64;
     }
 
     template <typename T32, typename T64>
-    T64 rvExt(T64 x) const { return rvSelect((T64)(T32)x, x); }
+    T64 rvExt(T64 x) const
+    {
+        return rvSelect((T64)(T32)x, x);
+    }
+
     uint64_t rvZext(uint64_t x) const { return rvExt<uint32_t, uint64_t>(x); }
+
     int64_t rvSext(int64_t x) const { return rvExt<int32_t, int64_t>(x); }
 
   public:
     ExtMachInst machInst;
 
-    void
-    advancePC(PCStateBase &pc) const override
+    void advancePC(PCStateBase &pc) const override
     {
         pc.as<PCState>().advance();
     }
 
-    void
-    advancePC(ThreadContext *tc) const override
+    void advancePC(ThreadContext *tc) const override
     {
         PCState pc = tc->pcState().as<PCState>();
         pc.advance();
@@ -88,16 +90,15 @@ class RiscvStaticInst : public StaticInst
 
     std::unique_ptr<PCStateBase>
     buildRetPC(const PCStateBase &cur_pc,
-            const PCStateBase &call_pc) const override
+               const PCStateBase &call_pc) const override
     {
         PCStateBase *ret_pc_ptr = call_pc.clone();
         auto &ret_pc = ret_pc_ptr->as<PCState>();
         ret_pc.advance();
-        return std::unique_ptr<PCStateBase>{ret_pc_ptr};
+        return std::unique_ptr<PCStateBase>{ ret_pc_ptr };
     }
 
-    size_t
-    asBytes(void *buf, size_t size) override
+    size_t asBytes(void *buf, size_t size) override
     {
         return simpleAsBytes(buf, size, machInst);
     }
@@ -111,36 +112,32 @@ class RiscvMacroInst : public RiscvStaticInst
   protected:
     std::vector<StaticInstPtr> microops;
 
-    RiscvMacroInst(const char *mnem, ExtMachInst _machInst,
-                   OpClass __opClass) :
-            RiscvStaticInst(mnem, _machInst, __opClass)
+    RiscvMacroInst(const char *mnem, ExtMachInst _machInst, OpClass __opClass)
+        : RiscvStaticInst(mnem, _machInst, __opClass)
     {
         flags[IsMacroop] = true;
     }
 
     ~RiscvMacroInst() { microops.clear(); }
 
-    StaticInstPtr
-    fetchMicroop(MicroPC upc) const override
+    StaticInstPtr fetchMicroop(MicroPC upc) const override
     {
         return microops[upc];
     }
 
-    Fault
-    initiateAcc(ExecContext *xc, trace::InstRecord *traceData) const override
+    Fault initiateAcc(ExecContext *xc,
+                      trace::InstRecord *traceData) const override
     {
         panic("Tried to execute a macroop directly!\n");
     }
 
-    Fault
-    completeAcc(PacketPtr pkt, ExecContext *xc,
-                trace::InstRecord *traceData) const override
+    Fault completeAcc(PacketPtr pkt, ExecContext *xc,
+                      trace::InstRecord *traceData) const override
     {
         panic("Tried to execute a macroop directly!\n");
     }
 
-    Fault
-    execute(ExecContext *xc, trace::InstRecord *traceData) const override
+    Fault execute(ExecContext *xc, trace::InstRecord *traceData) const override
     {
         panic("Tried to execute a macroop directly!\n");
     }
@@ -152,7 +149,6 @@ class RiscvMacroInst : public RiscvStaticInst
         }
         _size = newSize;
     }
-
 };
 
 /**
@@ -161,9 +157,8 @@ class RiscvMacroInst : public RiscvStaticInst
 class RiscvMicroInst : public RiscvStaticInst
 {
   protected:
-    RiscvMicroInst(const char *mnem, ExtMachInst _machInst,
-                   OpClass __opClass) :
-            RiscvStaticInst(mnem, _machInst, __opClass)
+    RiscvMicroInst(const char *mnem, ExtMachInst _machInst, OpClass __opClass)
+        : RiscvStaticInst(mnem, _machInst, __opClass)
     {
         flags[IsMicroop] = true;
     }

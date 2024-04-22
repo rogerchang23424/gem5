@@ -64,8 +64,7 @@ GlobalEvent *dumpEvent;
 
 void
 initSimStats()
-{
-}
+{}
 
 /**
  * Event to dump and/or reset the statistics.
@@ -80,12 +79,12 @@ class StatEvent : public GlobalEvent
   public:
     StatEvent(Tick _when, bool _dump, bool _reset, Tick _repeat)
         : GlobalEvent(_when, Stat_Event_Pri, 0),
-          dump(_dump), reset(_reset), repeat(_repeat)
-    {
-    }
+          dump(_dump),
+          reset(_reset),
+          repeat(_repeat)
+    {}
 
-    virtual void
-    process()
+    virtual void process()
     {
         if (dump)
             statistics::dump();
@@ -95,7 +94,7 @@ class StatEvent : public GlobalEvent
 
         if (repeat) {
             statistics::schedStatEvent(dump, reset, curTick() + repeat,
-                repeat);
+                                       repeat);
         }
     }
 

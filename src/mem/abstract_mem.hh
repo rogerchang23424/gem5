@@ -66,15 +66,12 @@ namespace memory
  */
 class LockedAddr
 {
-
   private:
-
     // on alpha, minimum LL/SC granularity is 16 bytes, so lower
     // bits need to masked off.
     static const Addr Addr_Mask = 0xf;
 
   public:
-
     // locked address
     Addr addr;
 
@@ -91,13 +88,12 @@ class LockedAddr
         return (contextId == req->contextId());
     }
 
-    LockedAddr(const RequestPtr &req) : addr(mask(req->getPaddr())),
-                                        contextId(req->contextId())
+    LockedAddr(const RequestPtr &req)
+        : addr(mask(req->getPaddr())), contextId(req->contextId())
     {}
 
     // constructor for unserialization use
-    LockedAddr(Addr _addr, int _cid) : addr(_addr), contextId(_cid)
-    {}
+    LockedAddr(Addr _addr, int _cid) : addr(_addr), contextId(_cid) {}
 };
 
 /**
@@ -110,12 +106,11 @@ class LockedAddr
 class AbstractMemory : public ClockedObject
 {
   protected:
-
     // Address range of this memory
     AddrRange range;
 
     // Pointer to host memory used to implement this memory
-    uint8_t* pmemAddr;
+    uint8_t *pmemAddr;
 
     // Backdoor to access this memory.
     MemBackdoor backdoor;
@@ -155,8 +150,7 @@ class AbstractMemory : public ClockedObject
     // requesting execution context), 'true' otherwise.  Note that
     // this method must be called on *all* stores since even
     // non-conditional stores must clear any matching lock addresses.
-    bool
-    writeOK(PacketPtr pkt)
+    bool writeOK(PacketPtr pkt)
     {
         const RequestPtr &req = pkt->req;
         if (!writeable)
@@ -210,20 +204,18 @@ class AbstractMemory : public ClockedObject
         statistics::Formula bwTotal;
     } stats;
 
-
   private:
-
     // Prevent copying
-    AbstractMemory(const AbstractMemory&);
+    AbstractMemory(const AbstractMemory &);
 
     // Prevent assignment
-    AbstractMemory& operator=(const AbstractMemory&);
+    AbstractMemory &operator=(const AbstractMemory &);
 
   public:
-
     PARAMS(AbstractMemory);
 
     AbstractMemory(const Params &p);
+
     virtual ~AbstractMemory() {}
 
     void initState() override;
@@ -242,10 +234,9 @@ class AbstractMemory : public ClockedObject
      *
      * @param pmem_addr Pointer to a segment of host memory
      */
-    void setBackingStore(uint8_t* pmem_addr);
+    void setBackingStore(uint8_t *pmem_addr);
 
-    void
-    getBackdoor(MemBackdoorPtr &bd_ptr)
+    void getBackdoor(MemBackdoorPtr &bd_ptr)
     {
         if (lockedAddrList.empty() && backdoor.ptr())
             bd_ptr = &backdoor;
@@ -254,8 +245,7 @@ class AbstractMemory : public ClockedObject
     /**
      * Get the list of locked addresses to allow checkpointing.
      */
-    const std::list<LockedAddr> &
-    getLockedAddrList() const
+    const std::list<LockedAddr> &getLockedAddrList() const
     {
         return lockedAddrList;
     }
@@ -263,8 +253,7 @@ class AbstractMemory : public ClockedObject
     /**
      * Add a locked address to allow for checkpointing.
      */
-    void
-    addLockedAddr(LockedAddr addr)
+    void addLockedAddr(LockedAddr addr)
     {
         backdoor.invalidate();
         lockedAddrList.push_back(addr);
@@ -273,7 +262,7 @@ class AbstractMemory : public ClockedObject
     /** read the system pointer
      * Implemented for completeness with the setter
      * @return pointer to the system object */
-    System* system() const { return _system; }
+    System *system() const { return _system; }
 
     /** Set the system pointer on this memory
      * This can't be done via a python parameter because the system needs
@@ -297,8 +286,7 @@ class AbstractMemory : public ClockedObject
      * @param addr Address in gem5's address space.
      * @return Pointer to the corresponding memory address of the host.
      */
-    inline uint8_t *
-    toHostAddr(Addr addr) const
+    inline uint8_t *toHostAddr(Addr addr) const
     {
         return pmemAddr + addr - range.start();
     }

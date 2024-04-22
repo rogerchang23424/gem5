@@ -95,7 +95,7 @@ class DynInst : public ExecContext, public RefCounted
     };
 
     static void *operator new(size_t count, Arrays &arrays);
-    static void  operator delete(void* ptr);
+    static void operator delete(void *ptr);
 
     /** BaseDynInst constructor given a binary instruction. */
     DynInst(const Arrays &arrays, const StaticInstPtr &staticInst,
@@ -143,31 +143,31 @@ class DynInst : public ExecContext, public RefCounted
   protected:
     enum Status
     {
-        IqEntry,                 /// Instruction is in the IQ
-        RobEntry,                /// Instruction is in the ROB
-        LsqEntry,                /// Instruction is in the LSQ
-        Completed,               /// Instruction has completed
-        ResultReady,             /// Instruction has its result
-        CanIssue,                /// Instruction can issue and execute
-        Issued,                  /// Instruction has issued
-        Executed,                /// Instruction has executed
-        CanCommit,               /// Instruction can commit
-        AtCommit,                /// Instruction has reached commit
-        Committed,               /// Instruction has committed
-        Squashed,                /// Instruction is squashed
-        SquashedInIQ,            /// Instruction is squashed in the IQ
-        SquashedInLSQ,           /// Instruction is squashed in the LSQ
-        SquashedInROB,           /// Instruction is squashed in the ROB
-        PinnedRegsRenamed,       /// Pinned registers are renamed
-        PinnedRegsWritten,       /// Pinned registers are written back
-        PinnedRegsSquashDone,    /// Regs pinning status updated after squash
-        RecoverInst,             /// Is a recover instruction
-        BlockingInst,            /// Is a blocking instruction
-        ThreadsyncWait,          /// Is a thread synchronization instruction
-        SerializeBefore,         /// Needs to serialize on
-                                 /// instructions ahead of it
-        SerializeAfter,          /// Needs to serialize instructions behind it
-        SerializeHandled,        /// Serialization has been handled
+        IqEntry,              /// Instruction is in the IQ
+        RobEntry,             /// Instruction is in the ROB
+        LsqEntry,             /// Instruction is in the LSQ
+        Completed,            /// Instruction has completed
+        ResultReady,          /// Instruction has its result
+        CanIssue,             /// Instruction can issue and execute
+        Issued,               /// Instruction has issued
+        Executed,             /// Instruction has executed
+        CanCommit,            /// Instruction can commit
+        AtCommit,             /// Instruction has reached commit
+        Committed,            /// Instruction has committed
+        Squashed,             /// Instruction is squashed
+        SquashedInIQ,         /// Instruction is squashed in the IQ
+        SquashedInLSQ,        /// Instruction is squashed in the LSQ
+        SquashedInROB,        /// Instruction is squashed in the ROB
+        PinnedRegsRenamed,    /// Pinned registers are renamed
+        PinnedRegsWritten,    /// Pinned registers are written back
+        PinnedRegsSquashDone, /// Regs pinning status updated after squash
+        RecoverInst,          /// Is a recover instruction
+        BlockingInst,         /// Is a blocking instruction
+        ThreadsyncWait,       /// Is a thread synchronization instruction
+        SerializeBefore,      /// Needs to serialize on
+                              /// instructions ahead of it
+        SerializeAfter,       /// Needs to serialize instructions behind it
+        SerializeHandled,     /// Serialization has been handled
         NumStatus
     };
 
@@ -238,76 +238,55 @@ class DynInst : public ExecContext, public RefCounted
 
   public:
     size_t numSrcs() const { return _numSrcs; }
+
     size_t numDests() const { return _numDests; }
 
     // Returns the flattened register index of the idx'th destination
     // register.
-    const RegId &
-    flattenedDestIdx(int idx) const
-    {
-        return _flatDestIdx[idx];
-    }
+    const RegId &flattenedDestIdx(int idx) const { return _flatDestIdx[idx]; }
 
     // Flattens a destination architectural register index into a logical
     // index.
-    void
-    flattenedDestIdx(int idx, const RegId &reg_id)
+    void flattenedDestIdx(int idx, const RegId &reg_id)
     {
         _flatDestIdx[idx] = reg_id;
     }
 
     // Returns the physical register index of the idx'th destination
     // register.
-    PhysRegIdPtr
-    renamedDestIdx(int idx) const
-    {
-        return _destIdx[idx];
-    }
+    PhysRegIdPtr renamedDestIdx(int idx) const { return _destIdx[idx]; }
 
     // Set the renamed dest register id.
-    void
-    renamedDestIdx(int idx, PhysRegIdPtr phys_reg_id)
+    void renamedDestIdx(int idx, PhysRegIdPtr phys_reg_id)
     {
         _destIdx[idx] = phys_reg_id;
     }
 
     // Returns the physical register index of the previous physical
     // register that remapped to the same logical register index.
-    PhysRegIdPtr
-    prevDestIdx(int idx) const
-    {
-        return _prevDestIdx[idx];
-    }
+    PhysRegIdPtr prevDestIdx(int idx) const { return _prevDestIdx[idx]; }
 
     // Set the previous renamed dest register id.
-    void
-    prevDestIdx(int idx, PhysRegIdPtr phys_reg_id)
+    void prevDestIdx(int idx, PhysRegIdPtr phys_reg_id)
     {
         _prevDestIdx[idx] = phys_reg_id;
     }
 
     // Returns the physical register index of the i'th source register.
-    PhysRegIdPtr
-    renamedSrcIdx(int idx) const
-    {
-        return _srcIdx[idx];
-    }
+    PhysRegIdPtr renamedSrcIdx(int idx) const { return _srcIdx[idx]; }
 
-    void
-    renamedSrcIdx(int idx, PhysRegIdPtr phys_reg_id)
+    void renamedSrcIdx(int idx, PhysRegIdPtr phys_reg_id)
     {
         _srcIdx[idx] = phys_reg_id;
     }
 
-    bool
-    readySrcIdx(int idx) const
+    bool readySrcIdx(int idx) const
     {
         uint8_t &byte = _readySrcIdx[idx / 8];
         return bits(byte, idx % 8);
     }
 
-    void
-    readySrcIdx(int idx, bool ready)
+    void readySrcIdx(int idx, bool ready)
     {
         uint8_t &byte = _readySrcIdx[idx / 8];
         replaceBits(byte, idx % 8, ready ? 1 : 0);
@@ -354,7 +333,6 @@ class DynInst : public ExecContext, public RefCounted
     ssize_t sqIdx = -1;
     typename LSQUnit::SQIterator sqIt;
 
-
     /////////////////////// TLB Miss //////////////////////
     /**
      * Saved memory request (needed when the DTB address translation is
@@ -372,15 +350,17 @@ class DynInst : public ExecContext, public RefCounted
 
     /** Is the effective virtual address valid. */
     bool effAddrValid() const { return instFlags[EffAddrValid]; }
+
     void effAddrValid(bool b) { instFlags[EffAddrValid] = b; }
 
     /** Whether or not the memory operation is done. */
     bool memOpDone() const { return instFlags[MemOpDone]; }
+
     void memOpDone(bool f) { instFlags[MemOpDone] = f; }
 
     bool notAnInst() const { return instFlags[NotAnInst]; }
-    void setNotAnInst() { instFlags[NotAnInst] = true; }
 
+    void setNotAnInst() { instFlags[NotAnInst] = true; }
 
     ////////////////////////////////////////////
     //
@@ -388,14 +368,13 @@ class DynInst : public ExecContext, public RefCounted
     //
     ////////////////////////////////////////////
 
-    void
-    demapPage(Addr vaddr, uint64_t asn) override
+    void demapPage(Addr vaddr, uint64_t asn) override
     {
         cpu->demapPage(vaddr, asn);
     }
 
     Fault initiateMemRead(Addr addr, unsigned size, Request::Flags flags,
-            const std::vector<bool> &byte_enable) override;
+                          const std::vector<bool> &byte_enable) override;
 
     Fault initiateMemMgmtCmd(Request::Flags flags) override;
 
@@ -408,14 +387,15 @@ class DynInst : public ExecContext, public RefCounted
 
     /** True if the DTB address translation has started. */
     bool translationStarted() const { return instFlags[TranslationStarted]; }
+
     void translationStarted(bool f) { instFlags[TranslationStarted] = f; }
 
     /** True if the DTB address translation has completed. */
-    bool
-    translationCompleted() const
+    bool translationCompleted() const
     {
         return instFlags[TranslationCompleted];
     }
+
     void translationCompleted(bool f) { instFlags[TranslationCompleted] = f; }
 
     /** True if this address was found to match a previous load and they issued
@@ -423,13 +403,12 @@ class DynInst : public ExecContext, public RefCounted
      * snoop invalidate modifies the line, in which case we need to squash.
      * If nothing modified the line the order doesn't matter.
      */
-    bool
-    possibleLoadViolation() const
+    bool possibleLoadViolation() const
     {
         return instFlags[PossibleLoadViolation];
     }
-    void
-    possibleLoadViolation(bool f)
+
+    void possibleLoadViolation(bool f)
     {
         instFlags[PossibleLoadViolation] = f;
     }
@@ -439,14 +418,14 @@ class DynInst : public ExecContext, public RefCounted
      * reexecute
      */
     bool hitExternalSnoop() const { return instFlags[HitExternalSnoop]; }
+
     void hitExternalSnoop(bool f) { instFlags[HitExternalSnoop] = f; }
 
     /**
      * Returns true if the DTB address translation is being delayed due to a hw
      * page table walk.
      */
-    bool
-    isTranslationDelayed() const
+    bool isTranslationDelayed() const
     {
         return (translationStarted() && !translationCompleted());
     }
@@ -459,9 +438,8 @@ class DynInst : public ExecContext, public RefCounted
     /** Renames a destination register to a physical register.  Also records
      *  the previous physical register that the logical register mapped to.
      */
-    void
-    renameDestReg(int idx, PhysRegIdPtr renamed_dest,
-                  PhysRegIdPtr previous_rename)
+    void renameDestReg(int idx, PhysRegIdPtr renamed_dest,
+                       PhysRegIdPtr previous_rename)
     {
         renamedDestIdx(idx, renamed_dest);
         prevDestIdx(idx, previous_rename);
@@ -473,8 +451,7 @@ class DynInst : public ExecContext, public RefCounted
      *  has/will produce that logical register's result.
      *  @todo: add in whether or not the source register is ready.
      */
-    void
-    renameSrcReg(int idx, PhysRegIdPtr renamed_src)
+    void renameSrcReg(int idx, PhysRegIdPtr renamed_src)
     {
         renamedSrcIdx(idx, renamed_src);
     }
@@ -499,9 +476,10 @@ class DynInst : public ExecContext, public RefCounted
 
     /** Returns the fault type. */
     Fault getFault() const { return fault; }
+
     /** TODO: This I added for the LSQRequest side to be able to modify the
      * fault. There should be a better mechanism in place. */
-    Fault& getFault() { return fault; }
+    Fault &getFault() { return fault; }
 
     /** Checks whether or not this instruction has had its branch target
      *  calculated yet.  For now it is not utilized and is hacked to be
@@ -518,15 +496,13 @@ class DynInst : public ExecContext, public RefCounted
     /** Returns whether the instruction was predicted taken or not. */
     bool readPredTaken() { return instFlags[PredTaken]; }
 
-    void
-    setPredTaken(bool predicted_taken)
+    void setPredTaken(bool predicted_taken)
     {
         instFlags[PredTaken] = predicted_taken;
     }
 
     /** Returns whether the instruction mispredicted. */
-    bool
-    mispredicted()
+    bool mispredicted()
     {
         std::unique_ptr<PCStateBase> next_pc(pc->clone());
         staticInst->advancePC(*next_pc);
@@ -536,77 +512,110 @@ class DynInst : public ExecContext, public RefCounted
     //
     //  Instruction types.  Forward checks to StaticInst object.
     //
-    bool isNop()          const { return staticInst->isNop(); }
-    bool isMemRef()       const { return staticInst->isMemRef(); }
-    bool isLoad()         const { return staticInst->isLoad(); }
-    bool isStore()        const { return staticInst->isStore(); }
-    bool isAtomic()       const { return staticInst->isAtomic(); }
+    bool isNop() const { return staticInst->isNop(); }
+
+    bool isMemRef() const { return staticInst->isMemRef(); }
+
+    bool isLoad() const { return staticInst->isLoad(); }
+
+    bool isStore() const { return staticInst->isStore(); }
+
+    bool isAtomic() const { return staticInst->isAtomic(); }
+
     bool isStoreConditional() const
-    { return staticInst->isStoreConditional(); }
+    {
+        return staticInst->isStoreConditional();
+    }
+
     bool isInstPrefetch() const { return staticInst->isInstPrefetch(); }
+
     bool isDataPrefetch() const { return staticInst->isDataPrefetch(); }
-    bool isInteger()      const { return staticInst->isInteger(); }
-    bool isFloating()     const { return staticInst->isFloating(); }
-    bool isVector()       const { return staticInst->isVector(); }
-    bool isControl()      const { return staticInst->isControl(); }
-    bool isCall()         const { return staticInst->isCall(); }
-    bool isReturn()       const { return staticInst->isReturn(); }
-    bool isDirectCtrl()   const { return staticInst->isDirectCtrl(); }
+
+    bool isInteger() const { return staticInst->isInteger(); }
+
+    bool isFloating() const { return staticInst->isFloating(); }
+
+    bool isVector() const { return staticInst->isVector(); }
+
+    bool isControl() const { return staticInst->isControl(); }
+
+    bool isCall() const { return staticInst->isCall(); }
+
+    bool isReturn() const { return staticInst->isReturn(); }
+
+    bool isDirectCtrl() const { return staticInst->isDirectCtrl(); }
+
     bool isIndirectCtrl() const { return staticInst->isIndirectCtrl(); }
-    bool isCondCtrl()     const { return staticInst->isCondCtrl(); }
-    bool isUncondCtrl()   const { return staticInst->isUncondCtrl(); }
-    bool isSerializing()  const { return staticInst->isSerializing(); }
-    bool
-    isSerializeBefore() const
+
+    bool isCondCtrl() const { return staticInst->isCondCtrl(); }
+
+    bool isUncondCtrl() const { return staticInst->isUncondCtrl(); }
+
+    bool isSerializing() const { return staticInst->isSerializing(); }
+
+    bool isSerializeBefore() const
     {
         return staticInst->isSerializeBefore() || status[SerializeBefore];
     }
-    bool
-    isSerializeAfter() const
+
+    bool isSerializeAfter() const
     {
         return staticInst->isSerializeAfter() || status[SerializeAfter];
     }
+
     bool isSquashAfter() const { return staticInst->isSquashAfter(); }
-    bool isFullMemBarrier()   const { return staticInst->isFullMemBarrier(); }
+
+    bool isFullMemBarrier() const { return staticInst->isFullMemBarrier(); }
+
     bool isReadBarrier() const { return staticInst->isReadBarrier(); }
+
     bool isWriteBarrier() const { return staticInst->isWriteBarrier(); }
+
     bool isNonSpeculative() const { return staticInst->isNonSpeculative(); }
+
     bool isQuiesce() const { return staticInst->isQuiesce(); }
+
     bool isUnverifiable() const { return staticInst->isUnverifiable(); }
+
     bool isSyscall() const { return staticInst->isSyscall(); }
+
     bool isMacroop() const { return staticInst->isMacroop(); }
+
     bool isMicroop() const { return staticInst->isMicroop(); }
+
     bool isDelayedCommit() const { return staticInst->isDelayedCommit(); }
+
     bool isLastMicroop() const { return staticInst->isLastMicroop(); }
+
     bool isFirstMicroop() const { return staticInst->isFirstMicroop(); }
+
     // hardware transactional memory
     bool isHtmStart() const { return staticInst->isHtmStart(); }
+
     bool isHtmStop() const { return staticInst->isHtmStop(); }
+
     bool isHtmCancel() const { return staticInst->isHtmCancel(); }
+
     bool isHtmCmd() const { return staticInst->isHtmCmd(); }
 
-    uint64_t
-    getHtmTransactionUid() const override
+    uint64_t getHtmTransactionUid() const override
     {
         assert(instFlags[HtmFromTransaction]);
         return htmUid;
     }
 
-    uint64_t
-    newHtmTransactionUid() const override
+    uint64_t newHtmTransactionUid() const override
     {
         panic("Not yet implemented\n");
         return 0;
     }
 
-    bool
-    inHtmTransactionalState() const override
+    bool inHtmTransactionalState() const override
     {
         return instFlags[HtmFromTransaction];
     }
 
-    uint64_t
-    getHtmTransactionalDepth() const override
+    uint64_t getHtmTransactionalDepth() const override
     {
         if (inHtmTransactionalState())
             return htmDepth;
@@ -614,21 +623,19 @@ class DynInst : public ExecContext, public RefCounted
             return 0;
     }
 
-    void
-    setHtmTransactionalState(uint64_t htm_uid, uint64_t htm_depth)
+    void setHtmTransactionalState(uint64_t htm_uid, uint64_t htm_depth)
     {
         instFlags.set(HtmFromTransaction);
         htmUid = htm_uid;
         htmDepth = htm_depth;
     }
 
-    void
-    clearHtmTransactionalState()
+    void clearHtmTransactionalState()
     {
         if (inHtmTransactionalState()) {
             DPRINTF(HtmCpu,
-                "clearing instuction's transactional state htmUid=%u\n",
-                getHtmTransactionUid());
+                    "clearing instuction's transactional state htmUid=%u\n",
+                    getHtmTransactionUid());
 
             instFlags.reset(HtmFromTransaction);
             htmUid = -1;
@@ -668,8 +675,7 @@ class DynInst : public ExecContext, public RefCounted
     OpClass opClass() const { return staticInst->opClass(); }
 
     /** Returns the branch target address. */
-    std::unique_ptr<PCStateBase>
-    branchTarget() const
+    std::unique_ptr<PCStateBase> branchTarget() const
     {
         return staticInst->branchTarget(*pc);
     }
@@ -680,17 +686,16 @@ class DynInst : public ExecContext, public RefCounted
     /** Returns the number of destination registers. */
     size_t numDestRegs() const { return numDests(); }
 
-    size_t
-    numDestRegs(RegClassType type) const
+    size_t numDestRegs(RegClassType type) const
     {
         return staticInst->numDestRegs(type);
     }
 
     /** Returns the logical register index of the i'th destination register. */
-    const RegId& destRegIdx(int i) const { return staticInst->destRegIdx(i); }
+    const RegId &destRegIdx(int i) const { return staticInst->destRegIdx(i); }
 
     /** Returns the logical register index of the i'th source register. */
-    const RegId& srcRegIdx(int i) const { return staticInst->srcRegIdx(i); }
+    const RegId &srcRegIdx(int i) const { return staticInst->srcRegIdx(i); }
 
     /** Return the size of the instResult queue. */
     uint8_t resultSize() { return instResult.size(); }
@@ -698,8 +703,7 @@ class DynInst : public ExecContext, public RefCounted
     /** Pops a result off the instResult queue.
      * If the result stack is empty, return the default value.
      * */
-    InstResult
-    popResult(InstResult dflt=InstResult())
+    InstResult popResult(InstResult dflt = InstResult())
     {
         if (!instResult.empty()) {
             InstResult t = instResult.front();
@@ -711,14 +715,14 @@ class DynInst : public ExecContext, public RefCounted
 
     /** Pushes a result onto the instResult queue. */
     /** @{ */
-    template<typename T>
-    void
-    setResult(const RegClass &reg_class, T &&t)
+    template <typename T>
+    void setResult(const RegClass &reg_class, T &&t)
     {
         if (instFlags[RecordResult]) {
             instResult.emplace(reg_class, std::forward<T>(t));
         }
     }
+
     /** @} */
 
     /** Records that one of the source registers is ready. */
@@ -788,7 +792,7 @@ class DynInst : public ExecContext, public RefCounted
     /** Returns whether or not this instruction is squashed. */
     bool isSquashed() const { return status[Squashed]; }
 
-    //Instruction Queue Entry
+    // Instruction Queue Entry
     //-----------------------
     /** Sets this instruction as a entry the IQ. */
     void setInIQ() { status.set(IqEntry); }
@@ -800,13 +804,16 @@ class DynInst : public ExecContext, public RefCounted
     bool isInIQ() const { return status[IqEntry]; }
 
     /** Sets this instruction as squashed in the IQ. */
-    void setSquashedInIQ() { status.set(SquashedInIQ); status.set(Squashed);}
+    void setSquashedInIQ()
+    {
+        status.set(SquashedInIQ);
+        status.set(Squashed);
+    }
 
     /** Returns whether or not this instruction is squashed in the IQ. */
     bool isSquashedInIQ() const { return status[SquashedInIQ]; }
 
-
-    //Load / Store Queue Functions
+    // Load / Store Queue Functions
     //-----------------------
     /** Sets this instruction as a entry the LSQ. */
     void setInLSQ() { status.set(LsqEntry); }
@@ -818,13 +825,16 @@ class DynInst : public ExecContext, public RefCounted
     bool isInLSQ() const { return status[LsqEntry]; }
 
     /** Sets this instruction as squashed in the LSQ. */
-    void setSquashedInLSQ() { status.set(SquashedInLSQ); status.set(Squashed);}
+    void setSquashedInLSQ()
+    {
+        status.set(SquashedInLSQ);
+        status.set(Squashed);
+    }
 
     /** Returns whether or not this instruction is squashed in the LSQ. */
     bool isSquashedInLSQ() const { return status[SquashedInLSQ]; }
 
-
-    //Reorder Buffer Functions
+    // Reorder Buffer Functions
     //-----------------------
     /** Sets this instruction as a entry the ROB. */
     void setInROB() { status.set(RobEntry); }
@@ -845,8 +855,7 @@ class DynInst : public ExecContext, public RefCounted
     bool isPinnedRegsRenamed() const { return status[PinnedRegsRenamed]; }
 
     /** Sets the destination registers as renamed */
-    void
-    setPinnedRegsRenamed()
+    void setPinnedRegsRenamed()
     {
         assert(!status[PinnedRegsSquashDone]);
         assert(!status[PinnedRegsWritten]);
@@ -857,8 +866,7 @@ class DynInst : public ExecContext, public RefCounted
     bool isPinnedRegsWritten() const { return status[PinnedRegsWritten]; }
 
     /** Sets destination registers as written */
-    void
-    setPinnedRegsWritten()
+    void setPinnedRegsWritten()
     {
         assert(!status[PinnedRegsSquashDone]);
         assert(status[PinnedRegsRenamed]);
@@ -866,34 +874,27 @@ class DynInst : public ExecContext, public RefCounted
     }
 
     /** Return whether dest registers' pinning status updated after squash */
-    bool
-    isPinnedRegsSquashDone() const
+    bool isPinnedRegsSquashDone() const
     {
         return status[PinnedRegsSquashDone];
     }
 
     /** Sets dest registers' status updated after squash */
-    void
-    setPinnedRegsSquashDone()
+    void setPinnedRegsSquashDone()
     {
         assert(!status[PinnedRegsSquashDone]);
         status.set(PinnedRegsSquashDone);
     }
 
     /** Read the PC state of this instruction. */
-    const PCStateBase &
-    pcState() const override
-    {
-        return *pc;
-    }
+    const PCStateBase &pcState() const override { return *pc; }
 
     /** Set the PC state of this instruction. */
     void pcState(const PCStateBase &val) override { set(pc, val); }
 
     bool readPredicate() const override { return instFlags[Predicate]; }
 
-    void
-    setPredicate(bool val) override
+    void setPredicate(bool val) override
     {
         instFlags[Predicate] = val;
 
@@ -902,14 +903,12 @@ class DynInst : public ExecContext, public RefCounted
         }
     }
 
-    bool
-    readMemAccPredicate() const override
+    bool readMemAccPredicate() const override
     {
         return instFlags[MemAccPredicate];
     }
 
-    void
-    setMemAccPredicate(bool val) override
+    void setMemAccPredicate(bool val) override
     {
         instFlags[MemAccPredicate] = val;
     }
@@ -926,10 +925,12 @@ class DynInst : public ExecContext, public RefCounted
   public:
     /** Is this instruction's memory access strictly ordered? */
     bool strictlyOrdered() const { return instFlags[IsStrictlyOrdered]; }
+
     void strictlyOrdered(bool so) { instFlags[IsStrictlyOrdered] = so; }
 
     /** Has this instruction generated a memory request. */
     bool hasRequest() const { return instFlags[ReqMade]; }
+
     /** Assert this instruction has generated a memory request. */
     void setRequest() { instFlags[ReqMade] = true; }
 
@@ -941,38 +942,35 @@ class DynInst : public ExecContext, public RefCounted
 
   public:
     /** Returns the number of consecutive store conditional failures. */
-    unsigned int
-    readStCondFailures() const override
+    unsigned int readStCondFailures() const override
     {
         return thread->storeCondFailures;
     }
 
     /** Sets the number of consecutive store conditional failures. */
-    void
-    setStCondFailures(unsigned int sc_failures) override
+    void setStCondFailures(unsigned int sc_failures) override
     {
         thread->storeCondFailures = sc_failures;
     }
 
   public:
     // monitor/mwait funtions
-    void
-    armMonitor(Addr address) override
+    void armMonitor(Addr address) override
     {
         cpu->armMonitor(threadNumber, address);
     }
-    bool
-    mwait(PacketPtr pkt) override
+
+    bool mwait(PacketPtr pkt) override
     {
         return cpu->mwait(threadNumber, pkt);
     }
-    void
-    mwaitAtomic(gem5::ThreadContext *tc) override
+
+    void mwaitAtomic(gem5::ThreadContext *tc) override
     {
         return cpu->mwaitAtomic(threadNumber, tc, cpu->mmu);
     }
-    AddressMonitor *
-    getAddrMonitor() override
+
+    AddressMonitor *getAddrMonitor() override
     {
         return cpu->getCpuAddrMonitor(threadNumber);
     }
@@ -987,9 +985,9 @@ class DynInst : public ExecContext, public RefCounted
     // Value -1 indicates that particular phase
     // hasn't happened (yet).
     /** Tick records used for the pipeline activity viewer. */
-    Tick fetchTick = -1;      // instruction fetch is completed.
-    int32_t decodeTick = -1;  // instruction enters decode phase
-    int32_t renameTick = -1;  // instruction enters rename phase
+    Tick fetchTick = -1;     // instruction fetch is completed.
+    int32_t decodeTick = -1; // instruction enters decode phase
+    int32_t renameTick = -1; // instruction enters rename phase
     int32_t dispatchTick = -1;
     int32_t issueTick = -1;
     int32_t completeTick = -1;
@@ -1004,8 +1002,7 @@ class DynInst : public ExecContext, public RefCounted
     /** Reads a misc. register, including any side-effects the read
      * might have as defined by the architecture.
      */
-    RegVal
-    readMiscReg(int misc_reg) override
+    RegVal readMiscReg(int misc_reg) override
     {
         return cpu->readMiscReg(misc_reg, threadNumber);
     }
@@ -1013,8 +1010,7 @@ class DynInst : public ExecContext, public RefCounted
     /** Sets a misc. register, including any side-effects the write
      * might have as defined by the architecture.
      */
-    void
-    setMiscReg(int misc_reg, RegVal val) override
+    void setMiscReg(int misc_reg, RegVal val) override
     {
         /** Writes to misc. registers are recorded and deferred until the
          * commit stage, when updateMiscRegs() is called. First, check if
@@ -1022,7 +1018,7 @@ class DynInst : public ExecContext, public RefCounted
          * committed instead of making a new entry. If not, make a new
          * entry and record the write.
          */
-        for (auto &idx: _destMiscRegIdx) {
+        for (auto &idx : _destMiscRegIdx) {
             if (idx == misc_reg)
                 return;
         }
@@ -1034,10 +1030,9 @@ class DynInst : public ExecContext, public RefCounted
     /** Reads a misc. register, including any side-effects the read
      * might have as defined by the architecture.
      */
-    RegVal
-    readMiscRegOperand(const StaticInst *si, int idx) override
+    RegVal readMiscRegOperand(const StaticInst *si, int idx) override
     {
-        const RegId& reg = si->srcRegIdx(idx);
+        const RegId &reg = si->srcRegIdx(idx);
         assert(reg.is(MiscRegClass));
         return cpu->readMiscReg(reg.index(), threadNumber);
     }
@@ -1045,17 +1040,15 @@ class DynInst : public ExecContext, public RefCounted
     /** Sets a misc. register, including any side-effects the write
      * might have as defined by the architecture.
      */
-    void
-    setMiscRegOperand(const StaticInst *si, int idx, RegVal val) override
+    void setMiscRegOperand(const StaticInst *si, int idx, RegVal val) override
     {
-        const RegId& reg = si->destRegIdx(idx);
+        const RegId &reg = si->destRegIdx(idx);
         assert(reg.is(MiscRegClass));
         setMiscReg(reg.index(), val);
     }
 
     /** Called at the commit stage to update the misc. registers. */
-    void
-    updateMiscRegs()
+    void updateMiscRegs()
     {
         // @todo: Pretty convoluted way to avoid squashing from happening when
         // using the TC during an instruction's execution (specifically for
@@ -1065,19 +1058,17 @@ class DynInst : public ExecContext, public RefCounted
         thread->noSquashFromTC = true;
 
         for (int i = 0; i < _destMiscRegIdx.size(); i++)
-            cpu->setMiscReg(
-                _destMiscRegIdx[i], _destMiscRegVal[i], threadNumber);
+            cpu->setMiscReg(_destMiscRegIdx[i], _destMiscRegVal[i],
+                            threadNumber);
 
         thread->noSquashFromTC = no_squash_from_TC;
     }
 
-    void
-    forwardOldRegs()
+    void forwardOldRegs()
     {
-
         for (int idx = 0; idx < numDestRegs(); idx++) {
             PhysRegIdPtr prev_phys_reg = prevDestIdx(idx);
-            const RegId& original_dest_reg = staticInst->destRegIdx(idx);
+            const RegId &original_dest_reg = staticInst->destRegIdx(idx);
             const auto bytes = original_dest_reg.regClass().regBytes();
 
             // Registers which aren't renamed don't need to be forwarded.
@@ -1086,7 +1077,7 @@ class DynInst : public ExecContext, public RefCounted
 
             if (bytes == sizeof(RegVal)) {
                 setRegOperand(staticInst.get(), idx,
-                        cpu->getReg(prev_phys_reg, threadNumber));
+                              cpu->getReg(prev_phys_reg, threadNumber));
             } else {
                 uint8_t val[original_dest_reg.regClass().regBytes()];
                 cpu->getReg(prev_phys_reg, val, threadNumber);
@@ -1094,11 +1085,11 @@ class DynInst : public ExecContext, public RefCounted
             }
         }
     }
+
     /** Traps to handle specified fault. */
     void trap(const Fault &fault);
 
   public:
-
     // The register accessor methods provide the index of the
     // instruction's operand (e.g., 0 or 1), not the architectural
     // register index, to simplify the implementation of register
@@ -1110,8 +1101,7 @@ class DynInst : public ExecContext, public RefCounted
     // storage (which is pretty hard to imagine they would have reason
     // to do).
 
-    RegVal
-    getRegOperand(const StaticInst *si, int idx) override
+    RegVal getRegOperand(const StaticInst *si, int idx) override
     {
         const PhysRegIdPtr reg = renamedSrcIdx(idx);
         if (reg->is(InvalidRegClass))
@@ -1119,8 +1109,7 @@ class DynInst : public ExecContext, public RefCounted
         return cpu->getReg(reg, threadNumber);
     }
 
-    void
-    getRegOperand(const StaticInst *si, int idx, void *val) override
+    void getRegOperand(const StaticInst *si, int idx, void *val) override
     {
         const PhysRegIdPtr reg = renamedSrcIdx(idx);
         if (reg->is(InvalidRegClass))
@@ -1128,8 +1117,7 @@ class DynInst : public ExecContext, public RefCounted
         cpu->getReg(reg, val, threadNumber);
     }
 
-    void *
-    getWritableRegOperand(const StaticInst *si, int idx) override
+    void *getWritableRegOperand(const StaticInst *si, int idx) override
     {
         return cpu->getWritableReg(renamedDestIdx(idx), threadNumber);
     }
@@ -1137,8 +1125,7 @@ class DynInst : public ExecContext, public RefCounted
     /** @todo: Make results into arrays so they can handle multiple dest
      *  registers.
      */
-    void
-    setRegOperand(const StaticInst *si, int idx, RegVal val) override
+    void setRegOperand(const StaticInst *si, int idx, RegVal val) override
     {
         const PhysRegIdPtr reg = renamedDestIdx(idx);
         if (reg->is(InvalidRegClass))
@@ -1147,8 +1134,7 @@ class DynInst : public ExecContext, public RefCounted
         setResult(reg->regClass(), val);
     }
 
-    void
-    setRegOperand(const StaticInst *si, int idx, const void *val) override
+    void setRegOperand(const StaticInst *si, int idx, const void *val) override
     {
         const PhysRegIdPtr reg = renamedDestIdx(idx);
         if (reg->is(InvalidRegClass))

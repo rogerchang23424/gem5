@@ -53,12 +53,11 @@ class DecodeFaultInst : public X86StaticInst
 
   public:
     // Constructor.
-    DecodeFaultInst(const char *mnem, ExtMachInst _machInst, Fault _fault) :
-        X86StaticInst(mnem, _machInst, No_OpClass), fault(_fault)
+    DecodeFaultInst(const char *mnem, ExtMachInst _machInst, Fault _fault)
+        : X86StaticInst(mnem, _machInst, No_OpClass), fault(_fault)
     {}
 
-    Fault
-    execute(ExecContext *tc, trace::InstRecord *traceData) const override
+    Fault execute(ExecContext *tc, trace::InstRecord *traceData) const override
     {
         return fault;
     }

@@ -47,34 +47,28 @@
 namespace gem5
 {
 
-namespace X86ISA {
+namespace X86ISA
+{
 
 class MMU : public BaseMMU
 {
   public:
-    MMU(const X86MMUParams &p)
-      : BaseMMU(p)
-    {}
+    MMU(const X86MMUParams &p) : BaseMMU(p) {}
 
-    void
-    flushNonGlobal()
+    void flushNonGlobal()
     {
-        static_cast<TLB*>(itb)->flushNonGlobal();
-        static_cast<TLB*>(dtb)->flushNonGlobal();
+        static_cast<TLB *>(itb)->flushNonGlobal();
+        static_cast<TLB *>(dtb)->flushNonGlobal();
     }
 
-    Walker*
-    getDataWalker()
-    {
-        return static_cast<TLB*>(dtb)->getWalker();
-    }
+    Walker *getDataWalker() { return static_cast<TLB *>(dtb)->getWalker(); }
 
-    TranslationGenPtr
-    translateFunctional(Addr start, Addr size, ThreadContext *tc,
-            Mode mode, Request::Flags flags) override
+    TranslationGenPtr translateFunctional(Addr start, Addr size,
+                                          ThreadContext *tc, Mode mode,
+                                          Request::Flags flags) override
     {
-        return TranslationGenPtr(new MMUTranslationGen(
-                PageBytes, start, size, tc, this, mode, flags));
+        return TranslationGenPtr(new MMUTranslationGen(PageBytes, start, size,
+                                                       tc, this, mode, flags));
     }
 };
 

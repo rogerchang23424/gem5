@@ -37,9 +37,11 @@
 
 using namespace gem5;
 
-namespace {
+namespace
+{
 
-static inline uint32_t *ptr(uintptr_t val)
+static inline uint32_t *
+ptr(uintptr_t val)
 {
     return (uint32_t *)val;
 }
@@ -52,8 +54,7 @@ class TrieTestData : public testing::Test
     typedef Trie<Addr, uint32_t> TrieType;
     TrieType trie;
 
-    std::string
-    dumpTrie()
+    std::string dumpTrie()
     {
         std::stringstream ss;
         trie.dump("test trie", ss);

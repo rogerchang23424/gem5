@@ -45,7 +45,7 @@ class FunctionProfile;
 
 namespace loader
 {
-    class SymbolTable;
+class SymbolTable;
 } // namespace loader
 
 class BaseStackTrace
@@ -63,10 +63,10 @@ class BaseStackTrace
 
   public:
     BaseStackTrace() : stack(64) {}
+
     virtual ~BaseStackTrace() {}
 
-    void
-    clear()
+    void clear()
     {
         tc = nullptr;
         stack.clear();
@@ -74,8 +74,7 @@ class BaseStackTrace
 
     bool valid() const { return tc; }
 
-    bool
-    trace(ThreadContext *tc, const StaticInstPtr &inst)
+    bool trace(ThreadContext *tc, const StaticInstPtr &inst)
     {
         if (!inst->isCall() && !inst->isReturn())
             return false;
@@ -89,7 +88,11 @@ class BaseStackTrace
 
     const std::vector<Addr> &getstack() const { return stack; }
 
-    void dprintf() { if (debug::Stack) dump(); }
+    void dprintf()
+    {
+        if (debug::Stack)
+            dump();
+    }
 
     // This function can be overridden so that special addresses which don't
     // actually refer to PCs can be translated into special names. For
@@ -101,9 +104,8 @@ class BaseStackTrace
     virtual bool tryGetSymbol(std::string &symbol, Addr addr,
                               const loader::SymbolTable *symtab);
 
-    void
-    getSymbol(std::string &symbol, Addr addr,
-              const loader::SymbolTable *symtab)
+    void getSymbol(std::string &symbol, Addr addr,
+                   const loader::SymbolTable *symtab)
     {
         panic_if(!tryGetSymbol(symbol, addr, symtab),
                  "Could not find symbol for address %#x\n", addr);

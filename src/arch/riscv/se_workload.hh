@@ -46,16 +46,15 @@ class SEWorkload : public gem5::SEWorkload
   public:
     PARAMS(RiscvSEWorkload);
 
-    SEWorkload(const Params &p, Addr page_shift) :
-        gem5::SEWorkload(p, page_shift)
+    SEWorkload(const Params &p, Addr page_shift)
+        : gem5::SEWorkload(p, page_shift)
     {}
 
-    void
-    setSystem(System *sys) override
+    void setSystem(System *sys) override
     {
         gem5::SEWorkload::setSystem(sys);
-        gdb = BaseRemoteGDB::build<RemoteGDB>(
-                params().remote_gdb_port, system);
+        gdb =
+            BaseRemoteGDB::build<RemoteGDB>(params().remote_gdb_port, system);
     }
 
     loader::Arch getArch() const override { return loader::Riscv64; }
@@ -72,8 +71,7 @@ namespace guest_abi
 template <>
 struct Result<RiscvISA::SEWorkload::SyscallABI64, SyscallReturn>
 {
-    static void
-    store(ThreadContext *tc, const SyscallReturn &ret)
+    static void store(ThreadContext *tc, const SyscallReturn &ret)
     {
         if (ret.successful()) {
             // no error
@@ -88,8 +86,7 @@ struct Result<RiscvISA::SEWorkload::SyscallABI64, SyscallReturn>
 template <>
 struct Result<RiscvISA::SEWorkload::SyscallABI32, SyscallReturn>
 {
-    static void
-    store(ThreadContext *tc, const SyscallReturn &ret)
+    static void store(ThreadContext *tc, const SyscallReturn &ret)
     {
         if (ret.successful()) {
             // no error

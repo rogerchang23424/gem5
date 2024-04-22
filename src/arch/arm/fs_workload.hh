@@ -93,38 +93,35 @@ class FsWorkload : public KernelWorkload
     loader::ObjectFile *getBootLoader(loader::ObjectFile *const obj);
 
     template <template <class ABI, class Base> class FuncEvent,
-             typename... Args>
-    PCEvent *
-    addSkipFunc(Args... args)
+              typename... Args>
+    PCEvent *addSkipFunc(Args... args)
     {
         if (getArch() == loader::Arm64) {
             return addKernelFuncEvent<FuncEvent<Aapcs64, SkipFunc>>(
-                    std::forward<Args>(args)...);
+                std::forward<Args>(args)...);
         } else {
             return addKernelFuncEvent<FuncEvent<Aapcs32, SkipFunc>>(
-                    std::forward<Args>(args)...);
+                std::forward<Args>(args)...);
         }
     }
 
     template <template <class ABI, class Base> class FuncEvent,
-             typename... Args>
-    PCEvent *
-    addSkipFuncOrPanic(Args... args)
+              typename... Args>
+    PCEvent *addSkipFuncOrPanic(Args... args)
     {
         if (getArch() == loader::Arm64) {
             return addKernelFuncEventOrPanic<FuncEvent<Aapcs64, SkipFunc>>(
-                    std::forward<Args>(args)...);
+                std::forward<Args>(args)...);
         } else {
             return addKernelFuncEventOrPanic<FuncEvent<Aapcs32, SkipFunc>>(
-                    std::forward<Args>(args)...);
+                std::forward<Args>(args)...);
         }
     }
 
   public:
     PARAMS(ArmFsWorkload);
 
-    Addr
-    getEntry() const override
+    Addr getEntry() const override
     {
         if (bootldr)
             return bootldr->entryPoint();
@@ -132,8 +129,7 @@ class FsWorkload : public KernelWorkload
             return kernelEntry;
     }
 
-    loader::Arch
-    getArch() const override
+    loader::Arch getArch() const override
     {
         if (bootldr)
             return bootldr->getArch();
@@ -149,16 +145,14 @@ class FsWorkload : public KernelWorkload
 
     void initState() override;
 
-    void
-    setSystem(System *sys) override
+    void setSystem(System *sys) override
     {
         KernelWorkload::setSystem(sys);
-        gdb = BaseRemoteGDB::build<RemoteGDB>(
-                params().remote_gdb_port, system);
+        gdb =
+            BaseRemoteGDB::build<RemoteGDB>(params().remote_gdb_port, system);
     }
 
-    Addr
-    fixFuncEventAddr(Addr addr) const override
+    Addr fixFuncEventAddr(Addr addr) const override
     {
         // Remove the low bit that thumb symbols have set
         // but that aren't actually odd aligned

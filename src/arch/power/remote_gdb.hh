@@ -44,7 +44,6 @@ namespace gem5
 namespace PowerISA
 {
 
-
 class RemoteGDB : public BaseRemoteGDB
 {
   protected:
@@ -52,7 +51,8 @@ class RemoteGDB : public BaseRemoteGDB
 
     class PowerGdbRegCache : public BaseGdbRegCache
     {
-      using BaseGdbRegCache::BaseGdbRegCache;
+        using BaseGdbRegCache::BaseGdbRegCache;
+
       private:
         struct GEM5_PACKED
         {
@@ -69,11 +69,13 @@ class RemoteGDB : public BaseRemoteGDB
 
       public:
         char *data() const { return (char *)&r; }
+
         size_t size() const { return sizeof(r); }
-        void getRegs(ThreadContext*);
-        void setRegs(ThreadContext*) const;
-        const std::string
-        name() const
+
+        void getRegs(ThreadContext *);
+        void setRegs(ThreadContext *) const;
+
+        const std::string name() const
         {
             return gdb->name() + ".PowerGdbRegCache";
         }
@@ -81,7 +83,8 @@ class RemoteGDB : public BaseRemoteGDB
 
     class Power64GdbRegCache : public BaseGdbRegCache
     {
-      using BaseGdbRegCache::BaseGdbRegCache;
+        using BaseGdbRegCache::BaseGdbRegCache;
+
       private:
         struct GEM5_PACKED
         {
@@ -98,11 +101,13 @@ class RemoteGDB : public BaseRemoteGDB
 
       public:
         char *data() const { return (char *)&r; }
+
         size_t size() const { return sizeof(r); }
-        void getRegs(ThreadContext*);
-        void setRegs(ThreadContext*) const;
-        const std::string
-        name() const
+
+        void getRegs(ThreadContext *);
+        void setRegs(ThreadContext *) const;
+
+        const std::string name() const
         {
             return gdb->name() + ".Power64GdbRegCache";
         }
@@ -115,10 +120,9 @@ class RemoteGDB : public BaseRemoteGDB
     RemoteGDB(System *_system, ListenSocketConfig _listen_config);
     BaseGdbRegCache *gdbRegs();
 
-    std::vector<std::string>
-    availableFeatures() const
+    std::vector<std::string> availableFeatures() const
     {
-        return {"qXfer:features:read+"};
+        return { "qXfer:features:read+" };
     };
 
     bool getXferFeaturesRead(const std::string &annex, std::string &output);

@@ -33,7 +33,8 @@
 
 using namespace gem5;
 
-namespace {
+namespace
+{
 
 class TestTarget : public Extensible<TestTarget>
 {
@@ -42,8 +43,7 @@ class TestTarget : public Extensible<TestTarget>
 class IntegerExtension : public Extension<TestTarget, IntegerExtension>
 {
   public:
-    explicit IntegerExtension(uint32_t data)
-        : data_(data) {}
+    explicit IntegerExtension(uint32_t data) : data_(data) {}
 
     std::unique_ptr<gem5::ExtensionBase> clone() const override
     {
@@ -59,8 +59,7 @@ class IntegerExtension : public Extension<TestTarget, IntegerExtension>
 class BoolExtension : public Extension<TestTarget, BoolExtension>
 {
   public:
-    explicit BoolExtension(bool data)
-        : data_(data) {}
+    explicit BoolExtension(bool data) : data_(data) {}
 
     std::unique_ptr<gem5::ExtensionBase> clone() const override
     {

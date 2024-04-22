@@ -61,15 +61,15 @@ class EmuLinux : public SEWorkload
 
     EmuLinux(const Params &p);
 
-    void
-    setSystem(System *sys) override
+    void setSystem(System *sys) override
     {
         SEWorkload::setSystem(sys);
-        gdb = BaseRemoteGDB::build<RemoteGDB>(
-                params().remote_gdb_port, system);
+        gdb =
+            BaseRemoteGDB::build<RemoteGDB>(params().remote_gdb_port, system);
     }
 
     loader::Arch getArch() const override { return loader::X86_64; }
+
     ByteOrder byteOrder() const override { return ByteOrder::little; }
 
     void syscall(ThreadContext *tc) override;
@@ -78,13 +78,15 @@ class EmuLinux : public SEWorkload
     void pageFault(ThreadContext *tc);
 
     struct SyscallABI64 :
-        public GenericSyscallABI64, public X86Linux::SyscallABI
+        public GenericSyscallABI64,
+        public X86Linux::SyscallABI
     {
         static const std::vector<RegId> ArgumentRegs;
     };
 
     struct SyscallABI32 :
-        public GenericSyscallABI32, public X86Linux::SyscallABI
+        public GenericSyscallABI32,
+        public X86Linux::SyscallABI
     {
         static const std::vector<RegId> ArgumentRegs;
     };
@@ -100,17 +102,17 @@ namespace guest_abi
 {
 
 template <typename Arg>
-struct Argument<X86ISA::EmuLinux::SyscallABI32, Arg,
+struct Argument<
+    X86ISA::EmuLinux::SyscallABI32, Arg,
     typename std::enable_if_t<std::is_integral_v<Arg> &&
-        X86ISA::EmuLinux::SyscallABI32::IsWideV<Arg>>>
+                              X86ISA::EmuLinux::SyscallABI32::IsWideV<Arg>>>
 {
     using ABI = X86ISA::EmuLinux::SyscallABI32;
 
-    static Arg
-    get(ThreadContext *tc, typename ABI::State &state)
+    static Arg get(ThreadContext *tc, typename ABI::State &state)
     {
         panic_if(state + 1 >= ABI::ArgumentRegs.size(),
-                "Ran out of syscall argument registers.");
+                 "Ran out of syscall argument registers.");
         auto low = ABI::ArgumentRegs[state++];
         auto high = ABI::ArgumentRegs[state++];
         return (Arg)ABI::mergeRegs(tc, low, high);

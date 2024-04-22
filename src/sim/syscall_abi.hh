@@ -55,20 +55,23 @@ struct GenericSyscallABI32 : public GenericSyscallABI
     using UintPtr = uint32_t;
 
     // Is this argument too big for a single register?
-    template <typename T, typename Enabled=void>
-    struct IsWide : public std::false_type {};
+    template <typename T, typename Enabled = void>
+    struct IsWide : public std::false_type
+    {
+    };
 
     template <typename T>
     struct IsWide<T, std::enable_if_t<(sizeof(T) > sizeof(UintPtr))>> :
         public std::true_type
-    {};
+    {
+    };
 
     template <typename T>
     static constexpr bool IsWideV = IsWide<T>::value;
 
     // Read two registers and merge them into one value.
-    static uint64_t
-    mergeRegs(ThreadContext *tc, const RegId &low_id, const RegId &high_id)
+    static uint64_t mergeRegs(ThreadContext *tc, const RegId &low_id,
+                              const RegId &high_id)
     {
         RegVal low = tc->getReg(low_id);
         RegVal high = tc->getReg(high_id);
@@ -82,16 +85,15 @@ namespace guest_abi
 // For 64 bit systems, return syscall args directly.
 template <typename ABI, typename Arg>
 struct Argument<ABI, Arg,
-    typename std::enable_if_t<
-        std::is_base_of_v<GenericSyscallABI64, ABI> &&
-        (std::is_integral_v<Arg> ||
-         std::is_same<Arg,pseudo_inst::GuestAddr>::value)>>
+                typename std::enable_if_t<
+                    std::is_base_of_v<GenericSyscallABI64, ABI> &&
+                    (std::is_integral_v<Arg> ||
+                     std::is_same<Arg, pseudo_inst::GuestAddr>::value)>>
 {
-    static Arg
-    get(ThreadContext *tc, typename ABI::State &state)
+    static Arg get(ThreadContext *tc, typename ABI::State &state)
     {
         panic_if(state >= ABI::ArgumentRegs.size(),
-                "Ran out of syscall argument registers.");
+                 "Ran out of syscall argument registers.");
         return (Arg)tc->getReg(ABI::ArgumentRegs[state++]);
     }
 };
@@ -100,14 +102,13 @@ struct Argument<ABI, Arg,
 // arguments aren't handled generically.
 template <typename ABI, typename Arg>
 struct Argument<ABI, Arg,
-    typename std::enable_if_t<std::is_integral_v<Arg> &&
-        !ABI::template IsWideV<Arg>>>
+                typename std::enable_if_t<std::is_integral_v<Arg> &&
+                                          !ABI::template IsWideV<Arg>>>
 {
-    static Arg
-    get(ThreadContext *tc, typename ABI::State &state)
+    static Arg get(ThreadContext *tc, typename ABI::State &state)
     {
         panic_if(state >= ABI::ArgumentRegs.size(),
-                "Ran out of syscall argument registers.");
+                 "Ran out of syscall argument registers.");
         return bits(tc->getReg(ABI::ArgumentRegs[state++]), 31, 0);
     }
 };

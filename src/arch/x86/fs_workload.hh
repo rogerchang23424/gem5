@@ -71,7 +71,7 @@ class ConfigTable;
 } // namespace intelmp
 
 void installSegDesc(ThreadContext *tc, int seg, SegDescriptor desc,
-        bool longmode);
+                    bool longmode);
 
 class FsWorkload : public KernelWorkload
 {
@@ -82,28 +82,26 @@ class FsWorkload : public KernelWorkload
   public:
     void initState() override;
 
-    void
-    setSystem(System *sys) override
+    void setSystem(System *sys) override
     {
         KernelWorkload::setSystem(sys);
-        gdb = BaseRemoteGDB::build<RemoteGDB>(
-                params().remote_gdb_port, system);
+        gdb =
+            BaseRemoteGDB::build<RemoteGDB>(params().remote_gdb_port, system);
     }
 
     ByteOrder byteOrder() const override { return ByteOrder::little; }
 
   protected:
-
     smbios::SMBiosTable *smbiosTable;
     intelmp::FloatingPointer *mpFloatingPointer;
     intelmp::ConfigTable *mpConfigTable;
     ACPI::RSDP *rsdp;
 
-    void writeOutSMBiosTable(Addr header,
-            Addr &headerSize, Addr &tableSize, Addr table=0);
+    void writeOutSMBiosTable(Addr header, Addr &headerSize, Addr &tableSize,
+                             Addr table = 0);
 
-    void writeOutMPTable(Addr fp,
-            Addr &fpSize, Addr &tableSize, Addr table=0);
+    void writeOutMPTable(Addr fp, Addr &fpSize, Addr &tableSize,
+                         Addr table = 0);
 
     void writeOutACPITables(Addr begin, Addr &size);
 

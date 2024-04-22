@@ -111,32 +111,32 @@ class InstId
 
   public:
     /** Very boring default constructor */
-    InstId(
-        ThreadID thread_id = 0, InstSeqNum stream_seq_num = 0,
-        InstSeqNum prediction_seq_num = 0, InstSeqNum line_seq_num = 0,
-        InstSeqNum fetch_seq_num = 0, InstSeqNum exec_seq_num = 0) :
-        threadId(thread_id), streamSeqNum(stream_seq_num),
-        predictionSeqNum(prediction_seq_num), lineSeqNum(line_seq_num),
-        fetchSeqNum(fetch_seq_num), execSeqNum(exec_seq_num)
-    { }
+    InstId(ThreadID thread_id = 0, InstSeqNum stream_seq_num = 0,
+           InstSeqNum prediction_seq_num = 0, InstSeqNum line_seq_num = 0,
+           InstSeqNum fetch_seq_num = 0, InstSeqNum exec_seq_num = 0)
+        : threadId(thread_id),
+          streamSeqNum(stream_seq_num),
+          predictionSeqNum(prediction_seq_num),
+          lineSeqNum(line_seq_num),
+          fetchSeqNum(fetch_seq_num),
+          execSeqNum(exec_seq_num)
+    {}
 
   public:
     /* Equal if the thread and last set sequence number matches */
-    bool
-    operator== (const InstId &rhs)
+    bool operator==(const InstId &rhs)
     {
         /* If any of fetch and exec sequence number are not set
          *  they need to be 0, so a straight comparison is still
          *  fine */
-        bool ret = (threadId == rhs.threadId &&
-            lineSeqNum == rhs.lineSeqNum &&
-            fetchSeqNum == rhs.fetchSeqNum &&
-            execSeqNum == rhs.execSeqNum);
+        bool ret =
+            (threadId == rhs.threadId && lineSeqNum == rhs.lineSeqNum &&
+             fetchSeqNum == rhs.fetchSeqNum && execSeqNum == rhs.execSeqNum);
 
         /* Stream and prediction *must* match if these are the same id */
         if (ret) {
             assert(streamSeqNum == rhs.streamSeqNum &&
-                predictionSeqNum == rhs.predictionSeqNum);
+                   predictionSeqNum == rhs.predictionSeqNum);
         }
 
         return ret;
@@ -145,7 +145,7 @@ class InstId
 
 /** Print this id in the usual slash-separated format expected by
  *  MinorTrace */
-std::ostream &operator <<(std::ostream &os, const InstId &id);
+std::ostream &operator<<(std::ostream &os, const InstId &id);
 
 class MinorDynInst;
 
@@ -153,7 +153,7 @@ class MinorDynInst;
  *  series of '/' separated sequence numbers for other instructions.  The
  *  sequence numbers will be in the order: stream, prediction, line, fetch,
  *  exec with exec absent if it is 0.  This is used by MinorTrace. */
-std::ostream &operator <<(std::ostream &os, const MinorDynInst &inst);
+std::ostream &operator<<(std::ostream &os, const MinorDynInst &inst);
 
 /** Dynamic instruction for Minor.
  *  MinorDynInst implements the BubbleIF interface
@@ -224,12 +224,12 @@ class MinorDynInst : public RefCounted
     InstSeqNum instToWaitFor = 0;
 
     /** Extra delay at the end of the pipeline */
-    Cycles extraCommitDelay{0};
+    Cycles extraCommitDelay{ 0 };
     TimingExpr *extraCommitDelayExpr = nullptr;
 
     /** Once issued, extraCommitDelay becomes minimumCommitCycle
      *  to account for delay in absolute time */
-    Cycles minimumCommitCycle{0};
+    Cycles minimumCommitCycle{ 0 };
 
     /** Flat register indices so that, when clearing the scoreboard, we
      *  have the same register indices as when the instruction was marked
@@ -237,10 +237,14 @@ class MinorDynInst : public RefCounted
     std::vector<RegId> flatDestRegIdx;
 
   public:
-    MinorDynInst(StaticInstPtr si, InstId id_=InstId(), Fault fault_=NoFault) :
-        staticInst(si), id(id_), fault(fault_), translationFault(NoFault),
-        flatDestRegIdx(si ? si->numDestRegs() : 0)
-    { }
+    MinorDynInst(StaticInstPtr si, InstId id_ = InstId(),
+                 Fault fault_ = NoFault)
+        : staticInst(si),
+          id(id_),
+          fault(fault_),
+          translationFault(NoFault),
+          flatDestRegIdx(si ? si->numDestRegs() : 0)
+    {}
 
   public:
     /** The BubbleIF interface. */
@@ -285,7 +289,7 @@ class MinorDynInst : public RefCounted
 };
 
 /** Print a summary of the instruction */
-std::ostream &operator <<(std::ostream &os, const MinorDynInst &inst);
+std::ostream &operator<<(std::ostream &os, const MinorDynInst &inst);
 
 } // namespace minor
 } // namespace gem5
