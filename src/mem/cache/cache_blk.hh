@@ -78,20 +78,20 @@ class CacheBlk : public TaggedEntry
     enum CoherenceBits : unsigned
     {
         /** write permission */
-        WritableBit =       0x02,
+        WritableBit = 0x02,
         /**
          * Read permission. Note that a block can be valid but not readable
          * if there is an outstanding write upgrade miss.
          */
-        ReadableBit =       0x04,
+        ReadableBit = 0x04,
         /** dirty (modified) */
-        DirtyBit =          0x08,
+        DirtyBit = 0x08,
 
         /**
          * Helper enum value that includes all other bits. Whenever a new
          * bits is added, this should be updated.
          */
-        AllBits  =          0x0E,
+        AllBits = 0x0E,
     };
 
     /**
@@ -117,18 +117,18 @@ class CacheBlk : public TaggedEntry
     class Lock
     {
       public:
-        ContextID contextId;     // locking context
-        Addr lowAddr;      // low address of lock range
-        Addr highAddr;     // high address of lock range
+        ContextID contextId; // locking context
+        Addr lowAddr;        // low address of lock range
+        Addr highAddr;       // high address of lock range
 
         // check for matching execution context, and an address that
         // is within the lock
         bool matches(const RequestPtr &req) const
         {
             Addr req_low = req->getPaddr();
-            Addr req_high = req_low + req->getSize() -1;
-            return (contextId == req->contextId()) &&
-                   (req_low >= lowAddr) && (req_high <= highAddr);
+            Addr req_high = req_low + req->getSize() - 1;
+            return (contextId == req->contextId()) && (req_low >= lowAddr) &&
+                   (req_high <= highAddr);
         }
 
         // check if a request is intersecting and thus invalidating the lock
@@ -144,8 +144,7 @@ class CacheBlk : public TaggedEntry
             : contextId(req->contextId()),
               lowAddr(req->getPaddr()),
               highAddr(lowAddr + req->getSize() - 1)
-        {
-        }
+        {}
     };
 
     /** List of thread contexts that have performed a load-locked (LL)
@@ -153,14 +152,12 @@ class CacheBlk : public TaggedEntry
     std::list<Lock> lockList;
 
   public:
-    CacheBlk()
-    {
-        invalidate();
-    }
+    CacheBlk() { invalidate(); }
 
-    CacheBlk(const CacheBlk&) = delete;
-    CacheBlk& operator=(const CacheBlk&) = delete;
-    CacheBlk(const CacheBlk&&) = delete;
+    CacheBlk(const CacheBlk &) = delete;
+    CacheBlk &operator=(const CacheBlk &) = delete;
+    CacheBlk(const CacheBlk &&) = delete;
+
     /**
      * Move assignment operator.
      * This should only be used to move an existing valid entry into an
@@ -169,8 +166,7 @@ class CacheBlk : public TaggedEntry
      * variables will remain the same, that is, an entry cannot move its
      * data, just its metadata contents.
      */
-    virtual CacheBlk&
-    operator=(CacheBlk&& other)
+    virtual CacheBlk &operator=(CacheBlk &&other)
     {
         // Copying an entry into a valid one would imply in skipping all
         // replacement steps, so it cannot be allowed
@@ -194,7 +190,8 @@ class CacheBlk : public TaggedEntry
 
         return *this;
     }
-    virtual ~CacheBlk() {};
+
+    virtual ~CacheBlk(){};
 
     /**
      * Invalidate the block and clear all state.
@@ -219,8 +216,7 @@ class CacheBlk : public TaggedEntry
      *
      * @param bits The coherence bits to be set.
      */
-    void
-    setCoherenceBits(unsigned bits)
+    void setCoherenceBits(unsigned bits)
     {
         assert(isValid());
         coherence |= bits;
@@ -238,11 +234,7 @@ class CacheBlk : public TaggedEntry
      *
      * @return True if the block is readable.
      */
-    bool
-    isSet(unsigned bits) const
-    {
-        return isValid() && (coherence & bits);
-    }
+    bool isSet(unsigned bits) const { return isValid() && (coherence & bits); }
 
     /**
      * Check if this block was the result of a hardware prefetch, yet to
@@ -304,8 +296,7 @@ class CacheBlk : public TaggedEntry
      *
      * @return The block's age.
      */
-    Tick
-    getAge() const
+    Tick getAge() const
     {
         assert(_tickInserted <= curTick());
         return curTick() - _tickInserted;
@@ -324,8 +315,8 @@ class CacheBlk : public TaggedEntry
      * @param partition_id The source partition ID.
      */
     void insert(const Addr tag, const bool is_secure,
-        const int src_requestor_ID, const uint32_t task_ID,
-        const uint64_t partition_id);
+                const int src_requestor_ID, const uint32_t task_ID,
+                const uint64_t partition_id);
     using TaggedEntry::insert;
 
     /**
@@ -368,8 +359,7 @@ class CacheBlk : public TaggedEntry
      *
      * @return string with basic state information
      */
-    std::string
-    print() const override
+    std::string print() const override
     {
         /**
          *  state       M   O   E   S   I
@@ -399,17 +389,30 @@ class CacheBlk : public TaggedEntry
             isSet(WritableBit) << 2 | isSet(DirtyBit) << 1 | isValid();
         char s = '?';
         switch (state) {
-          case 0b111: s = 'M'; break;
-          case 0b011: s = 'O'; break;
-          case 0b101: s = 'E'; break;
-          case 0b001: s = 'S'; break;
-          case 0b000: s = 'I'; break;
-          default:    s = 'T'; break; // @TODO add other types
+        case 0b111:
+            s = 'M';
+            break;
+        case 0b011:
+            s = 'O';
+            break;
+        case 0b101:
+            s = 'E';
+            break;
+        case 0b001:
+            s = 'S';
+            break;
+        case 0b000:
+            s = 'I';
+            break;
+        default:
+            s = 'T';
+            break; // @TODO add other types
         }
         return csprintf("state: %x (%c) writable: %d readable: %d "
-            "dirty: %d prefetched: %d | %s", coherence, s,
-            isSet(WritableBit), isSet(ReadableBit), isSet(DirtyBit),
-            wasPrefetched(), TaggedEntry::print());
+                        "dirty: %d prefetched: %d | %s",
+                        coherence, s, isSet(WritableBit), isSet(ReadableBit),
+                        isSet(DirtyBit), wasPrefetched(),
+                        TaggedEntry::print());
     }
 
     /**
@@ -475,8 +478,10 @@ class CacheBlk : public TaggedEntry
     void setSrcRequestorId(const uint32_t id) { _srcRequestorId = id; }
 
     /** Setter for _partitionId */
-    void
-    setPartitionId(const uint64_t partitionId) { _partitionId = partitionId; }
+    void setPartitionId(const uint64_t partitionId)
+    {
+        _partitionId = partitionId;
+    }
 
     /** Set the number of references to this block since insertion. */
     void setRefCount(const unsigned count) { _refCount = count; }
@@ -526,26 +531,25 @@ class TempCacheBlk final : public CacheBlk
      * Creates a temporary cache block, with its own storage.
      * @param size The size (in bytes) of this cache block.
      */
-    TempCacheBlk(unsigned size) : CacheBlk()
-    {
-        data = new uint8_t[size];
-    }
-    TempCacheBlk(const TempCacheBlk&) = delete;
+    TempCacheBlk(unsigned size) : CacheBlk() { data = new uint8_t[size]; }
+
+    TempCacheBlk(const TempCacheBlk &) = delete;
     using CacheBlk::operator=;
-    TempCacheBlk& operator=(const TempCacheBlk&) = delete;
-    ~TempCacheBlk() { delete [] data; };
+    TempCacheBlk &operator=(const TempCacheBlk &) = delete;
+
+    ~TempCacheBlk() { delete[] data; };
 
     /**
      * Invalidate the block and clear all state.
      */
-    void invalidate() override {
+    void invalidate() override
+    {
         CacheBlk::invalidate();
 
         _addr = MaxAddr;
     }
 
-    void
-    insert(const Addr addr, const bool is_secure) override
+    void insert(const Addr addr, const bool is_secure) override
     {
         CacheBlk::insert(addr, is_secure);
         _addr = addr;
@@ -556,10 +560,7 @@ class TempCacheBlk final : public CacheBlk
      *
      * @return addr Address value.
      */
-    Addr getAddr() const
-    {
-        return _addr;
-    }
+    Addr getAddr() const { return _addr; }
 };
 
 /**
@@ -571,9 +572,12 @@ class TempCacheBlk final : public CacheBlk
 class CacheBlkPrintWrapper : public Printable
 {
     CacheBlk *blk;
+
   public:
     CacheBlkPrintWrapper(CacheBlk *_blk) : blk(_blk) {}
+
     virtual ~CacheBlkPrintWrapper() {}
+
     void print(std::ostream &o, int verbosity = 0,
                const std::string &prefix = "") const;
 };

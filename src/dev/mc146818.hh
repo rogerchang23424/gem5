@@ -41,20 +41,17 @@ namespace gem5
 class MC146818 : public EventManager
 {
   protected:
-    virtual void handleEvent()
-    {
-        warn("No RTC event handler defined.\n");
-    }
+    virtual void handleEvent() { warn("No RTC event handler defined.\n"); }
 
   private:
     /** Event for RTC periodic interrupt */
     struct RTCEvent : public Event
     {
-        MC146818 * parent;
+        MC146818 *parent;
         Tick interval;
         Tick offset;
 
-        RTCEvent(MC146818 * _parent, Tick i);
+        RTCEvent(MC146818 *_parent, Tick i);
 
         /** Schedule the RTC periodic interrupt */
         void scheduleIntr();
@@ -69,11 +66,11 @@ class MC146818 : public EventManager
     /** Event for RTC periodic interrupt */
     struct RTCTickEvent : public Event
     {
-        MC146818 * parent;
+        MC146818 *parent;
         Tick offset;
 
-        RTCTickEvent(MC146818 * _parent) :
-            parent(_parent), offset(sim_clock::as_int::s)
+        RTCTickEvent(MC146818 *_parent)
+            : parent(_parent), offset(sim_clock::as_int::s)
         {}
 
         /** Event process to occur at interrupt*/
@@ -85,6 +82,7 @@ class MC146818 : public EventManager
 
   private:
     std::string _name;
+
     const std::string &name() const { return _name; }
 
     /** RTC periodic interrupt event */
@@ -118,8 +116,8 @@ class MC146818 : public EventManager
     void setTime(const struct tm time);
 
     BitUnion8(RtcRegA)
-        Bitfield<7> uip;    /// 1 = date and time update in progress
-        Bitfield<6, 4> dv;  /// Divider configuration
+        Bitfield<7> uip;   /// 1 = date and time update in progress
+        Bitfield<6, 4> dv; /// Divider configuration
         /** Rate selection
             0 = Disabled
             For 32768 Hz time bases:
@@ -154,7 +152,7 @@ class MC146818 : public EventManager
 
   public:
     MC146818(EventManager *em, const std::string &name, const struct tm time,
-            bool bcd, Tick frequency);
+             bool bcd, Tick frequency);
     virtual ~MC146818();
 
     /** Start ticking */
@@ -169,10 +167,10 @@ class MC146818 : public EventManager
     void tickClock();
 
     /**
-      * Serialize this object to the given output stream.
-      * @param base The base name of the counter object.
-      * @param os The stream to serialize to.
-      */
+     * Serialize this object to the given output stream.
+     * @param base The base name of the counter object.
+     * @param os The stream to serialize to.
+     */
     void serialize(const std::string &base, CheckpointOut &cp) const;
 
     /**

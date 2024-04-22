@@ -67,13 +67,16 @@ enum BlockMemoryHop : int
 class WaitClass
 {
   public:
-    WaitClass() : nxtAvail(0), lookAheadAvail(0), clockedObject(nullptr) { }
+    WaitClass() : nxtAvail(0), lookAheadAvail(0), clockedObject(nullptr) {}
 
-    WaitClass(ClockedObject *_clockedObject, uint64_t _numStages=0)
-        : nxtAvail(0), lookAheadAvail(0), clockedObject(_clockedObject),
-          numStages(_numStages) { }
+    WaitClass(ClockedObject *_clockedObject, uint64_t _numStages = 0)
+        : nxtAvail(0),
+          lookAheadAvail(0),
+          clockedObject(_clockedObject),
+          numStages(_numStages)
+    {}
 
-    void init(ClockedObject *_clockedObject, uint64_t _numStages=0)
+    void init(ClockedObject *_clockedObject, uint64_t _numStages = 0)
     {
         clockedObject = _clockedObject;
         numStages = _numStages;
@@ -85,15 +88,18 @@ class WaitClass
                  "Can't allocate resource because it is busy!!!");
         nxtAvail = clockedObject->clockEdge() + i;
     }
+
     void preset(uint64_t delay)
     {
-        lookAheadAvail = std::max(lookAheadAvail, delay +
-                (clockedObject->clockEdge()) - numStages);
+        lookAheadAvail = std::max(
+            lookAheadAvail, delay + (clockedObject->clockEdge()) - numStages);
     }
+
     bool rdy(Cycles cycles = Cycles(0)) const
     {
         return clockedObject->clockEdge(cycles) >= nxtAvail;
     }
+
     bool prerdy() const
     {
         return clockedObject->clockEdge() >= lookAheadAvail;
@@ -120,7 +126,7 @@ class Float16
 
     Float16() { val = 0; }
 
-    Float16(const Float16 &x) : val(x.val) { }
+    Float16(const Float16 &x) : val(x.val) {}
 
     Float16(float x)
     {

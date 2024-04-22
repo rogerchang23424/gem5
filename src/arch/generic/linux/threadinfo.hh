@@ -48,8 +48,7 @@ class ThreadInfo
     ByteOrder byteOrder;
 
     template <typename T>
-    bool
-    get_data(const char *symbol, T &data)
+    bool get_data(const char *symbol, T &data)
     {
         auto &symtab = sys->workload->symtab(tc);
         auto it = symtab.find(symbol);
@@ -67,22 +66,16 @@ class ThreadInfo
 
   public:
     ThreadInfo(ThreadContext *_tc)
-        : tc(_tc), sys(tc->getSystemPtr()),
-        byteOrder(tc->getSystemPtr()->getGuestByteOrder())
-    {
-
-    }
-    ~ThreadInfo()
+        : tc(_tc),
+          sys(tc->getSystemPtr()),
+          byteOrder(tc->getSystemPtr()->getGuestByteOrder())
     {}
 
-    virtual Addr
-    curThreadInfo()
-    {
-        panic("curThreadInfo() not implemented.");
-    }
+    ~ThreadInfo() {}
 
-    Addr
-    curTaskInfo(Addr thread_info = 0)
+    virtual Addr curThreadInfo() { panic("curThreadInfo() not implemented."); }
+
+    Addr curTaskInfo(Addr thread_info = 0)
     {
         // Note that in Linux 4.10 the thread_info struct will no longer have a
         // pointer to the task_struct for arm64. See:
@@ -97,8 +90,7 @@ class ThreadInfo
         return TranslatingPortProxy(tc).read<Addr>(thread_info + offset);
     }
 
-    int32_t
-    curTaskPIDFromTaskStruct(Addr task_struct)
+    int32_t curTaskPIDFromTaskStruct(Addr task_struct)
     {
         int32_t offset = 0;
         if (!get_data("task_struct_pid", offset))
@@ -107,14 +99,12 @@ class ThreadInfo
         return TranslatingPortProxy(tc).read<int32_t>(task_struct + offset);
     }
 
-    int32_t
-    curTaskPID(Addr thread_info = 0)
+    int32_t curTaskPID(Addr thread_info = 0)
     {
         return curTaskPIDFromTaskStruct(curTaskInfo(thread_info));
     }
 
-    int32_t
-    curTaskTGIDFromTaskStruct(Addr task_struct)
+    int32_t curTaskTGIDFromTaskStruct(Addr task_struct)
     {
         int32_t offset = 0;
         if (!get_data("task_struct_tgid", offset))
@@ -123,14 +113,12 @@ class ThreadInfo
         return TranslatingPortProxy(tc).read<int32_t>(task_struct + offset);
     }
 
-    int32_t
-    curTaskTGID(Addr thread_info = 0)
+    int32_t curTaskTGID(Addr thread_info = 0)
     {
         return curTaskTGIDFromTaskStruct(curTaskInfo(thread_info));
     }
 
-    int64_t
-    curTaskStartFromTaskStruct(Addr task_struct)
+    int64_t curTaskStartFromTaskStruct(Addr task_struct)
     {
         int32_t offset = 0;
         if (!get_data("task_struct_start_time", offset))
@@ -141,14 +129,12 @@ class ThreadInfo
         return TranslatingPortProxy(tc).read<int64_t>(task_struct + offset);
     }
 
-    int64_t
-    curTaskStart(Addr thread_info = 0)
+    int64_t curTaskStart(Addr thread_info = 0)
     {
         return curTaskStartFromTaskStruct(curTaskInfo(thread_info));
     }
 
-    std::string
-    curTaskNameFromTaskStruct(Addr task_struct)
+    std::string curTaskNameFromTaskStruct(Addr task_struct)
     {
         int32_t offset = 0;
         int32_t size = 0;
@@ -160,20 +146,18 @@ class ThreadInfo
             return "FailureIn_curTaskName";
 
         char buffer[size + 1];
-        TranslatingPortProxy(tc).readString(
-                buffer, task_struct + offset, size);
+        TranslatingPortProxy(tc).readString(buffer, task_struct + offset,
+                                            size);
 
         return buffer;
     }
 
-    std::string
-    curTaskName(Addr thread_info = 0)
+    std::string curTaskName(Addr thread_info = 0)
     {
         return curTaskNameFromTaskStruct(curTaskInfo(thread_info));
     }
 
-    int32_t
-    curTaskMmFromTaskStruct(Addr task_struct)
+    int32_t curTaskMmFromTaskStruct(Addr task_struct)
     {
         int32_t offset;
         if (!get_data("task_struct_mm", offset))
@@ -182,8 +166,7 @@ class ThreadInfo
         return TranslatingPortProxy(tc).read<int32_t>(task_struct + offset);
     }
 
-    int32_t
-    curTaskMm(Addr thread_info = 0)
+    int32_t curTaskMm(Addr thread_info = 0)
     {
         return curTaskMmFromTaskStruct(curTaskInfo(thread_info));
     }

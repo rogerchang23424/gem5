@@ -56,7 +56,6 @@ namespace gem5
 class VoltageDomain : public SimObject
 {
   public:
-
     typedef VoltageDomainParams Params;
     VoltageDomain(const Params &p);
 
@@ -77,10 +76,11 @@ class VoltageDomain : public SimObject
      */
     double voltage(PerfLevel perf_level) const
     {
-        gem5_assert(perf_level < numVoltages(), "VoltageDomain %s "\
-                    "request for voltage perf level %u is outside "\
-                    "of numVoltages %u", name(), perf_level,
-                    numVoltages());
+        gem5_assert(perf_level < numVoltages(),
+                    "VoltageDomain %s "
+                    "request for voltage perf level %u is outside "
+                    "of numVoltages %u",
+                    name(), perf_level, numVoltages());
         return voltageOpPoints[perf_level];
     }
 
@@ -102,7 +102,8 @@ class VoltageDomain : public SimObject
      * Register a SrcClockDomain with this voltage domain.
      * @param src_clock_domain The SrcClockDomain to register.
      */
-    void registerSrcClockDom(SrcClockDomain *src_clock_dom) {
+    void registerSrcClockDom(SrcClockDomain *src_clock_dom)
+    {
         assert(src_clock_dom->voltageDomain() == this);
         srcClockChildren.push_back(src_clock_dom);
     }

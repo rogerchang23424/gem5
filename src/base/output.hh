@@ -76,8 +76,7 @@ class OutputStream
     friend class OutputDirectory;
 
     /** Wrap an existing stream */
-    OutputStream(const std::string &name,
-                 std::ostream *stream);
+    OutputStream(const std::string &name, std::ostream *stream);
 
     /* Prevent copying */
     OutputStream(const OutputStream &f);
@@ -92,9 +91,8 @@ class OutputStream
     std::ostream *const _stream;
 };
 
-template<class StreamType>
-class OutputFile
-    : public OutputStream
+template <class StreamType>
+class OutputFile : public OutputStream
 {
   public:
     typedef StreamType stream_type_t;
@@ -112,10 +110,8 @@ class OutputFile
   protected:
     friend class OutputDirectory;
 
-    OutputFile(const OutputDirectory &dir,
-               const std::string &name,
-               std::ios_base::openmode mode,
-               bool recreateable);
+    OutputFile(const OutputDirectory &dir, const std::string &name,
+               std::ios_base::openmode mode, bool recreateable);
 
     /* Prevent copying */
     OutputFile(const OutputFile<StreamType> &f);
@@ -215,12 +211,11 @@ class OutputDirectory
      * @param name name of file to create (without this directory's name
      *          leading it)
      * @param binary true to create a binary file; false otherwise
-     * @param no_gz true to disable opening the file as a gzip compressed output
-     *     stream; false otherwise
+     * @param no_gz true to disable opening the file as a gzip compressed
+     * output stream; false otherwise
      * @return OutputStream instance representing the created file
      */
-    OutputStream *create(const std::string &name,
-                         bool binary = false,
+    OutputStream *create(const std::string &name, bool binary = false,
                          bool no_gz = false);
 
     /**
@@ -233,14 +228,12 @@ class OutputDirectory
      * @param mode attributes to open file with
      * @param recreateable Set to true if the file can be recreated in a new
      *     location.
-     * @param no_gz true to disable opening the file as a gzip compressed output
-     *     stream; false otherwise
+     * @param no_gz true to disable opening the file as a gzip compressed
+     * output stream; false otherwise
      * @return OutputStream instance representing the opened file
      */
-    OutputStream *open(const std::string &name,
-                       std::ios_base::openmode mode,
-                       bool recreateable = true,
-                       bool no_gz = false);
+    OutputStream *open(const std::string &name, std::ios_base::openmode mode,
+                       bool recreateable = true, bool no_gz = false);
 
     /**
      * Closes an output file and free the corresponding OutputFile.
@@ -274,7 +267,8 @@ class OutputDirectory
     /**
      * Test if a path is absolute.
      */
-    static inline bool isAbsolute(const std::string &name) {
+    static inline bool isAbsolute(const std::string &name)
+    {
         return name[0] == PATH_SEPARATOR;
     }
 
@@ -299,7 +293,7 @@ class OutputDirectory
      * @param recursive set to true to attempt to recursively delete a
      *                  subdirectory and its contents
      */
-    void remove(const std::string &name, bool recursive=false);
+    void remove(const std::string &name, bool recursive = false);
 };
 
 extern OutputDirectory simout;

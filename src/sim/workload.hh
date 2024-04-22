@@ -54,23 +54,23 @@ class Workload : public SimObject
 
     struct WorkloadStats : public statistics::Group
     {
-        struct InstStats: public statistics::Group
+        struct InstStats : public statistics::Group
         {
             statistics::Scalar arm;
             statistics::Scalar quiesce;
 
             InstStats(statistics::Group *parent)
-              : statistics::Group(parent, "inst"),
-                ADD_STAT(arm, statistics::units::Count::get(),
-                         "number of arm instructions executed"),
-                ADD_STAT(quiesce, statistics::units::Count::get(),
-                         "number of quiesce instructions executed")
+                : statistics::Group(parent, "inst"),
+                  ADD_STAT(arm, statistics::units::Count::get(),
+                           "number of arm instructions executed"),
+                  ADD_STAT(quiesce, statistics::units::Count::get(),
+                           "number of quiesce instructions executed")
             {}
 
         } instStats;
 
-        WorkloadStats(Workload *workload) : statistics::Group(workload),
-            instStats(workload)
+        WorkloadStats(Workload *workload)
+            : statistics::Group(workload), instStats(workload)
         {}
     } stats;
 
@@ -81,13 +81,16 @@ class Workload : public SimObject
     System *system = nullptr;
 
   public:
-    Workload(const WorkloadParams &params) : SimObject(params), stats(this),
-            waitForRemoteGDB(params.wait_for_remote_gdb)
+    Workload(const WorkloadParams &params)
+        : SimObject(params),
+          stats(this),
+          waitForRemoteGDB(params.wait_for_remote_gdb)
     {}
 
     virtual void setSystem(System *sys) { system = sys; }
 
     void recordQuiesce() { stats.instStats.quiesce++; }
+
     void recordArm() { stats.instStats.arm++; }
 
     // Once trapping into GDB is no longer a special case routed through the
@@ -107,14 +110,12 @@ class Workload : public SimObject
     virtual const loader::SymbolTable &symtab(ThreadContext *tc) = 0;
     virtual bool insertSymbol(const loader::Symbol &symbol) = 0;
 
-    virtual void
-    syscall(ThreadContext *tc)
+    virtual void syscall(ThreadContext *tc)
     {
         panic("syscall() not implemented.");
     }
 
-    virtual void
-    event(ThreadContext *tc)
+    virtual void event(ThreadContext *tc)
     {
         warn("Unhandled workload event.");
     }
@@ -133,34 +134,32 @@ class Workload : public SimObject
      * @param args Arguments to be forwarded to the event constructor.
      */
     template <class T, typename... Args>
-    T *
-    addFuncEvent(const loader::SymbolTable &symtab, const char *lbl,
-                 const std::string &desc, Args... args)
+    T *addFuncEvent(const loader::SymbolTable &symtab, const char *lbl,
+                    const std::string &desc, Args... args)
     {
         auto it = symtab.find(lbl);
         if (it == symtab.end())
             return nullptr;
 
         return new T(system, desc, fixFuncEventAddr(it->address()),
-                      std::forward<Args>(args)...);
+                     std::forward<Args>(args)...);
     }
 
     template <class T>
-    T *
-    addFuncEvent(const loader::SymbolTable &symtab, const char *lbl)
+    T *addFuncEvent(const loader::SymbolTable &symtab, const char *lbl)
     {
         return addFuncEvent<T>(symtab, lbl, lbl);
     }
 
     template <class T, typename... Args>
-    T *
-    addFuncEventOrPanic(const loader::SymbolTable &symtab, const char *lbl,
-                        Args... args)
+    T *addFuncEventOrPanic(const loader::SymbolTable &symtab, const char *lbl,
+                           Args... args)
     {
         T *e = addFuncEvent<T>(symtab, lbl, std::forward<Args>(args)...);
         panic_if(!e, "Failed to find symbol '%s'", lbl);
         return e;
     }
+
     /** @} */
 };
 
@@ -174,15 +173,17 @@ class StubWorkload : public Workload
     StubWorkload(const StubWorkloadParams &params) : Workload(params) {}
 
     Addr getEntry() const override { return params().entry; }
+
     ByteOrder byteOrder() const override { return params().byte_order; }
+
     loader::Arch getArch() const override { return loader::UnknownArch; }
-    const loader::SymbolTable &
-    symtab(ThreadContext *tc) override
+
+    const loader::SymbolTable &symtab(ThreadContext *tc) override
     {
         return _symtab;
     }
-    bool
-    insertSymbol(const loader::Symbol &symbol) override
+
+    bool insertSymbol(const loader::Symbol &symbol) override
     {
         return _symtab.insert(symbol);
     }

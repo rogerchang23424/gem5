@@ -78,6 +78,7 @@ class SyscallDesc
     void doSyscall(ThreadContext *tc);
 
     std::string name() const { return _name; }
+
     int num() const { return _num; }
 
     /**
@@ -91,8 +92,8 @@ class SyscallDesc
         std::function<SyscallReturn(SyscallDesc *, ThreadContext *)>;
     using Dumper = std::function<std::string(std::string, ThreadContext *)>;
 
-    SyscallDesc(int num, const char *name, Executor exec, Dumper dump) :
-        _name(name), _num(num), executor(exec), dumper(dump)
+    SyscallDesc(int num, const char *name, Executor exec, Dumper dump)
+        : _name(name), _num(num), executor(exec), dumper(dump)
     {}
 
     void retrySyscall(ThreadContext *tc);
@@ -120,41 +121,38 @@ class SyscallDescABI : public SyscallDesc
 {
   private:
     // Aliases to make the code below a little more concise.
-    template <typename ...Args>
+    template <typename... Args>
     using ABIExecutor =
         std::function<SyscallReturn(SyscallDesc *, ThreadContext *, Args...)>;
 
-    template <typename ...Args>
-    using ABIExecutorPtr =
-        SyscallReturn (*)(SyscallDesc *, ThreadContext *, Args...);
-
+    template <typename... Args>
+    using ABIExecutorPtr = SyscallReturn (*)(SyscallDesc *, ThreadContext *,
+                                             Args...);
 
     // Wrap an executor with guest arguments with a normal executor that gets
     // those additional arguments from the guest context.
-    template <typename ...Args>
-    static inline Executor
-    buildExecutor(ABIExecutor<Args...> target)
+    template <typename... Args>
+    static inline Executor buildExecutor(ABIExecutor<Args...> target)
     {
-        return [target](SyscallDesc *desc,
-                        ThreadContext *tc) -> SyscallReturn {
-            // Create a partial function which will stick desc to the front of
-            // the parameter list.
-            auto partial = [target,desc](
-                    ThreadContext *tc, Args... args) -> SyscallReturn {
-                return target(desc, tc, args...);
-            };
+        return
+            [target](SyscallDesc *desc, ThreadContext *tc) -> SyscallReturn {
+                // Create a partial function which will stick desc to the front
+                // of the parameter list.
+                auto partial = [target, desc](ThreadContext *tc,
+                                              Args... args) -> SyscallReturn {
+                    return target(desc, tc, args...);
+                };
 
-            // Use invokeSimcall to gather the other arguments based on the
-            // given ABI and pass them to the syscall implementation.
-            return invokeSimcall<ABI, false, SyscallReturn, Args...>(tc,
-                    std::function<SyscallReturn(ThreadContext *, Args...)>(
-                        partial));
-        };
+                // Use invokeSimcall to gather the other arguments based on the
+                // given ABI and pass them to the syscall implementation.
+                return invokeSimcall<ABI, false, SyscallReturn, Args...>(
+                    tc, std::function<SyscallReturn(ThreadContext *, Args...)>(
+                            partial));
+            };
     }
 
-    template <typename ...Args>
-    static inline Dumper
-    buildDumper()
+    template <typename... Args>
+    static inline Dumper buildDumper()
     {
         return [](std::string name, ThreadContext *tc) -> std::string {
             return dumpSimcall<ABI, SyscallReturn, Args...>(name, tc);
@@ -163,23 +161,22 @@ class SyscallDescABI : public SyscallDesc
 
   public:
     // Constructors which plumb in buildExecutor.
-    template <typename ...Args>
-    SyscallDescABI(int num, const char *name, ABIExecutor<Args...> target) :
-        SyscallDesc(num, name, buildExecutor<Args...>(target),
-                               buildDumper<Args...>())
+    template <typename... Args>
+    SyscallDescABI(int num, const char *name, ABIExecutor<Args...> target)
+        : SyscallDesc(num, name, buildExecutor<Args...>(target),
+                      buildDumper<Args...>())
     {}
 
-    template <typename ...Args>
-    SyscallDescABI(int num, const char *name, ABIExecutorPtr<Args...> target) :
-        SyscallDescABI(num, name, ABIExecutor<Args...>(target))
+    template <typename... Args>
+    SyscallDescABI(int num, const char *name, ABIExecutorPtr<Args...> target)
+        : SyscallDescABI(num, name, ABIExecutor<Args...>(target))
     {}
 
-    SyscallDescABI(int num, const char *name) :
-        SyscallDescABI(num, name, ABIExecutor<>(unimplementedFunc))
+    SyscallDescABI(int num, const char *name)
+        : SyscallDescABI(num, name, ABIExecutor<>(unimplementedFunc))
     {}
 
-    void
-    returnInto(ThreadContext *tc, const SyscallReturn &ret) override
+    void returnInto(ThreadContext *tc, const SyscallReturn &ret) override
     {
         guest_abi::Result<ABI, SyscallReturn>::store(tc, ret);
     }
@@ -194,14 +191,13 @@ class SyscallDescTable
   public:
     SyscallDescTable(std::initializer_list<SyscallDescABI<ABI>> descs)
     {
-        for (auto &desc: descs) {
-            auto res = _descs.insert({desc.num(), desc});
+        for (auto &desc : descs) {
+            auto res = _descs.insert({ desc.num(), desc });
             panic_if(!res.second, "Failed to insert desc %s", desc.name());
         }
     }
 
-    SyscallDesc
-    *get(int num, bool fatal_if_missing=true)
+    SyscallDesc *get(int num, bool fatal_if_missing = true)
     {
         auto it = _descs.find(num);
         if (it == _descs.end()) {

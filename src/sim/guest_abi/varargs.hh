@@ -66,10 +66,10 @@ namespace guest_abi
 
 // A recursive template which defines virtual functions to retrieve each of the
 // requested types. This provides the ABI agnostic interface the function uses.
-template <typename ...Types>
+template <typename... Types>
 class VarArgsBase;
 
-template <typename First, typename ...Types>
+template <typename First, typename... Types>
 class VarArgsBase<First, Types...> : public VarArgsBase<Types...>
 {
   public:
@@ -93,7 +93,6 @@ class VarArgsBase<>
     void _getImpl();
 };
 
-
 // A recursive template which defines the ABI specific implementation of the
 // interface defined above.
 //
@@ -101,10 +100,10 @@ class VarArgsBase<>
 // the time we get down to the base case we'd have lost track of the complete
 // set we need to know what interface to inherit. The Base parameter keeps
 // track of that through the recursion.
-template <typename ABI, typename Base, typename ...Types>
+template <typename ABI, typename Base, typename... Types>
 class VarArgsImpl;
 
-template <typename ABI, typename Base, typename First, typename ...Types>
+template <typename ABI, typename Base, typename First, typename... Types>
 class VarArgsImpl<ABI, Base, First, Types...> :
     public VarArgsImpl<ABI, Base, Types...>
 {
@@ -116,8 +115,7 @@ class VarArgsImpl<ABI, Base, First, Types...> :
 
     // Implement a version of _getImple, using the ABI specialized version of
     // the Argument class.
-    void
-    _getImpl(First &first) override
+    void _getImpl(First &first) override
     {
         first = Argument<ABI, First>::get(this->tc, this->state);
     }
@@ -138,14 +136,14 @@ class VarArgsImpl<ABI, Base> : public Base
     void _getImpl();
 
   public:
-    VarArgsImpl(ThreadContext *_tc, const typename ABI::State &_state) :
-        tc(_tc), state(_state)
+    VarArgsImpl(ThreadContext *_tc, const typename ABI::State &_state)
+        : tc(_tc), state(_state)
     {}
 };
 
 // A wrapper which provides a nice interface to the virtual functions, and a
 // hook for the Argument template mechanism.
-template <typename ...Types>
+template <typename... Types>
 class VarArgs
 {
   private:
@@ -160,8 +158,7 @@ class VarArgs
     // raw interface provides. This version lets you pick a type which it then
     // returns, instead of having to pre-declare a variable to pass in.
     template <typename Arg>
-    Arg
-    get()
+    Arg get()
     {
         Arg arg;
         _ptr->_getImpl(arg);
@@ -170,17 +167,21 @@ class VarArgs
 };
 
 template <typename T>
-struct IsVarArgs : public std::false_type {};
+struct IsVarArgs : public std::false_type
+{
+};
 
-template <typename ...Types>
-struct IsVarArgs<VarArgs<Types...>> : public std::true_type {};
+template <typename... Types>
+struct IsVarArgs<VarArgs<Types...>> : public std::true_type
+{
+};
 
 template <typename T>
 constexpr bool IsVarArgsV = IsVarArgs<T>::value;
 
-template <typename ...Types>
+template <typename... Types>
 std::ostream &
-operator << (std::ostream &os, const VarArgs<Types...> &va)
+operator<<(std::ostream &os, const VarArgs<Types...> &va)
 {
     os << "...";
     return os;
@@ -190,11 +191,10 @@ operator << (std::ostream &os, const VarArgs<Types...> &va)
 // a VarArgs argument. It constructs the underlying implementation which knows
 // about the ABI, and installs it in the VarArgs wrapper to give to the
 // function.
-template <typename ABI, typename ...Types>
+template <typename ABI, typename... Types>
 struct Argument<ABI, VarArgs<Types...>>
 {
-    static VarArgs<Types...>
-    get(ThreadContext *tc, typename ABI::State &state)
+    static VarArgs<Types...> get(ThreadContext *tc, typename ABI::State &state)
     {
         using Base = VarArgsBase<Types...>;
         using Impl = VarArgsImpl<ABI, Base, Types...>;

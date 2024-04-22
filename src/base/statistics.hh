@@ -45,17 +45,17 @@
  */
 
 /**
-* @todo
-*
-* Generalized N-dimensinal vector
-* documentation
-* key stats
-* interval stats
-*   -- these both can use the same function that prints out a
-*   specific set of stats
-* VectorStandardDeviation totals
-* Document Namespaces
-*/
+ * @todo
+ *
+ * Generalized N-dimensinal vector
+ * documentation
+ * key stats
+ * interval stats
+ *   -- these both can use the same function that prints out a
+ *   specific set of stats
+ * VectorStandardDeviation totals
+ * Document Namespaces
+ */
 #ifndef __BASE_STATISTICS_HH__
 #define __BASE_STATISTICS_HH__
 
@@ -104,13 +104,13 @@ class InfoProxy : public Base
     InfoProxy(Stat &stat) : s(stat) {}
 
     bool check() const { return s.check(); }
+
     void prepare() { s.prepare(); }
+
     void reset() { s.reset(); }
-    void
-    visit(Output &visitor)
-    {
-        visitor.visit(*static_cast<Base *>(this));
-    }
+
+    void visit(Output &visitor) { visitor.visit(*static_cast<Base *>(this)); }
+
     bool zero() const { return s.zero(); }
 };
 
@@ -121,7 +121,9 @@ class ScalarInfoProxy : public InfoProxy<Stat, ScalarInfo>
     ScalarInfoProxy(Stat &stat) : InfoProxy<Stat, ScalarInfo>(stat) {}
 
     Counter value() const { return this->s.value(); }
+
     Result result() const { return this->s.result(); }
+
     Result total() const { return this->s.total(); }
 };
 
@@ -137,15 +139,13 @@ class VectorInfoProxy : public InfoProxy<Stat, VectorInfo>
 
     size_type size() const { return this->s.size(); }
 
-    VCounter &
-    value() const
+    VCounter &value() const
     {
         this->s.value(cvec);
         return cvec;
     }
 
-    const VResult &
-    result() const
+    const VResult &result() const
     {
         this->s.result(rvec);
         return rvec;
@@ -201,13 +201,12 @@ class InfoAccess
     bool newStyleStats() const;
 
   public:
-    InfoAccess()
-        : _info(nullptr) {};
+    InfoAccess() : _info(nullptr){};
 
     /**
      * Reset the stat to the default state.
      */
-    void reset() { }
+    void reset() {}
 
     /**
      * @return true if this stat has a value and satisfies its
@@ -233,15 +232,10 @@ class DataWrap : public InfoAccess
     Derived &self() { return *static_cast<Derived *>(this); }
 
   protected:
-    Info *
-    info()
-    {
-        return safe_cast<Info *>(InfoAccess::info());
-    }
+    Info *info() { return safe_cast<Info *>(InfoAccess::info()); }
 
   public:
-    const Info *
-    info() const
+    const Info *info() const
     {
         return safe_cast<const Info *>(InfoAccess::info());
     }
@@ -271,7 +265,8 @@ class DataWrap : public InfoAccess
             info->desc = desc;
 
         // Stat that does not belong to any statistics::Group is a legacy stat
-        std::string common_message = "Legacy stat is a stat that does not "
+        std::string common_message =
+            "Legacy stat is a stat that does not "
             "belong to any statistics::Group. Legacy stat is deprecated.";
         if (parent == nullptr && name != nullptr)
             warn(csprintf("`%s` is a legacy stat. %s", name, common_message));
@@ -284,14 +279,14 @@ class DataWrap : public InfoAccess
      * @param name The new name.
      * @return A reference to this stat.
      */
-    Derived &
-    name(const std::string &name)
+    Derived &name(const std::string &name)
     {
         Info *info = this->info();
         info->setName(name, !newStyleStats());
         info->flags.set(display);
         return this->self();
     }
+
     const std::string &name() const { return this->info()->name; }
 
     /**
@@ -300,15 +295,15 @@ class DataWrap : public InfoAccess
      * @param _sep The new separator string
      * @return A reference to this stat.
      */
-    Derived &
-    setSeparator(const std::string &_sep)
+    Derived &setSeparator(const std::string &_sep)
     {
-      this->info()->setSeparator(_sep);
-      return this->self();
+        this->info()->setSeparator(_sep);
+        return this->self();
     }
+
     const std::string &setSeparator() const
     {
-      return this->info()->separatorString;
+        return this->info()->separatorString;
     }
 
     /**
@@ -316,8 +311,7 @@ class DataWrap : public InfoAccess
      * @param unit The new unit.
      * @return A reference to this stat.
      */
-    Derived &
-    unit(const units::Base *_unit)
+    Derived &unit(const units::Base *_unit)
     {
         this->info()->unit = _unit;
         return this->self();
@@ -329,8 +323,7 @@ class DataWrap : public InfoAccess
      * @param desc The new description.
      * @return A reference to this stat.
      */
-    Derived &
-    desc(const std::string &_desc)
+    Derived &desc(const std::string &_desc)
     {
         this->info()->desc = _desc;
         return this->self();
@@ -341,8 +334,7 @@ class DataWrap : public InfoAccess
      * @param _precision The new precision
      * @return A reference to this stat.
      */
-    Derived &
-    precision(int _precision)
+    Derived &precision(int _precision)
     {
         this->info()->precision = _precision;
         return this->self();
@@ -353,8 +345,7 @@ class DataWrap : public InfoAccess
      * @param f The new flags.
      * @return A reference to this stat.
      */
-    Derived &
-    flags(Flags _flags)
+    Derived &flags(Flags _flags)
     {
         this->info()->flags.set(_flags);
         return this->self();
@@ -367,8 +358,7 @@ class DataWrap : public InfoAccess
      * @return A reference to this stat.
      */
     template <class Stat>
-    Derived &
-    prereq(const Stat &prereq)
+    Derived &prereq(const Stat &prereq)
     {
         this->info()->prereq = prereq.info();
         return this->self();
@@ -382,7 +372,7 @@ class DataWrapVec : public DataWrap<Derived, InfoProxyType>
     typedef InfoProxyType<Derived> Info;
 
     DataWrapVec(Group *parent = nullptr, const char *name = nullptr,
-                const units::Base *unit=units::Unspecified::get(),
+                const units::Base *unit = units::Unspecified::get(),
                 const char *desc = nullptr)
         : DataWrap<Derived, InfoProxyType>(parent, name, unit, desc)
     {}
@@ -397,8 +387,7 @@ class DataWrapVec : public DataWrap<Derived, InfoProxyType>
      * @param name The new name of the subfield.
      * @return A reference to this stat.
      */
-    Derived &
-    subname(off_type index, const std::string &name)
+    Derived &subname(off_type index, const std::string &name)
     {
         Derived &self = this->self();
         Info *info = self.info();
@@ -421,8 +410,7 @@ class DataWrapVec : public DataWrap<Derived, InfoProxyType>
      * @param desc The new description of the subfield
      * @return A reference to this stat.
      */
-    Derived &
-    subdesc(off_type index, const std::string &desc)
+    Derived &subdesc(off_type index, const std::string &desc)
     {
         Info *info = this->info();
 
@@ -434,8 +422,7 @@ class DataWrapVec : public DataWrap<Derived, InfoProxyType>
         return this->self();
     }
 
-    void
-    prepare()
+    void prepare()
     {
         Derived &self = this->self();
         Info *info = this->info();
@@ -445,8 +432,7 @@ class DataWrapVec : public DataWrap<Derived, InfoProxyType>
             self.data(i)->prepare(info->getStorageParams());
     }
 
-    void
-    reset()
+    void reset()
     {
         Derived &self = this->self();
         Info *info = this->info();
@@ -463,18 +449,16 @@ class DataWrapVec2d : public DataWrapVec<Derived, InfoProxyType>
   public:
     typedef InfoProxyType<Derived> Info;
 
-    DataWrapVec2d(Group *parent, const char *name,
-                  const units::Base *unit, const char *desc)
+    DataWrapVec2d(Group *parent, const char *name, const units::Base *unit,
+                  const char *desc)
         : DataWrapVec<Derived, InfoProxyType>(parent, name, unit, desc)
-    {
-    }
+    {}
 
     /**
      * @warning This makes the assumption that if you're gonna subnames a 2d
      * vector, you're subnaming across all y
      */
-    Derived &
-    ysubnames(const char **names)
+    Derived &ysubnames(const char **names)
     {
         Derived &self = this->self();
         Info *info = this->info();
@@ -485,8 +469,7 @@ class DataWrapVec2d : public DataWrapVec<Derived, InfoProxyType>
         return self;
     }
 
-    Derived &
-    ysubname(off_type index, const std::string &subname)
+    Derived &ysubname(off_type index, const std::string &subname)
     {
         Derived &self = this->self();
         Info *info = this->info();
@@ -497,12 +480,10 @@ class DataWrapVec2d : public DataWrapVec<Derived, InfoProxyType>
         return self;
     }
 
-    std::string
-    ysubname(off_type i) const
+    std::string ysubname(off_type i) const
     {
         return this->info()->y_subnames[i];
     }
-
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -532,11 +513,7 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
      * @param index The vector index to access.
      * @return The storage object at the given index.
      */
-    Storage *
-    data()
-    {
-        return reinterpret_cast<Storage *>(storage);
-    }
+    Storage *data() { return reinterpret_cast<Storage *>(storage); }
 
     /**
      * Retrieve a const pointer to the storage.
@@ -544,14 +521,12 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
      * @param index The vector index to access.
      * @return A const pointer to the storage object at the given index.
      */
-    const Storage *
-    data() const
+    const Storage *data() const
     {
         return reinterpret_cast<const Storage *>(storage);
     }
 
-    void
-    doInit()
+    void doInit()
     {
         new (storage) Storage(this->info()->getStorageParams());
         this->setInit();
@@ -559,7 +534,7 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
 
   public:
     ScalarBase(Group *parent = nullptr, const char *name = nullptr,
-               const units::Base *unit=units::Unspecified::get(),
+               const units::Base *unit = units::Unspecified::get(),
                const char *desc = nullptr)
         : DataWrap<Derived, ScalarInfoProxy>(parent, name, unit, desc)
     {
@@ -573,6 +548,7 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
      * function.
      */
     void operator++() { data()->inc(1); }
+
     /**
      * Decrement the stat by 1. This calls the associated storage object dec
      * function.
@@ -581,6 +557,7 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
 
     /** Increment the stat by 1. */
     void operator++(int) { ++*this; }
+
     /** Decrement the stat by 1. */
     void operator--(int) { --*this; }
 
@@ -590,7 +567,10 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
      * @param v The new value.
      */
     template <typename U>
-    void operator=(const U &v) { data()->set(v); }
+    void operator=(const U &v)
+    {
+        data()->set(v);
+    }
 
     /**
      * Increment the stat by the given value. This calls the associated
@@ -598,7 +578,10 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
      * @param v The value to add.
      */
     template <typename U>
-    void operator+=(const U &v) { data()->inc(v); }
+    void operator+=(const U &v)
+    {
+        data()->inc(v);
+    }
 
     /**
      * Decrement the stat by the given value. This calls the associated
@@ -606,7 +589,10 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
      * @param v The value to substract.
      */
     template <typename U>
-    void operator-=(const U &v) { data()->dec(v); }
+    void operator-=(const U &v)
+    {
+        data()->dec(v);
+    }
 
     /**
      * Return the number of elements, always 1 for a scalar.
@@ -627,6 +613,7 @@ class ScalarBase : public DataWrap<Derived, ScalarInfoProxy>
     bool zero() const { return result() == 0.0; }
 
     void reset() { data()->reset(this->info()->getStorageParams()); }
+
     void prepare() { data()->prepare(this->info()->getStorageParams()); }
 };
 
@@ -634,10 +621,15 @@ class ProxyInfo : public ScalarInfo
 {
   public:
     std::string str() const { return std::to_string(value()); }
+
     size_type size() const { return 1; }
+
     bool check() const { return true; }
-    void prepare() { }
-    void reset() { }
+
+    void prepare() {}
+
+    void reset() {}
+
     bool zero() const { return value() == 0; }
 
     void visit(Output &visitor) { visitor.visit(*this); }
@@ -651,12 +643,15 @@ class ValueProxy : public ProxyInfo
 
   public:
     ValueProxy(T &val) : scalar(&val) {}
+
     Counter value() const { return *scalar; }
+
     Result result() const { return *scalar; }
+
     Result total() const { return *scalar; }
 };
 
-template <class T, class Enabled=void>
+template <class T, class Enabled = void>
 class FunctorProxy : public ProxyInfo
 {
   private:
@@ -664,8 +659,11 @@ class FunctorProxy : public ProxyInfo
 
   public:
     FunctorProxy(T &func) : functor(&func) {}
+
     Counter value() const { return (*functor)(); }
+
     Result result() const { return (*functor)(); }
+
     Result total() const { return (*functor)(); }
 };
 
@@ -676,17 +674,20 @@ class FunctorProxy : public ProxyInfo
  * somewhere else.
  */
 template <class T>
-class FunctorProxy<T,
-    typename std::enable_if_t<std::is_constructible_v<std::function<Result()>,
-        const T &>>> : public ProxyInfo
+class FunctorProxy<T, typename std::enable_if_t<std::is_constructible_v<
+                          std::function<Result()>, const T &>>> :
+    public ProxyInfo
 {
   private:
     std::function<Result()> functor;
 
   public:
     FunctorProxy(const T &func) : functor(func) {}
+
     Counter value() const { return functor(); }
+
     Result result() const { return functor(); }
+
     Result total() const { return functor(); }
 };
 
@@ -699,13 +700,16 @@ class MethodProxy : public ProxyInfo
 {
   private:
     T *object;
-    typedef V (T::*MethodPointer) () const;
+    typedef V (T::*MethodPointer)() const;
     MethodPointer method;
 
   public:
     MethodProxy(T *obj, MethodPointer meth) : object(obj), method(meth) {}
+
     Counter value() const { return (object->*method)(); }
+
     Result result() const { return (object->*method)(); }
+
     Result total() const { return (object->*method)(); }
 };
 
@@ -716,19 +720,20 @@ class ValueBase : public DataWrap<Derived, ScalarInfoProxy>
     ProxyInfo *proxy;
 
   public:
-    ValueBase(Group *parent, const char *name,
-              const units::Base *unit,
+    ValueBase(Group *parent, const char *name, const units::Base *unit,
               const char *desc)
         : DataWrap<Derived, ScalarInfoProxy>(parent, name, unit, desc),
           proxy(NULL)
+    {}
+
+    ~ValueBase()
     {
+        if (proxy)
+            delete proxy;
     }
 
-    ~ValueBase() { if (proxy) delete proxy; }
-
     template <class T>
-    Derived &
-    scalar(T &value)
+    Derived &scalar(T &value)
     {
         proxy = new ValueProxy<T>(value);
         this->setInit();
@@ -736,8 +741,7 @@ class ValueBase : public DataWrap<Derived, ScalarInfoProxy>
     }
 
     template <class T>
-    Derived &
-    functor(const T &func)
+    Derived &functor(const T &func)
     {
         proxy = new FunctorProxy<T>(func);
         this->setInit();
@@ -745,8 +749,7 @@ class ValueBase : public DataWrap<Derived, ScalarInfoProxy>
     }
 
     template <class T>
-    Derived &
-    functor(T &func)
+    Derived &functor(T &func)
     {
         proxy = new FunctorProxy<T>(func);
         this->setInit();
@@ -761,24 +764,30 @@ class ValueBase : public DataWrap<Derived, ScalarInfoProxy>
      * @return Updated stats item.
      */
     template <class T, class V>
-    Derived &
-    method(T *obj,  V (T::*method)() const)
+    Derived &method(T *obj, V (T::*method)() const)
     {
-        proxy = new MethodProxy<T,V>(obj, method);
+        proxy = new MethodProxy<T, V>(obj, method);
         this->setInit();
         return this->self();
     }
 
     Counter value() { return proxy->value(); }
+
     Result result() const { return proxy->result(); }
+
     Result total() const { return proxy->total(); };
+
     size_type size() const { return proxy->size(); }
 
     std::string str() const { return proxy->str(); }
+
     bool zero() const { return proxy->zero(); }
+
     bool check() const { return proxy != NULL; }
-    void prepare() { }
-    void reset() { }
+
+    void prepare() {}
+
+    void reset() {}
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -819,26 +828,20 @@ class ScalarProxy
      * Create and initialize this proxy, do not register it with the database.
      * @param i The index to access.
      */
-    ScalarProxy(Stat &s, off_type i)
-        : stat(s), index(i)
-    {
-    }
+    ScalarProxy(Stat &s, off_type i) : stat(s), index(i) {}
 
     /**
      * Create a copy of the provided ScalarProxy.
      * @param sp The proxy to copy.
      */
-    ScalarProxy(const ScalarProxy &sp)
-        : stat(sp.stat), index(sp.index)
-    {}
+    ScalarProxy(const ScalarProxy &sp) : stat(sp.stat), index(sp.index) {}
 
     /**
      * Set this proxy equal to the provided one.
      * @param sp The proxy to copy.
      * @return A reference to this proxy.
      */
-    const ScalarProxy &
-    operator=(const ScalarProxy &sp)
+    const ScalarProxy &operator=(const ScalarProxy &sp)
     {
         stat = sp.stat;
         index = sp.index;
@@ -852,6 +855,7 @@ class ScalarProxy
      * function.
      */
     void operator++() { stat.data(index)->inc(1); }
+
     /**
      * Decrement the stat by 1. This calls the associated storage object dec
      * function.
@@ -860,6 +864,7 @@ class ScalarProxy
 
     /** Increment the stat by 1. */
     void operator++(int) { ++*this; }
+
     /** Decrement the stat by 1. */
     void operator--(int) { --*this; }
 
@@ -869,8 +874,7 @@ class ScalarProxy
      * @param v The new value.
      */
     template <typename U>
-    void
-    operator=(const U &v)
+    void operator=(const U &v)
     {
         stat.data(index)->set(v);
     }
@@ -881,8 +885,7 @@ class ScalarProxy
      * @param v The value to add.
      */
     template <typename U>
-    void
-    operator+=(const U &v)
+    void operator+=(const U &v)
     {
         stat.data(index)->inc(v);
     }
@@ -893,8 +896,7 @@ class ScalarProxy
      * @param v The value to substract.
      */
     template <typename U>
-    void
-    operator-=(const U &v)
+    void operator-=(const U &v)
     {
         stat.data(index)->dec(v);
     }
@@ -906,8 +908,7 @@ class ScalarProxy
     size_type size() const { return 1; }
 
   public:
-    std::string
-    str() const
+    std::string str() const
     {
         return csprintf("%s[%d]", stat.info()->name, index);
     }
@@ -931,7 +932,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
 
   protected:
     /** The storage of this stat. */
-    std::vector<Storage*> storage;
+    std::vector<Storage *> storage;
 
   protected:
     /**
@@ -948,8 +949,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
      */
     const Storage *data(off_type index) const { return storage[index]; }
 
-    void
-    doInit(size_type s)
+    void doInit(size_type s)
     {
         fatal_if(s <= 0, "Storage size must be positive");
         fatal_if(check(), "Stat has already been initialized");
@@ -962,8 +962,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
     }
 
   public:
-    void
-    value(VCounter &vec) const
+    void value(VCounter &vec) const
     {
         vec.resize(size());
         for (off_type i = 0; i < size(); ++i)
@@ -974,8 +973,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
      * Copy the values to a local vector and return a reference to it.
      * @return A reference to a vector of the stat values.
      */
-    void
-    result(VResult &vec) const
+    void result(VResult &vec) const
     {
         vec.resize(size());
         for (off_type i = 0; i < size(); ++i)
@@ -986,8 +984,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
      * Return a total of all entries in this vector.
      * @return The total of all vector entries.
      */
-    Result
-    total() const
+    Result total() const
     {
         Result total = 0.0;
         for (off_type i = 0; i < size(); ++i)
@@ -1000,8 +997,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
      */
     size_type size() const { return storage.size(); }
 
-    bool
-    zero() const
+    bool zero() const
     {
         for (off_type i = 0; i < size(); ++i)
             if (data(i)->zero())
@@ -1009,15 +1005,10 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
         return true;
     }
 
-    bool
-    check() const
-    {
-        return size() > 0;
-    }
+    bool check() const { return size() > 0; }
 
   public:
-    VectorBase(Group *parent, const char *name,
-               const units::Base *unit,
+    VectorBase(Group *parent, const char *name, const units::Base *unit,
                const char *desc)
         : DataWrapVec<Derived, VectorInfoProxy>(parent, name, unit, desc),
           storage()
@@ -1025,7 +1016,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
 
     ~VectorBase()
     {
-        for (auto& stor : storage) {
+        for (auto &stor : storage) {
             delete stor;
         }
     }
@@ -1035,8 +1026,7 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
      * @param size The new size.
      * @return A reference to this stat.
      */
-    Derived &
-    init(size_type size)
+    Derived &init(size_type size)
     {
         Derived &self = this->self();
         self.doInit(size);
@@ -1048,10 +1038,9 @@ class VectorBase : public DataWrapVec<Derived, VectorInfoProxy>
      * @param index The vector index to access.
      * @return A reference of the stat.
      */
-    Proxy
-    operator[](off_type index)
+    Proxy operator[](off_type index)
     {
-        assert (index < size());
+        assert(index < size());
         return Proxy(this->self(), index);
     }
 };
@@ -1067,23 +1056,20 @@ class VectorProxy
   private:
     mutable VResult vec;
 
-    typename Stat::Storage *
-    data(off_type index)
+    typename Stat::Storage *data(off_type index)
     {
         assert(index < len);
         return stat.data(offset + index);
     }
 
-    const typename Stat::Storage *
-    data(off_type index) const
+    const typename Stat::Storage *data(off_type index) const
     {
         assert(index < len);
         return stat.data(offset + index);
     }
 
   public:
-    const VResult &
-    result() const
+    const VResult &result() const
     {
         vec.resize(size());
 
@@ -1093,8 +1079,7 @@ class VectorProxy
         return vec;
     }
 
-    Result
-    total() const
+    Result total() const
     {
         Result total = 0.0;
         for (off_type i = 0; i < size(); ++i)
@@ -1103,18 +1088,14 @@ class VectorProxy
     }
 
   public:
-    VectorProxy(Stat &s, off_type o, size_type l)
-        : stat(s), offset(o), len(l)
-    {
-    }
+    VectorProxy(Stat &s, off_type o, size_type l) : stat(s), offset(o), len(l)
+    {}
 
     VectorProxy(const VectorProxy &sp)
         : stat(sp.stat), offset(sp.offset), len(sp.len)
-    {
-    }
+    {}
 
-    const VectorProxy &
-    operator=(const VectorProxy &sp)
+    const VectorProxy &operator=(const VectorProxy &sp)
     {
         stat = sp.stat;
         offset = sp.offset;
@@ -1122,10 +1103,9 @@ class VectorProxy
         return *this;
     }
 
-    ScalarProxy<Stat>
-    operator[](off_type index)
+    ScalarProxy<Stat> operator[](off_type index)
     {
-        assert (index < size());
+        assert(index < size());
         return ScalarProxy<Stat>(stat, offset + index);
     }
 
@@ -1148,29 +1128,30 @@ class Vector2dBase : public DataWrapVec2d<Derived, Vector2dInfoProxy>
   protected:
     size_type x;
     size_type y;
-    std::vector<Storage*> storage;
+    std::vector<Storage *> storage;
 
   protected:
     Storage *data(off_type index) { return storage[index]; }
+
     const Storage *data(off_type index) const { return storage[index]; }
 
   public:
-    Vector2dBase(Group *parent, const char *name,
-                 const units::Base *unit,
+    Vector2dBase(Group *parent, const char *name, const units::Base *unit,
                  const char *desc)
         : DataWrapVec2d<Derived, Vector2dInfoProxy>(parent, name, unit, desc),
-          x(0), y(0), storage()
+          x(0),
+          y(0),
+          storage()
     {}
 
     ~Vector2dBase()
     {
-        for (auto& stor : storage) {
+        for (auto &stor : storage) {
             delete stor;
         }
     }
 
-    Derived &
-    init(size_type _x, size_type _y)
+    Derived &init(size_type _x, size_type _y)
     {
         fatal_if((_x <= 0) || (_y <= 0), "Storage sizes must be positive");
         fatal_if(check(), "Stat has already been initialized");
@@ -1192,33 +1173,22 @@ class Vector2dBase : public DataWrapVec2d<Derived, Vector2dInfoProxy>
         return self;
     }
 
-    Proxy
-    operator[](off_type index)
+    Proxy operator[](off_type index)
     {
         off_type offset = index * y;
-        assert (offset + y <= size());
+        assert(offset + y <= size());
         return Proxy(this->self(), offset, y);
     }
 
+    size_type size() const { return storage.size(); }
 
-    size_type
-    size() const
-    {
-        return storage.size();
-    }
-
-    bool
-    zero() const
-    {
-        return data(0)->zero();
-    }
+    bool zero() const { return data(0)->zero(); }
 
     /**
      * Return a total of all entries in this vector.
      * @return The total of all vector entries.
      */
-    Result
-    total() const
+    Result total() const
     {
         Result total = 0.0;
         for (off_type i = 0; i < size(); ++i)
@@ -1226,8 +1196,7 @@ class Vector2dBase : public DataWrapVec2d<Derived, Vector2dInfoProxy>
         return total;
     }
 
-    void
-    prepare()
+    void prepare()
     {
         Info *info = this->info();
         size_type size = this->size();
@@ -1243,8 +1212,7 @@ class Vector2dBase : public DataWrapVec2d<Derived, Vector2dInfoProxy>
     /**
      * Reset stat value to default
      */
-    void
-    reset()
+    void reset()
     {
         Info *info = this->info();
         size_type size = this->size();
@@ -1252,11 +1220,7 @@ class Vector2dBase : public DataWrapVec2d<Derived, Vector2dInfoProxy>
             data(i)->reset(info->getStorageParams());
     }
 
-    bool
-    check() const
-    {
-        return size() > 0;
-    }
+    bool check() const { return size() > 0; }
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -1286,36 +1250,28 @@ class DistBase : public DataWrap<Derived, DistInfoProxy>
      * Retrieve the storage.
      * @return The storage object for this stat.
      */
-    Storage *
-    data()
-    {
-        return reinterpret_cast<Storage *>(storage);
-    }
+    Storage *data() { return reinterpret_cast<Storage *>(storage); }
 
     /**
      * Retrieve a const pointer to the storage.
      * @return A const pointer to the storage object for this stat.
      */
-    const Storage *
-    data() const
+    const Storage *data() const
     {
         return reinterpret_cast<const Storage *>(storage);
     }
 
-    void
-    doInit()
+    void doInit()
     {
         new (storage) Storage(this->info()->getStorageParams());
         this->setInit();
     }
 
   public:
-    DistBase(Group *parent, const char *name,
-             const units::Base *unit,
+    DistBase(Group *parent, const char *name, const units::Base *unit,
              const char *desc)
         : DataWrap<Derived, DistInfoProxy>(parent, name, unit, desc)
-    {
-    }
+    {}
 
     /**
      * Add a value to the distribtion n times. Calls sample on the storage
@@ -1324,21 +1280,24 @@ class DistBase : public DataWrap<Derived, DistInfoProxy>
      * @param n The number of times to add it, defaults to 1.
      */
     template <typename U>
-    void sample(const U &v, int n = 1) { data()->sample(v, n); }
+    void sample(const U &v, int n = 1)
+    {
+        data()->sample(v, n);
+    }
 
     /**
      * Return the number of entries in this stat.
      * @return The number of entries.
      */
     size_type size() const { return data()->size(); }
+
     /**
      * Return true if no samples have been added.
      * @return True if there haven't been any samples.
      */
     bool zero() const { return data()->zero(); }
 
-    void
-    prepare()
+    void prepare()
     {
         Info *info = this->info();
         data()->prepare(info->getStorageParams(), info->data);
@@ -1347,11 +1306,7 @@ class DistBase : public DataWrap<Derived, DistInfoProxy>
     /**
      * Reset stat value to default
      */
-    void
-    reset()
-    {
-        data()->reset(this->info()->getStorageParams());
-    }
+    void reset() { data()->reset(this->info()->getStorageParams()); }
 
     /**
      *  Add the argument distribution to the this distribution.
@@ -1374,23 +1329,14 @@ class VectorDistBase : public DataWrapVec<Derived, VectorDistInfoProxy>
     friend class DataWrapVec<Derived, VectorDistInfoProxy>;
 
   protected:
-    std::vector<Storage*> storage;
+    std::vector<Storage *> storage;
 
   protected:
-    Storage *
-    data(off_type index)
-    {
-        return storage[index];
-    }
+    Storage *data(off_type index) { return storage[index]; }
 
-    const Storage *
-    data(off_type index) const
-    {
-        return storage[index];
-    }
+    const Storage *data(off_type index) const { return storage[index]; }
 
-    void
-    doInit(size_type s)
+    void doInit(size_type s)
     {
         fatal_if(s <= 0, "Storage size must be positive");
         fatal_if(check(), "Stat has already been initialized");
@@ -1403,8 +1349,7 @@ class VectorDistBase : public DataWrapVec<Derived, VectorDistInfoProxy>
     }
 
   public:
-    VectorDistBase(Group *parent, const char *name,
-                   const units::Base *unit,
+    VectorDistBase(Group *parent, const char *name, const units::Base *unit,
                    const char *desc)
         : DataWrapVec<Derived, VectorDistInfoProxy>(parent, name, unit, desc),
           storage()
@@ -1412,7 +1357,7 @@ class VectorDistBase : public DataWrapVec<Derived, VectorDistInfoProxy>
 
     ~VectorDistBase()
     {
-        for (auto& stor : storage) {
+        for (auto &stor : storage) {
             delete stor;
         }
     }
@@ -1423,14 +1368,9 @@ class VectorDistBase : public DataWrapVec<Derived, VectorDistInfoProxy>
         return Proxy(this->self(), index);
     }
 
-    size_type
-    size() const
-    {
-        return storage.size();
-    }
+    size_type size() const { return storage.size(); }
 
-    bool
-    zero() const
+    bool zero() const
     {
         for (off_type i = 0; i < size(); ++i)
             if (!data(i)->zero())
@@ -1438,8 +1378,7 @@ class VectorDistBase : public DataWrapVec<Derived, VectorDistInfoProxy>
         return true;
     }
 
-    void
-    prepare()
+    void prepare()
     {
         Info *info = this->info();
         size_type size = this->size();
@@ -1448,11 +1387,7 @@ class VectorDistBase : public DataWrapVec<Derived, VectorDistInfoProxy>
             data(i)->prepare(info->getStorageParams(), info->data[i]);
     }
 
-    bool
-    check() const
-    {
-        return size() > 0;
-    }
+    bool check() const { return size() > 0; }
 };
 
 template <class Stat>
@@ -1464,19 +1399,15 @@ class DistProxy
 
   protected:
     typename Stat::Storage *data() { return stat.data(index); }
+
     const typename Stat::Storage *data() const { return stat.data(index); }
 
   public:
-    DistProxy(Stat &s, off_type i)
-        : stat(s), index(i)
-    {}
+    DistProxy(Stat &s, off_type i) : stat(s), index(i) {}
 
-    DistProxy(const DistProxy &sp)
-        : stat(sp.stat), index(sp.index)
-    {}
+    DistProxy(const DistProxy &sp) : stat(sp.stat), index(sp.index) {}
 
-    const DistProxy &
-    operator=(const DistProxy &sp)
+    const DistProxy &operator=(const DistProxy &sp)
     {
         stat = sp.stat;
         index = sp.index;
@@ -1485,28 +1416,19 @@ class DistProxy
 
   public:
     template <typename U>
-    void
-    sample(const U &v, int n = 1)
+    void sample(const U &v, int n = 1)
     {
         data()->sample(v, n);
     }
 
-    size_type
-    size() const
-    {
-        return 1;
-    }
+    size_type size() const { return 1; }
 
-    bool
-    zero() const
-    {
-        return data()->zero();
-    }
+    bool zero() const { return data()->zero(); }
 
     /**
      * Proxy has no state.  Nothing to reset.
      */
-    void reset() { }
+    void reset() {}
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -1543,7 +1465,7 @@ class Node
      */
     virtual std::string str() const = 0;
 
-    virtual ~Node() {};
+    virtual ~Node(){};
 };
 
 /** Shared pointer to a function Node. */
@@ -1558,8 +1480,7 @@ class ScalarStatNode : public Node
   public:
     ScalarStatNode(const ScalarInfo *d) : data(d), vresult(1) {}
 
-    const VResult &
-    result() const
+    const VResult &result() const
     {
         vresult[0] = data->result();
         return vresult;
@@ -1583,37 +1504,22 @@ class ScalarProxyNode : public Node
     mutable VResult vresult;
 
   public:
-    ScalarProxyNode(const ScalarProxy<Stat> &p)
-        : proxy(p), vresult(1)
-    { }
+    ScalarProxyNode(const ScalarProxy<Stat> &p) : proxy(p), vresult(1) {}
 
-    const VResult &
-    result() const
+    const VResult &result() const
     {
         vresult[0] = proxy.result();
         return vresult;
     }
 
-    Result
-    total() const
-    {
-        return proxy.result();
-    }
+    Result total() const { return proxy.result(); }
 
-    size_type
-    size() const
-    {
-        return 1;
-    }
+    size_type size() const { return 1; }
 
     /**
      *
      */
-    std::string
-    str() const
-    {
-        return proxy.str();
-    }
+    std::string str() const { return proxy.str(); }
 };
 
 class VectorStatNode : public Node
@@ -1622,8 +1528,10 @@ class VectorStatNode : public Node
     const VectorInfo *data;
 
   public:
-    VectorStatNode(const VectorInfo *d) : data(d) { }
+    VectorStatNode(const VectorInfo *d) : data(d) {}
+
     const VResult &result() const { return data->result(); }
+
     Result total() const { return data->total(); };
 
     size_type size() const { return data->size(); }
@@ -1639,9 +1547,13 @@ class ConstNode : public Node
 
   public:
     ConstNode(T s) : vresult(1, (Result)s) {}
+
     const VResult &result() const { return vresult; }
+
     Result total() const { return vresult[0]; };
+
     size_type size() const { return 1; }
+
     std::string str() const { return std::to_string(vresult[0]); }
 };
 
@@ -1653,10 +1565,10 @@ class ConstVectorNode : public Node
 
   public:
     ConstVectorNode(const T &s) : vresult(s.begin(), s.end()) {}
+
     const VResult &result() const { return vresult; }
 
-    Result
-    total() const
+    Result total() const
     {
         size_type size = this->size();
         Result tmp = 0;
@@ -1666,8 +1578,8 @@ class ConstVectorNode : public Node
     }
 
     size_type size() const { return vresult.size(); }
-    std::string
-    str() const
+
+    std::string str() const
     {
         size_type size = this->size();
         std::string tmp = "(";
@@ -1681,38 +1593,38 @@ class ConstVectorNode : public Node
 template <class Op>
 struct OpString;
 
-template<>
-struct OpString<std::plus<Result> >
+template <>
+struct OpString<std::plus<Result>>
 {
     static std::string str() { return "+"; }
 };
 
-template<>
-struct OpString<std::minus<Result> >
+template <>
+struct OpString<std::minus<Result>>
 {
     static std::string str() { return "-"; }
 };
 
-template<>
-struct OpString<std::multiplies<Result> >
+template <>
+struct OpString<std::multiplies<Result>>
 {
     static std::string str() { return "*"; }
 };
 
-template<>
-struct OpString<std::divides<Result> >
+template <>
+struct OpString<std::divides<Result>>
 {
     static std::string str() { return "/"; }
 };
 
-template<>
-struct OpString<std::modulus<Result> >
+template <>
+struct OpString<std::modulus<Result>>
 {
     static std::string str() { return "%"; }
 };
 
-template<>
-struct OpString<std::negate<Result> >
+template <>
+struct OpString<std::negate<Result>>
 {
     static std::string str() { return "-"; }
 };
@@ -1727,8 +1639,7 @@ class UnaryNode : public Node
   public:
     UnaryNode(NodePtr &p) : l(p) {}
 
-    const VResult &
-    result() const
+    const VResult &result() const
     {
         const VResult &lvec = l->result();
         size_type size = lvec.size();
@@ -1743,8 +1654,7 @@ class UnaryNode : public Node
         return vresult;
     }
 
-    Result
-    total() const
+    Result total() const
     {
         const VResult &vec = this->result();
         Result total = 0.0;
@@ -1755,11 +1665,7 @@ class UnaryNode : public Node
 
     size_type size() const { return l->size(); }
 
-    std::string
-    str() const
-    {
-        return OpString<Op>::str() + l->str();
-    }
+    std::string str() const { return OpString<Op>::str() + l->str(); }
 };
 
 template <class Op>
@@ -1773,8 +1679,7 @@ class BinaryNode : public Node
   public:
     BinaryNode(NodePtr &a, NodePtr &b) : l(a), r(b) {}
 
-    const VResult &
-    result() const override
+    const VResult &result() const override
     {
         Op op;
         const VResult &lvec = l->result();
@@ -1805,8 +1710,7 @@ class BinaryNode : public Node
         return vresult;
     }
 
-    Result
-    total() const override
+    Result total() const override
     {
         const VResult &vec = this->result();
         const VResult &lvec = l->result();
@@ -1817,8 +1721,8 @@ class BinaryNode : public Node
         Op op;
 
         assert(lvec.size() > 0 && rvec.size() > 0);
-        assert(lvec.size() == rvec.size() ||
-               lvec.size() == 1 || rvec.size() == 1);
+        assert(lvec.size() == rvec.size() || lvec.size() == 1 ||
+               rvec.size() == 1);
 
         /** If vectors are the same divide their sums (x0+x1)/(y0+y1) */
         if (lvec.size() == rvec.size() && lvec.size() > 1) {
@@ -1837,8 +1741,7 @@ class BinaryNode : public Node
         return total;
     }
 
-    size_type
-    size() const override
+    size_type size() const override
     {
         size_type ls = l->size();
         size_type rs = r->size();
@@ -1852,8 +1755,7 @@ class BinaryNode : public Node
         }
     }
 
-    std::string
-    str() const override
+    std::string str() const override
     {
         return csprintf("(%s %s %s)", l->str(), OpString<Op>::str(), r->str());
     }
@@ -1869,8 +1771,7 @@ class SumNode : public Node
   public:
     SumNode(NodePtr &p) : l(p), vresult(1) {}
 
-    const VResult &
-    result() const
+    const VResult &result() const
     {
         const VResult &lvec = l->result();
         size_type size = lvec.size();
@@ -1885,8 +1786,7 @@ class SumNode : public Node
         return vresult;
     }
 
-    Result
-    total() const
+    Result total() const
     {
         const VResult &lvec = l->result();
         size_type size = lvec.size();
@@ -1903,13 +1803,8 @@ class SumNode : public Node
 
     size_type size() const { return 1; }
 
-    std::string
-    str() const
-    {
-        return csprintf("total(%s)", l->str());
-    }
+    std::string str() const { return csprintf("total(%s)", l->str()); }
 };
-
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1932,22 +1827,19 @@ class Scalar : public ScalarBase<Scalar, StatStor>
     using ScalarBase<Scalar, StatStor>::operator=;
 
     Scalar(Group *parent = nullptr)
-        : ScalarBase<Scalar, StatStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+        : ScalarBase<Scalar, StatStor>(parent, nullptr,
+                                       units::Unspecified::get(), nullptr)
+    {}
 
     Scalar(Group *parent, const char *name, const char *desc = nullptr)
-        : ScalarBase<Scalar, StatStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+        : ScalarBase<Scalar, StatStor>(parent, name, units::Unspecified::get(),
+                                       desc)
+    {}
 
     Scalar(Group *parent, const char *name, const units::Base *unit,
            const char *desc = nullptr)
         : ScalarBase<Scalar, StatStor>(parent, name, unit, desc)
-    {
-    }
+    {}
 };
 
 /**
@@ -1960,22 +1852,19 @@ class Average : public ScalarBase<Average, AvgStor>
     using ScalarBase<Average, AvgStor>::operator=;
 
     Average(Group *parent = nullptr)
-        : ScalarBase<Average, AvgStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+        : ScalarBase<Average, AvgStor>(parent, nullptr,
+                                       units::Unspecified::get(), nullptr)
+    {}
 
     Average(Group *parent, const char *name, const char *desc = nullptr)
-        : ScalarBase<Average, AvgStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+        : ScalarBase<Average, AvgStor>(parent, name, units::Unspecified::get(),
+                                       desc)
+    {}
 
     Average(Group *parent, const char *name, const units::Base *unit,
             const char *desc = nullptr)
         : ScalarBase<Average, AvgStor>(parent, name, unit, desc)
-    {
-    }
+    {}
 };
 
 class Value : public ValueBase<Value>
@@ -1983,19 +1872,16 @@ class Value : public ValueBase<Value>
   public:
     Value(Group *parent = nullptr)
         : ValueBase<Value>(parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+    {}
 
     Value(Group *parent, const char *name, const char *desc = nullptr)
         : ValueBase<Value>(parent, name, units::Unspecified::get(), desc)
-    {
-    }
+    {}
 
     Value(Group *parent, const char *name, const units::Base *unit,
           const char *desc = nullptr)
         : ValueBase<Value>(parent, name, unit, desc)
-    {
-    }
+    {}
 };
 
 /**
@@ -2006,22 +1892,19 @@ class Vector : public VectorBase<Vector, StatStor>
 {
   public:
     Vector(Group *parent = nullptr)
-        : VectorBase<Vector, StatStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+        : VectorBase<Vector, StatStor>(parent, nullptr,
+                                       units::Unspecified::get(), nullptr)
+    {}
 
     Vector(Group *parent, const char *name, const char *desc = nullptr)
-        : VectorBase<Vector, StatStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+        : VectorBase<Vector, StatStor>(parent, name, units::Unspecified::get(),
+                                       desc)
+    {}
 
     Vector(Group *parent, const char *name, const units::Base *unit,
            const char *desc = nullptr)
         : VectorBase<Vector, StatStor>(parent, name, unit, desc)
-    {
-    }
+    {}
 };
 
 /**
@@ -2033,21 +1916,18 @@ class AverageVector : public VectorBase<AverageVector, AvgStor>
   public:
     AverageVector(Group *parent = nullptr)
         : VectorBase<AverageVector, AvgStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+              parent, nullptr, units::Unspecified::get(), nullptr)
+    {}
 
     AverageVector(Group *parent, const char *name, const char *desc = nullptr)
-        : VectorBase<AverageVector, AvgStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+        : VectorBase<AverageVector, AvgStor>(parent, name,
+                                             units::Unspecified::get(), desc)
+    {}
 
     AverageVector(Group *parent, const char *name, const units::Base *unit,
                   const char *desc = nullptr)
         : VectorBase<AverageVector, AvgStor>(parent, name, unit, desc)
-    {
-    }
+    {}
 };
 
 /**
@@ -2058,22 +1938,19 @@ class Vector2d : public Vector2dBase<Vector2d, StatStor>
 {
   public:
     Vector2d(Group *parent = nullptr)
-        : Vector2dBase<Vector2d, StatStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+        : Vector2dBase<Vector2d, StatStor>(parent, nullptr,
+                                           units::Unspecified::get(), nullptr)
+    {}
 
     Vector2d(Group *parent, const char *name, const char *desc = nullptr)
-        : Vector2dBase<Vector2d, StatStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+        : Vector2dBase<Vector2d, StatStor>(parent, name,
+                                           units::Unspecified::get(), desc)
+    {}
 
     Vector2d(Group *parent, const char *name, const units::Base *unit,
              const char *desc = nullptr)
         : Vector2dBase<Vector2d, StatStor>(parent, name, unit, desc)
-    {
-    }
+    {}
 };
 
 /**
@@ -2084,22 +1961,19 @@ class Distribution : public DistBase<Distribution, DistStor>
 {
   public:
     Distribution(Group *parent = nullptr)
-        : DistBase<Distribution, DistStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+        : DistBase<Distribution, DistStor>(parent, nullptr,
+                                           units::Unspecified::get(), nullptr)
+    {}
 
     Distribution(Group *parent, const char *name, const char *desc = nullptr)
-        : DistBase<Distribution, DistStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+        : DistBase<Distribution, DistStor>(parent, name,
+                                           units::Unspecified::get(), desc)
+    {}
 
     Distribution(Group *parent, const char *name, const units::Base *unit,
                  const char *desc = nullptr)
         : DistBase<Distribution, DistStor>(parent, name, unit, desc)
-    {
-    }
+    {}
 
     /**
      * Set the parameters of this distribution. @sa DistStor::Params
@@ -2108,8 +1982,7 @@ class Distribution : public DistBase<Distribution, DistStor>
      * @param bkt The number of values in each bucket.
      * @return A reference to this distribution.
      */
-    Distribution &
-    init(Counter min, Counter max, Counter bkt)
+    Distribution &init(Counter min, Counter max, Counter bkt)
     {
         DistStor::Params *params = new DistStor::Params(min, max, bkt);
         this->setParams(params);
@@ -2126,31 +1999,26 @@ class Histogram : public DistBase<Histogram, HistStor>
 {
   public:
     Histogram(Group *parent = nullptr)
-        : DistBase<Histogram, HistStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+        : DistBase<Histogram, HistStor>(parent, nullptr,
+                                        units::Unspecified::get(), nullptr)
+    {}
 
-    Histogram(Group *parent, const char *name,
-              const char *desc = nullptr)
-        : DistBase<Histogram, HistStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+    Histogram(Group *parent, const char *name, const char *desc = nullptr)
+        : DistBase<Histogram, HistStor>(parent, name,
+                                        units::Unspecified::get(), desc)
+    {}
 
     Histogram(Group *parent, const char *name, const units::Base *unit,
               const char *desc = nullptr)
         : DistBase<Histogram, HistStor>(parent, name, unit, desc)
-    {
-    }
+    {}
 
     /**
      * Set the parameters of this histogram. @sa HistStor::Params
      * @param size The number of buckets in the histogram
      * @return A reference to this histogram.
      */
-    Histogram &
-    init(size_type size)
+    Histogram &init(size_type size)
     {
         HistStor::Params *params = new HistStor::Params(size);
         this->setParams(params);
@@ -2171,7 +2039,7 @@ class StandardDeviation : public DistBase<StandardDeviation, SampleStor>
      */
     StandardDeviation(Group *parent = nullptr)
         : DistBase<StandardDeviation, SampleStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
+              parent, nullptr, units::Unspecified::get(), nullptr)
     {
         SampleStor::Params *params = new SampleStor::Params;
         this->doInit();
@@ -2181,7 +2049,7 @@ class StandardDeviation : public DistBase<StandardDeviation, SampleStor>
     StandardDeviation(Group *parent, const char *name,
                       const char *desc = nullptr)
         : DistBase<StandardDeviation, SampleStor>(
-                parent, name, units::Unspecified::get(), desc)
+              parent, name, units::Unspecified::get(), desc)
     {
         SampleStor::Params *params = new SampleStor::Params;
         this->doInit();
@@ -2210,7 +2078,7 @@ class AverageDeviation : public DistBase<AverageDeviation, AvgSampleStor>
      */
     AverageDeviation(Group *parent = nullptr)
         : DistBase<AverageDeviation, AvgSampleStor>(
-                parent, nullptr, units::Unspecified::get(), nullptr)
+              parent, nullptr, units::Unspecified::get(), nullptr)
     {
         AvgSampleStor::Params *params = new AvgSampleStor::Params;
         this->doInit();
@@ -2220,7 +2088,7 @@ class AverageDeviation : public DistBase<AverageDeviation, AvgSampleStor>
     AverageDeviation(Group *parent, const char *name,
                      const char *desc = nullptr)
         : DistBase<AverageDeviation, AvgSampleStor>(
-                parent, name, units::Unspecified::get(), desc)
+              parent, name, units::Unspecified::get(), desc)
     {
         AvgSampleStor::Params *params = new AvgSampleStor::Params;
         this->doInit();
@@ -2245,25 +2113,21 @@ class VectorDistribution : public VectorDistBase<VectorDistribution, DistStor>
 {
   public:
     VectorDistribution(Group *parent = nullptr)
-        : VectorDistBase<VectorDistribution, DistStor>(parent, nullptr,
-            units::Unspecified::get(), nullptr)
-    {
-    }
+        : VectorDistBase<VectorDistribution, DistStor>(
+              parent, nullptr, units::Unspecified::get(), nullptr)
+    {}
 
     VectorDistribution(Group *parent, const char *name,
                        const char *desc = nullptr)
         : VectorDistBase<VectorDistribution, DistStor>(
-                parent, name, units::Unspecified::get(), desc)
-    {
-    }
+              parent, name, units::Unspecified::get(), desc)
+    {}
 
     VectorDistribution(Group *parent, const char *name,
-                       const units::Base *unit,
-                       const char *desc = nullptr)
+                       const units::Base *unit, const char *desc = nullptr)
         : VectorDistBase<VectorDistribution, DistStor>(parent, name, unit,
                                                        desc)
-    {
-    }
+    {}
 
     /**
      * Initialize storage and parameters for this distribution.
@@ -2273,8 +2137,8 @@ class VectorDistribution : public VectorDistBase<VectorDistribution, DistStor>
      * @param bkt The number of values in each bucket.
      * @return A reference to this distribution.
      */
-    VectorDistribution &
-    init(size_type size, Counter min, Counter max, Counter bkt)
+    VectorDistribution &init(size_type size, Counter min, Counter max,
+                             Counter bkt)
     {
         DistStor::Params *params = new DistStor::Params(min, max, bkt);
         this->setParams(params);
@@ -2287,38 +2151,34 @@ class VectorDistribution : public VectorDistBase<VectorDistribution, DistStor>
  * This is a vector of StandardDeviation stats.
  * @sa VectorDistBase, SampleStor
  */
-class VectorStandardDeviation
-    : public VectorDistBase<VectorStandardDeviation, SampleStor>
+class VectorStandardDeviation :
+    public VectorDistBase<VectorStandardDeviation, SampleStor>
 {
   public:
     VectorStandardDeviation(Group *parent = nullptr)
-        : VectorDistBase<VectorStandardDeviation, SampleStor>(parent, nullptr,
-            units::Unspecified::get(), nullptr)
-    {
-    }
+        : VectorDistBase<VectorStandardDeviation, SampleStor>(
+              parent, nullptr, units::Unspecified::get(), nullptr)
+    {}
 
     VectorStandardDeviation(Group *parent, const char *name,
                             const char *desc = nullptr)
-        : VectorDistBase<VectorStandardDeviation, SampleStor>(parent, name,
-            units::Unspecified::get(), desc)
-    {
-    }
+        : VectorDistBase<VectorStandardDeviation, SampleStor>(
+              parent, name, units::Unspecified::get(), desc)
+    {}
 
     VectorStandardDeviation(Group *parent, const char *name,
                             const units::Base *unit,
                             const char *desc = nullptr)
         : VectorDistBase<VectorStandardDeviation, SampleStor>(parent, name,
                                                               unit, desc)
-    {
-    }
+    {}
 
     /**
      * Initialize storage for this distribution.
      * @param size The size of the vector.
      * @return A reference to this distribution.
      */
-    VectorStandardDeviation &
-    init(size_type size)
+    VectorStandardDeviation &init(size_type size)
     {
         SampleStor::Params *params = new SampleStor::Params;
         this->doInit(size);
@@ -2331,38 +2191,33 @@ class VectorStandardDeviation
  * This is a vector of AverageDeviation stats.
  * @sa VectorDistBase, AvgSampleStor
  */
-class VectorAverageDeviation
-    : public VectorDistBase<VectorAverageDeviation, AvgSampleStor>
+class VectorAverageDeviation :
+    public VectorDistBase<VectorAverageDeviation, AvgSampleStor>
 {
   public:
     VectorAverageDeviation(Group *parent = nullptr)
-        : VectorDistBase<VectorAverageDeviation, AvgSampleStor>(parent,
-            nullptr, units::Unspecified::get(), nullptr)
-    {
-    }
+        : VectorDistBase<VectorAverageDeviation, AvgSampleStor>(
+              parent, nullptr, units::Unspecified::get(), nullptr)
+    {}
 
     VectorAverageDeviation(Group *parent, const char *name,
                            const char *desc = nullptr)
-        : VectorDistBase<VectorAverageDeviation, AvgSampleStor>(parent, name,
-            units::Unspecified::get(), desc)
-    {
-    }
+        : VectorDistBase<VectorAverageDeviation, AvgSampleStor>(
+              parent, name, units::Unspecified::get(), desc)
+    {}
 
     VectorAverageDeviation(Group *parent, const char *name,
-                           const units::Base *unit,
-                           const char *desc = nullptr)
+                           const units::Base *unit, const char *desc = nullptr)
         : VectorDistBase<VectorAverageDeviation, AvgSampleStor>(parent, name,
-            unit, desc)
-    {
-    }
+                                                                unit, desc)
+    {}
 
     /**
      * Initialize storage for this distribution.
      * @param size The size of the vector.
      * @return A reference to this distribution.
      */
-    VectorAverageDeviation &
-    init(size_type size)
+    VectorAverageDeviation &init(size_type size)
     {
         AvgSampleStor::Params *params = new AvgSampleStor::Params;
         this->doInit(size);
@@ -2383,13 +2238,14 @@ class FormulaInfoProxy : public InfoProxy<Stat, FormulaInfo>
 
     size_type size() const { return this->s.size(); }
 
-    const VResult &
-    result() const
+    const VResult &result() const
     {
         this->s.result(vec);
         return vec;
     }
+
     Result total() const { return this->s.total(); }
+
     VCounter &value() const { return cvec; }
 
     std::string str() const { return this->s.str(); }
@@ -2423,36 +2279,28 @@ class SparseHistBase : public DataWrap<Derived, SparseHistInfoProxy>
      * Retrieve the storage.
      * @return The storage object for this stat.
      */
-    Storage *
-    data()
-    {
-        return reinterpret_cast<Storage *>(storage);
-    }
+    Storage *data() { return reinterpret_cast<Storage *>(storage); }
 
     /**
      * Retrieve a const pointer to the storage.
      * @return A const pointer to the storage object for this stat.
      */
-    const Storage *
-    data() const
+    const Storage *data() const
     {
         return reinterpret_cast<const Storage *>(storage);
     }
 
-    void
-    doInit()
+    void doInit()
     {
         new (storage) Storage(this->info()->getStorageParams());
         this->setInit();
     }
 
   public:
-    SparseHistBase(Group *parent, const char *name,
-                   const units::Base *unit,
+    SparseHistBase(Group *parent, const char *name, const units::Base *unit,
                    const char *desc)
         : DataWrap<Derived, SparseHistInfoProxy>(parent, name, unit, desc)
-    {
-    }
+    {}
 
     /**
      * Add a value to the distribtion n times. Calls sample on the storage
@@ -2461,21 +2309,24 @@ class SparseHistBase : public DataWrap<Derived, SparseHistInfoProxy>
      * @param n The number of times to add it, defaults to 1.
      */
     template <typename U>
-    void sample(const U &v, int n = 1) { data()->sample(v, n); }
+    void sample(const U &v, int n = 1)
+    {
+        data()->sample(v, n);
+    }
 
     /**
      * Return the number of entries in this stat.
      * @return The number of entries.
      */
     size_type size() const { return data()->size(); }
+
     /**
      * Return true if no samples have been added.
      * @return True if there haven't been any samples.
      */
     bool zero() const { return data()->zero(); }
 
-    void
-    prepare()
+    void prepare()
     {
         Info *info = this->info();
         data()->prepare(info->getStorageParams(), info->data);
@@ -2484,43 +2335,35 @@ class SparseHistBase : public DataWrap<Derived, SparseHistInfoProxy>
     /**
      * Reset stat value to default
      */
-    void
-    reset()
-    {
-        data()->reset(this->info()->getStorageParams());
-    }
+    void reset() { data()->reset(this->info()->getStorageParams()); }
 };
 
 class SparseHistogram : public SparseHistBase<SparseHistogram, SparseHistStor>
 {
   public:
     SparseHistogram(Group *parent = nullptr)
-        : SparseHistBase<SparseHistogram, SparseHistStor>(parent, nullptr,
-            units::Unspecified::get(), nullptr)
-    {
-    }
+        : SparseHistBase<SparseHistogram, SparseHistStor>(
+              parent, nullptr, units::Unspecified::get(), nullptr)
+    {}
 
     SparseHistogram(Group *parent, const char *name,
                     const char *desc = nullptr)
-        : SparseHistBase<SparseHistogram, SparseHistStor>(parent, name,
-            units::Unspecified::get(), desc)
-    {
-    }
+        : SparseHistBase<SparseHistogram, SparseHistStor>(
+              parent, name, units::Unspecified::get(), desc)
+    {}
 
     SparseHistogram(Group *parent, const char *name, const units::Base *unit,
                     const char *desc = nullptr)
         : SparseHistBase<SparseHistogram, SparseHistStor>(parent, name, unit,
                                                           desc)
-    {
-    }
+    {}
 
     /**
      * Set the parameters of this histogram. @sa HistStor::Params
      * @param size The number of buckets in the histogram
      * @return A reference to this histogram.
      */
-    SparseHistogram &
-    init(size_type size)
+    SparseHistogram &init(size_type size)
     {
         SparseHistStor::Params *params = new SparseHistStor::Params;
         this->setParams(params);
@@ -2530,6 +2373,7 @@ class SparseHistogram : public SparseHistBase<SparseHistogram, SparseHistStor>
 };
 
 class Temp;
+
 /**
  * A formula for statistics that is calculated when printed. A formula is
  * stored as a tree of Nodes that represent the equation to calculate.
@@ -2552,8 +2396,7 @@ class Formula : public DataWrapVec<Formula, FormulaInfoProxy>
     Formula(Group *parent, const char *name, const units::Base *unit,
             const char *desc = nullptr);
 
-    Formula(Group *parent, const char *name, const char *desc,
-            const Temp &r);
+    Formula(Group *parent, const char *name, const char *desc, const Temp &r);
 
     Formula(Group *parent, const char *name, const units::Base *unit,
             const char *desc, const Temp &r);
@@ -2565,7 +2408,7 @@ class Formula : public DataWrapVec<Formula, FormulaInfoProxy>
      */
     const Formula &operator=(const Temp &r);
 
-    template<typename T>
+    template <typename T>
     const Formula &operator=(const T &v)
     {
         *this = Temp(v);
@@ -2612,7 +2455,7 @@ class Formula : public DataWrapVec<Formula, FormulaInfoProxy>
      */
     size_type size() const;
 
-    void prepare() { }
+    void prepare() {}
 
     /**
      * Formulas don't need to be reset
@@ -2637,7 +2480,13 @@ class FormulaNode : public Node
     FormulaNode(const Formula &f) : formula(f) {}
 
     size_type size() const { return formula.size(); }
-    const VResult &result() const { formula.result(vec); return vec; }
+
+    const VResult &result() const
+    {
+        formula.result(vec);
+        return vec;
+    }
+
     Result total() const { return formula.total(); }
 
     std::string str() const { return formula.str(); }
@@ -2659,15 +2508,15 @@ class Temp
      * Copy the given pointer to this class.
      * @param n A pointer to a Node object to copy.
      */
-    Temp(const NodePtr &n) : node(n) { }
+    Temp(const NodePtr &n) : node(n) {}
 
-    Temp(NodePtr &&n) : node(std::move(n)) { }
+    Temp(NodePtr &&n) : node(std::move(n)) {}
 
     /**
      * Return the node pointer.
      * @return the node pointer.
      */
-    operator NodePtr&() { return node; }
+    operator NodePtr &() { return node; }
 
     /**
      * Makde gcc < 4.6.3 happy and explicitly get the underlying node.
@@ -2679,125 +2528,95 @@ class Temp
      * Create a new ScalarStatNode.
      * @param s The ScalarStat to place in a node.
      */
-    Temp(const Scalar &s)
-        : node(new ScalarStatNode(s.info()))
-    { }
+    Temp(const Scalar &s) : node(new ScalarStatNode(s.info())) {}
 
     /**
      * Create a new ScalarStatNode.
      * @param s The ScalarStat to place in a node.
      */
-    Temp(const Value &s)
-        : node(new ScalarStatNode(s.info()))
-    { }
+    Temp(const Value &s) : node(new ScalarStatNode(s.info())) {}
 
     /**
      * Create a new ScalarStatNode.
      * @param s The ScalarStat to place in a node.
      */
-    Temp(const Average &s)
-        : node(new ScalarStatNode(s.info()))
-    { }
+    Temp(const Average &s) : node(new ScalarStatNode(s.info())) {}
 
     /**
      * Create a new VectorStatNode.
      * @param s The VectorStat to place in a node.
      */
-    Temp(const Vector &s)
-        : node(new VectorStatNode(s.info()))
-    { }
+    Temp(const Vector &s) : node(new VectorStatNode(s.info())) {}
 
-    Temp(const AverageVector &s)
-        : node(new VectorStatNode(s.info()))
-    { }
+    Temp(const AverageVector &s) : node(new VectorStatNode(s.info())) {}
 
     /**
      *
      */
-    Temp(const Formula &f)
-        : node(new FormulaNode(f))
-    { }
+    Temp(const Formula &f) : node(new FormulaNode(f)) {}
 
     /**
      * Create a new ScalarProxyNode.
      * @param p The ScalarProxy to place in a node.
      */
     template <class Stat>
-    Temp(const ScalarProxy<Stat> &p)
-        : node(new ScalarProxyNode<Stat>(p))
-    { }
+    Temp(const ScalarProxy<Stat> &p) : node(new ScalarProxyNode<Stat>(p))
+    {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(signed char value)
-        : node(new ConstNode<signed char>(value))
-    { }
+    Temp(signed char value) : node(new ConstNode<signed char>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(unsigned char value)
-        : node(new ConstNode<unsigned char>(value))
-    { }
+    Temp(unsigned char value) : node(new ConstNode<unsigned char>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(signed short value)
-        : node(new ConstNode<signed short>(value))
-    { }
+    Temp(signed short value) : node(new ConstNode<signed short>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(unsigned short value)
-        : node(new ConstNode<unsigned short>(value))
-    { }
+    Temp(unsigned short value) : node(new ConstNode<unsigned short>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(signed int value)
-        : node(new ConstNode<signed int>(value))
-    { }
+    Temp(signed int value) : node(new ConstNode<signed int>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(unsigned int value)
-        : node(new ConstNode<unsigned int>(value))
-    { }
+    Temp(unsigned int value) : node(new ConstNode<unsigned int>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(signed long value)
-        : node(new ConstNode<signed long>(value))
-    { }
+    Temp(signed long value) : node(new ConstNode<signed long>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(unsigned long value)
-        : node(new ConstNode<unsigned long>(value))
-    { }
+    Temp(unsigned long value) : node(new ConstNode<unsigned long>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(signed long long value)
-        : node(new ConstNode<signed long long>(value))
-    { }
+    Temp(signed long long value) : node(new ConstNode<signed long long>(value))
+    {}
 
     /**
      * Create a ConstNode
@@ -2805,25 +2624,20 @@ class Temp
      */
     Temp(unsigned long long value)
         : node(new ConstNode<unsigned long long>(value))
-    { }
+    {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(float value)
-        : node(new ConstNode<float>(value))
-    { }
+    Temp(float value) : node(new ConstNode<float>(value)) {}
 
     /**
      * Create a ConstNode
      * @param value The value of the const node.
      */
-    Temp(double value)
-        : node(new ConstNode<double>(value))
-    { }
+    Temp(double value) : node(new ConstNode<double>(value)) {}
 };
-
 
 /**
  * @}
@@ -2832,51 +2646,51 @@ class Temp
 inline Temp
 operator+(Temp l, Temp r)
 {
-    return Temp(std::make_shared<BinaryNode<std::plus<Result> > >(l, r));
+    return Temp(std::make_shared<BinaryNode<std::plus<Result>>>(l, r));
 }
 
 inline Temp
 operator-(Temp l, Temp r)
 {
-    return Temp(std::make_shared<BinaryNode<std::minus<Result> > >(l, r));
+    return Temp(std::make_shared<BinaryNode<std::minus<Result>>>(l, r));
 }
 
 inline Temp
 operator*(Temp l, Temp r)
 {
-    return Temp(std::make_shared<BinaryNode<std::multiplies<Result> > >(l, r));
+    return Temp(std::make_shared<BinaryNode<std::multiplies<Result>>>(l, r));
 }
 
 inline Temp
 operator/(Temp l, Temp r)
 {
-    return Temp(std::make_shared<BinaryNode<std::divides<Result> > >(l, r));
+    return Temp(std::make_shared<BinaryNode<std::divides<Result>>>(l, r));
 }
 
 inline Temp
 operator-(Temp l)
 {
-    return Temp(std::make_shared<UnaryNode<std::negate<Result> > >(l));
+    return Temp(std::make_shared<UnaryNode<std::negate<Result>>>(l));
 }
 
 template <typename T>
 inline Temp
 constant(T val)
 {
-    return Temp(std::make_shared<ConstNode<T> >(val));
+    return Temp(std::make_shared<ConstNode<T>>(val));
 }
 
 template <typename T>
 inline Temp
 constantVector(T val)
 {
-    return Temp(std::make_shared<ConstVectorNode<T> >(val));
+    return Temp(std::make_shared<ConstVectorNode<T>>(val));
 }
 
 inline Temp
 sum(Temp val)
 {
-    return Temp(std::make_shared<SumNode<std::plus<Result> > >(val));
+    return Temp(std::make_shared<SumNode<std::plus<Result>>>(val));
 }
 
 /** Dump all statistics data to the registered outputs */
@@ -2884,7 +2698,7 @@ void dump();
 void reset();
 void enable();
 bool enabled();
-const Info* resolve(const std::string &name);
+const Info *resolve(const std::string &name);
 
 /**
  * Register reset and dump handlers.  These are the functions which

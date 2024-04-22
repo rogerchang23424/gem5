@@ -61,8 +61,11 @@ class VegaFault : public FaultBase
     {}
 
     FaultName name() const override { return _name; }
+
     bool isInterrupt() const { return _interrupt; }
+
     ExceptionCode exception() const { return _code; }
+
     virtual RegVal trap_value() const { return 0; }
 
     void invoke(ThreadContext *tc, const StaticInstPtr &inst) override;
@@ -74,11 +77,10 @@ class PageFault : public VegaFault
     Addr addr;
 
   public:
-    PageFault(Addr _addr, ExceptionCode code, bool present,
-              BaseMMU::Mode mode, bool user)
+    PageFault(Addr _addr, ExceptionCode code, bool present, BaseMMU::Mode mode,
+              bool user)
         : VegaFault("PageFault", false, code), addr(_addr)
-    {
-    }
+    {}
 
     RegVal trap_value() const override { return addr; }
 };

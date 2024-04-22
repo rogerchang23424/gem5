@@ -49,13 +49,9 @@ class Printer : public sc_core::sc_module
     sc_core::sc_in<const char *> input;
     std::string prefix;
 
-    SC_CTOR(Printer)
-    {
-        SC_THREAD(print);
-    }
+    SC_CTOR(Printer) { SC_THREAD(print); }
 
-    void
-    print()
+    void print()
     {
         int i = 0;
         while (true) {
@@ -75,13 +71,10 @@ class Printer : public sc_core::sc_module
 
     // Gem5 statistics should be set up during the "end_of_elabortion"
     // callback.
-    void
-    end_of_elaboration() override
+    void end_of_elaboration() override
     {
-        numWords
-            .name(std::string(name()) + ".numWords")
-            .desc("number of words printed")
-            ;
+        numWords.name(std::string(name()) + ".numWords")
+            .desc("number of words printed");
     }
 };
 

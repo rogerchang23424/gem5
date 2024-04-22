@@ -49,6 +49,7 @@ class TaggedEntry : public CacheEntry
 {
   public:
     TaggedEntry() : CacheEntry(), _secure(false) {}
+
     ~TaggedEntry() = default;
 
     /**
@@ -65,8 +66,7 @@ class TaggedEntry : public CacheEntry
      * @param is_secure Whether secure bit is set.
      * @return True if the tag information match this entry's.
      */
-    virtual bool
-    matchTag(Addr tag, bool is_secure) const
+    virtual bool matchTag(Addr tag, bool is_secure) const
     {
         return isValid() && (getTag() == tag) && (isSecure() == is_secure);
     }
@@ -77,8 +77,7 @@ class TaggedEntry : public CacheEntry
      *
      * @param tag The tag value.
      */
-    virtual void
-    insert(const Addr tag, const bool is_secure)
+    virtual void insert(const Addr tag, const bool is_secure)
     {
         setValid();
         setTag(tag);
@@ -88,33 +87,30 @@ class TaggedEntry : public CacheEntry
     }
 
     /** Invalidate the block. Its contents are no longer valid. */
-    void
-    invalidate() override
+    void invalidate() override
     {
         CacheEntry::invalidate();
         clearSecure();
     }
 
-    std::string
-    print() const override
+    std::string print() const override
     {
         return csprintf("tag: %#x secure: %d valid: %d | %s", getTag(),
-            isSecure(), isValid(), ReplaceableEntry::print());
+                        isSecure(), isValid(), ReplaceableEntry::print());
     }
 
-    bool
-    matchTag(const Addr tag) const override
+    bool matchTag(const Addr tag) const override
     {
         panic("Need is_secure arg");
         return false;
     }
 
-    void
-    insert(const Addr tag) override
+    void insert(const Addr tag) override
     {
         panic("Need is_secure arg");
         return;
     }
+
   protected:
     /** Set secure bit. */
     virtual void setSecure() { _secure = true; }
@@ -130,10 +126,10 @@ class TaggedEntry : public CacheEntry
     void clearSecure() { _secure = false; }
 
     /** Do not use API without is_secure flag. */
-    using CacheEntry::matchTag;
     using CacheEntry::insert;
+    using CacheEntry::matchTag;
 };
 
 } // namespace gem5
 
-#endif//__CACHE_TAGGED_ENTRY_HH__
+#endif //__CACHE_TAGGED_ENTRY_HH__

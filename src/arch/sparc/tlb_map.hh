@@ -42,14 +42,13 @@ namespace SparcISA
 class TlbMap
 {
   private:
-    typedef std::map<TlbRange, TlbEntry*> RangeMap;
+    typedef std::map<TlbRange, TlbEntry *> RangeMap;
     RangeMap tree;
 
   public:
     typedef RangeMap::iterator iterator;
 
-    iterator
-    find(const TlbRange &r)
+    iterator find(const TlbRange &r)
     {
         iterator i;
 
@@ -59,7 +58,7 @@ class TlbMap
             if (r.real == i->first.real &&
                 r.partitionId == i->first.partitionId &&
                 i->first.va < r.va + r.size &&
-                i->first.va+i->first.size >= r.va &&
+                i->first.va + i->first.size >= r.va &&
                 (r.real || r.contextId == i->first.contextId))
                 return i;
             else
@@ -75,15 +74,14 @@ class TlbMap
             return tree.end();
         if (r.partitionId != i->first.partitionId)
             return tree.end();
-        if (i->first.va <= r.va+r.size &&
-            i->first.va+i->first.size >= r.va)
+        if (i->first.va <= r.va + r.size &&
+            i->first.va + i->first.size >= r.va)
             return i;
 
         return tree.end();
     }
 
-    bool
-    intersect(const TlbRange &r)
+    bool intersect(const TlbRange &r)
     {
         iterator i;
         i = find(r);
@@ -92,9 +90,7 @@ class TlbMap
         return false;
     }
 
-
-    iterator
-    insert(TlbRange &r, TlbEntry *d)
+    iterator insert(TlbRange &r, TlbEntry *d)
     {
         if (intersect(r))
             return tree.end();
@@ -102,67 +98,33 @@ class TlbMap
         return tree.insert(std::make_pair(r, d)).first;
     }
 
-    size_t
-    erase(TlbRange k)
-    {
-        return tree.erase(k);
-    }
+    size_t erase(TlbRange k) { return tree.erase(k); }
 
-    void
-    erase(iterator p)
-    {
-        tree.erase(p);
-    }
+    void erase(iterator p) { tree.erase(p); }
 
-    void
-    erase(iterator p, iterator q)
-    {
-        tree.erase(p,q);
-    }
+    void erase(iterator p, iterator q) { tree.erase(p, q); }
 
-    void
-    clear()
-    {
-        tree.erase(tree.begin(), tree.end());
-    }
+    void clear() { tree.erase(tree.begin(), tree.end()); }
 
-    iterator
-    begin()
-    {
-        return tree.begin();
-    }
+    iterator begin() { return tree.begin(); }
 
-    iterator
-    end()
-    {
-        return tree.end();
-    }
+    iterator end() { return tree.end(); }
 
-    size_t
-    size()
-    {
-        return tree.size();
-    }
+    size_t size() { return tree.size(); }
 
-    bool
-    empty()
-    {
-        return tree.empty();
-    }
+    bool empty() { return tree.empty(); }
 
-    void
-    print()
+    void print()
     {
         iterator i;
         i = tree.begin();
         while (i != tree.end()) {
-           std::cout << std::hex << i->first.va << " " << i->first.size << " " <<
-                i->first.contextId << " " << i->first.partitionId << " " <<
-                i->first.real << " " << i->second << std::endl;
+            std::cout << std::hex << i->first.va << " " << i->first.size << " "
+                      << i->first.contextId << " " << i->first.partitionId
+                      << " " << i->first.real << " " << i->second << std::endl;
             i++;
         }
     }
-
 };
 
 } // namespace SparcISA

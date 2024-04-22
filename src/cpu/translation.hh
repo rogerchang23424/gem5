@@ -81,8 +81,15 @@ class WholeTranslationState
      */
     WholeTranslationState(const RequestPtr &_req, uint8_t *_data,
                           uint64_t *_res, BaseMMU::Mode _mode)
-        : outstanding(1), delay(false), isSplit(false), mainReq(_req),
-          sreqLow(NULL), sreqHigh(NULL), data(_data), res(_res), mode(_mode)
+        : outstanding(1),
+          delay(false),
+          isSplit(false),
+          mainReq(_req),
+          sreqLow(NULL),
+          sreqHigh(NULL),
+          data(_data),
+          res(_res),
+          mode(_mode)
     {
         faults[0] = faults[1] = NoFault;
         assert(mode == BaseMMU::Read || mode == BaseMMU::Write);
@@ -96,8 +103,14 @@ class WholeTranslationState
     WholeTranslationState(const RequestPtr &_req, const RequestPtr &_sreqLow,
                           const RequestPtr &_sreqHigh, uint8_t *_data,
                           uint64_t *_res, BaseMMU::Mode _mode)
-        : outstanding(2), delay(false), isSplit(true), mainReq(_req),
-          sreqLow(_sreqLow), sreqHigh(_sreqHigh), data(_data), res(_res),
+        : outstanding(2),
+          delay(false),
+          isSplit(true),
+          mainReq(_req),
+          sreqLow(_sreqLow),
+          sreqHigh(_sreqHigh),
+          data(_data),
+          res(_res),
           mode(_mode)
     {
         faults[0] = faults[1] = NoFault;
@@ -111,14 +124,12 @@ class WholeTranslationState
      * In this case, flags from the split request are copied to the main
      * request to make it easier to access them later on.
      */
-    bool
-    finish(const Fault &fault, int index)
+    bool finish(const Fault &fault, int index)
     {
         assert(outstanding);
         faults[index] = fault;
         outstanding--;
         if (isSplit && outstanding == 0) {
-
             // For ease later, we copy some state to the main request.
             if (faults[0] == NoFault) {
                 mainReq->setPaddr(sreqLow->getPaddr());
@@ -133,8 +144,7 @@ class WholeTranslationState
      * Determine whether this translation produced a fault.  Both parts of the
      * translation must be checked if this is a split translation.
      */
-    Fault
-    getFault() const
+    Fault getFault() const
     {
         if (!isSplit)
             return faults[0];
@@ -147,55 +157,34 @@ class WholeTranslationState
     }
 
     /** Remove all faults from the translation. */
-    void
-    setNoFault()
-    {
-        faults[0] = faults[1] = NoFault;
-    }
+    void setNoFault() { faults[0] = faults[1] = NoFault; }
 
     /**
      * Check if this request is strictly ordered device access.  We
      * only need to check the main request because the flags will have
      * been copied here on a split translation.
      */
-    bool
-    isStrictlyOrdered() const
-    {
-        return mainReq->isStrictlyOrdered();
-    }
+    bool isStrictlyOrdered() const { return mainReq->isStrictlyOrdered(); }
 
     /**
      * Check if this request is a prefetch.  We only need to check the main
      * request because the flags will have been copied here on a split
      * translation.
      */
-    bool
-    isPrefetch() const
-    {
-        return mainReq->isPrefetch();
-    }
+    bool isPrefetch() const { return mainReq->isPrefetch(); }
 
     /** Get the physical address of this request. */
-    Addr
-    getPaddr() const
-    {
-        return mainReq->getPaddr();
-    }
+    Addr getPaddr() const { return mainReq->getPaddr(); }
 
     /**
      * Get the flags associated with this request.  We only need to access
      * the main request because the flags will have been copied here on a
      * split translation.
      */
-    unsigned
-    getFlags()
-    {
-        return mainReq->getFlags();
-    }
+    unsigned getFlags() { return mainReq->getFlags(); }
 
     /** Delete all requests that make up this translation. */
-    void
-    deleteReqs()
+    void deleteReqs()
     {
         mainReq.reset();
         if (isSplit) {
@@ -204,7 +193,6 @@ class WholeTranslationState
         }
     }
 };
-
 
 /**
  * This class represents part of a data address translation.  All state for
@@ -224,34 +212,27 @@ class DataTranslation : public BaseMMU::Translation
     int index;
 
   public:
-    DataTranslation(ExecContextPtr _xc, WholeTranslationState* _state)
+    DataTranslation(ExecContextPtr _xc, WholeTranslationState *_state)
         : xc(_xc), state(_state), index(0)
-    {
-    }
+    {}
 
-    DataTranslation(ExecContextPtr _xc, WholeTranslationState* _state,
+    DataTranslation(ExecContextPtr _xc, WholeTranslationState *_state,
                     int _index)
         : xc(_xc), state(_state), index(_index)
-    {
-    }
+    {}
 
     /**
      * Signal the translation state that the translation has been delayed due
      * to a hw page table walk.  Split requests are transparently handled.
      */
-    void
-    markDelayed()
-    {
-        state->delay = true;
-    }
+    void markDelayed() { state->delay = true; }
 
     /**
      * Finish this part of the translation and indicate that the whole
      * translation is complete if the state says so.
      */
-    void
-    finish(const Fault &fault, const RequestPtr &req, ThreadContext *tc,
-           BaseMMU::Mode mode)
+    void finish(const Fault &fault, const RequestPtr &req, ThreadContext *tc,
+                BaseMMU::Mode mode)
     {
         assert(state);
         assert(mode == state->mode);
@@ -265,11 +246,7 @@ class DataTranslation : public BaseMMU::Translation
         delete this;
     }
 
-    bool
-    squashed() const
-    {
-        return xc->isSquashed();
-    }
+    bool squashed() const { return xc->isSquashed(); }
 };
 
 } // namespace gem5

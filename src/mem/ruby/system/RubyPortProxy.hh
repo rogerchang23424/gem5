@@ -57,9 +57,7 @@ namespace ruby
 
 class RubyPortProxy : public RubyPort
 {
-
   public:
-
     /**
      * Create a new RubyPortProxy.
      *
@@ -111,8 +109,7 @@ class RubyPortProxy : public RubyPort
      * implement even if it is never used (since there are only
      * functional accesses).
      */
-    void descheduleDeadlockEvent() { }
-
+    void descheduleDeadlockEvent() {}
 };
 
 } // namespace ruby

@@ -328,8 +328,7 @@ class TwoDifferentMatRegs : public testing::Test
     MatStore<size, size> mat1;
     MatStore<size, size> mat2;
 
-    void
-    SetUp() override
+    void SetUp() override
     {
         auto tile1 = mat1.asTile<uint8_t>(0);
         auto tile2 = mat2.asTile<uint8_t>(0);

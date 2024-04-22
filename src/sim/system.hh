@@ -74,7 +74,6 @@ class ThreadContext;
 class System : public SimObject, public PCEventScope
 {
   private:
-
     /**
      * Private class for the system port which is only used as a
      * requestor for debug access and for non-structural entities that do
@@ -83,22 +82,17 @@ class System : public SimObject, public PCEventScope
     class SystemPort : public RequestPort
     {
       public:
-
         /**
          * Create a system port with a name and an owner.
          */
-        SystemPort(const std::string &_name)
-            : RequestPort(_name)
-        { }
+        SystemPort(const std::string &_name) : RequestPort(_name) {}
 
-        bool
-        recvTimingResp(PacketPtr pkt) override
+        bool recvTimingResp(PacketPtr pkt) override
         {
             panic("SystemPort does not receive timing!");
         }
 
-        void
-        recvReqRetry() override
+        void recvReqRetry() override
         {
             panic("SystemPort does not expect retry!");
         }
@@ -112,7 +106,6 @@ class System : public SimObject, public PCEventScope
         deviceMemMap;
 
   public:
-
     class Threads
     {
       private:
@@ -129,15 +122,13 @@ class System : public SimObject, public PCEventScope
 
         std::vector<Thread> threads;
 
-        Thread &
-        thread(ContextID id)
+        Thread &thread(ContextID id)
         {
             assert(id < size());
             return threads[id];
         }
 
-        const Thread &
-        thread(ContextID id) const
+        const Thread &thread(ContextID id) const
         {
             assert(id < size());
             return threads[id];
@@ -152,13 +143,13 @@ class System : public SimObject, public PCEventScope
         class const_iterator
         {
           private:
-            Threads const* threads;
+            Threads const *threads;
             int pos;
 
             friend class Threads;
 
-            const_iterator(const Threads &_threads, int _pos) :
-                threads(&_threads), pos(_pos)
+            const_iterator(const Threads &_threads, int _pos)
+                : threads(&_threads), pos(_pos)
             {}
 
           public:
@@ -168,30 +159,27 @@ class System : public SimObject, public PCEventScope
             using pointer = const value_type *;
             using reference = const value_type &;
 
-            const_iterator &
-            operator ++ ()
+            const_iterator &operator++()
             {
                 pos++;
                 return *this;
             }
 
-            const_iterator
-            operator ++ (int)
+            const_iterator operator++(int)
             {
                 return const_iterator(*threads, pos++);
             }
 
-            reference operator * () { return threads->thread(pos).context; }
-            pointer operator -> () { return &threads->thread(pos).context; }
+            reference operator*() { return threads->thread(pos).context; }
 
-            bool
-            operator == (const const_iterator &other) const
+            pointer operator->() { return &threads->thread(pos).context; }
+
+            bool operator==(const const_iterator &other) const
             {
                 return threads == other.threads && pos == other.pos;
             }
 
-            bool
-            operator != (const const_iterator &other) const
+            bool operator!=(const const_iterator &other) const
             {
                 return !(*this == other);
             }
@@ -199,8 +187,7 @@ class System : public SimObject, public PCEventScope
 
         ThreadContext *findFree();
 
-        ThreadContext *
-        operator [](ContextID id) const
+        ThreadContext *operator[](ContextID id) const
         {
             return thread(id).context;
         }
@@ -208,13 +195,15 @@ class System : public SimObject, public PCEventScope
         void markActive(ContextID id) { thread(id).active = true; }
 
         int size() const { return threads.size(); }
+
         bool empty() const { return threads.empty(); }
+
         int numRunning() const;
-        int
-        numActive() const
+
+        int numActive() const
         {
             int count = 0;
-            for (auto &thread: threads) {
+            for (auto &thread : threads) {
                 if (thread.active)
                     count++;
             }
@@ -225,6 +214,7 @@ class System : public SimObject, public PCEventScope
         void quiesceTick(ContextID id, Tick when);
 
         const_iterator begin() const { return const_iterator(*this, 0); }
+
         const_iterator end() const { return const_iterator(*this, size()); }
     };
 
@@ -236,13 +226,13 @@ class System : public SimObject, public PCEventScope
      *
      * @return a reference to the system port we own
      */
-    RequestPort& getSystemPort() { return _systemPort; }
+    RequestPort &getSystemPort() { return _systemPort; }
 
     /**
      * Additional function to return the Port of a memory object.
      */
     Port &getPort(const std::string &if_name,
-                  PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 
     /** @{ */
     /**
@@ -254,11 +244,10 @@ class System : public SimObject, public PCEventScope
      * CPUs. SimObjects are expected to use Port::sendAtomic() and
      * Port::recvAtomic() when accessing memory in this mode.
      */
-    bool
-    isAtomicMode() const
+    bool isAtomicMode() const
     {
         return memoryMode == enums::atomic ||
-            memoryMode == enums::atomic_noncaching;
+               memoryMode == enums::atomic_noncaching;
     }
 
     /**
@@ -275,11 +264,11 @@ class System : public SimObject, public PCEventScope
      * Some CPUs need to bypass caches to allow direct memory
      * accesses, which is required for hardware virtualization.
      */
-    bool
-    bypassCaches() const
+    bool bypassCaches() const
     {
         return memoryMode == enums::atomic_noncaching;
     }
+
     /** @} */
 
     /** @{ */
@@ -300,6 +289,7 @@ class System : public SimObject, public PCEventScope
      * @param mode Mode to change to (atomic/timing/...)
      */
     void setMemoryMode(enums::MemoryMode mode);
+
     /** @} */
 
     /**
@@ -339,8 +329,9 @@ class System : public SimObject, public PCEventScope
     void setKvmVM(KvmVM *const vm) { kvmVM = vm; }
 
     /** Get a pointer to access the physical memory of the system */
-    memory::PhysicalMemory& getPhysMem() { return physmem; }
-    const memory::PhysicalMemory& getPhysMem() const { return physmem; }
+    memory::PhysicalMemory &getPhysMem() { return physmem; }
+
+    const memory::PhysicalMemory &getPhysMem() const { return physmem; }
 
     /** Amount of physical memory that exists */
     Addr memSize() const;
@@ -360,19 +351,19 @@ class System : public SimObject, public PCEventScope
      * and range match something in the device memory map.
      */
     void addDeviceMemory(RequestorID requestorId,
-        memory::AbstractMemory *deviceMemory);
+                         memory::AbstractMemory *deviceMemory);
 
     /**
      * Similar to isMemAddr but for devices. Checks if a physical address
      * of the packet match an address range of a device corresponding to the
      * RequestorId of the request.
      */
-    bool isDeviceMemAddr(const PacketPtr& pkt) const;
+    bool isDeviceMemAddr(const PacketPtr &pkt) const;
 
     /**
      * Return a pointer to the device memory.
      */
-    memory::AbstractMemory *getDeviceMemory(const PacketPtr& pkt) const;
+    memory::AbstractMemory *getDeviceMemory(const PacketPtr &pkt) const;
 
     /*
      * Return the list of address ranges backed by a shadowed ROM.
@@ -384,19 +375,14 @@ class System : public SimObject, public PCEventScope
     /**
      * Get the guest byte order.
      */
-    ByteOrder
-    getGuestByteOrder() const
-    {
-        return workload->byteOrder();
-    }
+    ByteOrder getGuestByteOrder() const { return workload->byteOrder(); }
 
     /**
      * The thermal model used for this system (if any).
      */
-    ThermalModel * getThermalModel() const { return thermalModel; }
+    ThermalModel *getThermalModel() const { return thermalModel; }
 
   protected:
-
     KvmVM *kvmVM = nullptr;
 
     memory::PhysicalMemory physmem;
@@ -418,16 +404,15 @@ class System : public SimObject, public PCEventScope
      */
     std::vector<RequestorInfo> requestors;
 
-    ThermalModel * thermalModel;
+    ThermalModel *thermalModel;
 
   protected:
     /**
      * Strips off the system name from a requestor name
      */
-    std::string stripSystemName(const std::string& requestor_name) const;
+    std::string stripSystemName(const std::string &requestor_name) const;
 
   public:
-
     /**
      * Request an id used to create a request object in the system. All objects
      * that intend to issues requests into the memory system must request an id
@@ -461,8 +446,8 @@ class System : public SimObject, public PCEventScope
      * @param subrequestor String containing the subrequestor's name
      * @return the requestor's ID.
      */
-    RequestorID getRequestorId(const SimObject* requestor,
-                         std::string subrequestor={});
+    RequestorID getRequestorId(const SimObject *requestor,
+                               std::string subrequestor = {});
 
     /**
      * Registers a GLOBAL RequestorID, which is a RequestorID not related
@@ -472,7 +457,7 @@ class System : public SimObject, public PCEventScope
      * @param requestorName full name of the requestor
      * @return the requestor's ID.
      */
-    RequestorID getGlobalRequestorId(const std::string& requestor_name);
+    RequestorID getGlobalRequestorId(const std::string &requestor_name);
 
     /**
      * Get the name of an object for a given request id.
@@ -483,66 +468,56 @@ class System : public SimObject, public PCEventScope
      * Looks up the RequestorID for a given SimObject
      * returns an invalid RequestorID (invldRequestorId) if not found.
      */
-    RequestorID lookupRequestorId(const SimObject* obj) const;
+    RequestorID lookupRequestorId(const SimObject *obj) const;
 
     /**
      * Looks up the RequestorID for a given object name string
      * returns an invalid RequestorID (invldRequestorId) if not found.
      */
-    RequestorID lookupRequestorId(const std::string& name) const;
+    RequestorID lookupRequestorId(const std::string &name) const;
 
     /** Get the number of requestors registered in the system */
     RequestorID maxRequestors() { return requestors.size(); }
 
   protected:
     /** helper function for getRequestorId */
-    RequestorID _getRequestorId(const SimObject* requestor,
-                          const std::string& requestor_name);
+    RequestorID _getRequestorId(const SimObject *requestor,
+                                const std::string &requestor_name);
 
     /**
      * Helper function for constructing the full (sub)requestor name
      * by providing the root requestor and the relative subrequestor name.
      */
-    std::string leafRequestorName(const SimObject* requestor,
-                               const std::string& subrequestor);
+    std::string leafRequestorName(const SimObject *requestor,
+                                  const std::string &subrequestor);
 
   public:
-
     void regStats() override;
+
     /**
      * Called by pseudo_inst to track the number of work items started by this
      * system.
      */
-    uint64_t
-    incWorkItemsBegin()
-    {
-        return ++workItemsBegin;
-    }
+    uint64_t incWorkItemsBegin() { return ++workItemsBegin; }
 
     /**
      * Called by pseudo_inst to track the number of work items completed by
      * this system.
      */
-    uint64_t
-    incWorkItemsEnd()
-    {
-        return ++workItemsEnd;
-    }
+    uint64_t incWorkItemsEnd() { return ++workItemsEnd; }
 
     /**
      * Called by pseudo_inst to mark the cpus actively executing work items.
      * Returns the total number of cpus that have executed work item begin or
      * ends.
      */
-    int
-    markWorkItem(int index)
+    int markWorkItem(int index)
     {
         threads.markActive(index);
         return threads.numActive();
     }
 
-    void
-    workItemBegin(uint32_t tid, uint32_t workid)
+    void workItemBegin(uint32_t tid, uint32_t workid)
     {
         std::pair<uint32_t, uint32_t> p(tid, workid);
         lastWorkItemStarted[p] = curTick();
@@ -573,7 +548,6 @@ class System : public SimObject, public PCEventScope
     const AddrRange &m5opRange() const { return _m5opRange; }
 
   public:
-
     void registerThreadContext(ThreadContext *tc);
     void replaceThreadContext(ThreadContext *tc, ContextID context_id);
 
@@ -581,8 +555,8 @@ class System : public SimObject, public PCEventScope
     void unserialize(CheckpointIn &cp) override;
 
   public:
-    std::map<std::pair<uint32_t, uint32_t>, Tick>  lastWorkItemStarted;
-    std::map<uint32_t, statistics::Histogram*> workItemStats;
+    std::map<std::pair<uint32_t, uint32_t>, Tick> lastWorkItemStarted;
+    std::map<uint32_t, statistics::Histogram *> workItemStats;
 
     ////////////////////////////////////////////
     //
@@ -609,7 +583,7 @@ class System : public SimObject, public PCEventScope
     // Used by syscall-emulation mode. This member contains paths which need
     // to be redirected to the faux-filesystem (a duplicate filesystem
     // intended to replace certain files on the host filesystem).
-    std::vector<RedirectPath*> redirectPaths;
+    std::vector<RedirectPath *> redirectPaths;
 };
 
 void printSystems();

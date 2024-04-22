@@ -45,7 +45,9 @@ namespace replacement_policy
  * The replacement data needed by replacement policies. Each replacement policy
  * should have its own implementation of replacement data.
  */
-struct ReplacementData {};
+struct ReplacementData
+{
+};
 
 } // namespace replacement_policy
 
@@ -88,8 +90,7 @@ class ReplaceableEntry
      * @param set The set of this entry.
      * @param way The way of this entry.
      */
-    virtual void
-    setPosition(const uint32_t set, const uint32_t way)
+    virtual void setPosition(const uint32_t set, const uint32_t way)
     {
         _set = set;
         _way = way;
@@ -114,8 +115,7 @@ class ReplaceableEntry
      *
      * @return A string containg the contents of this entry.
      */
-    virtual std::string
-    print() const
+    virtual std::string print() const
     {
         return csprintf("set: %#x way: %#x", getSet(), getWay());
     }

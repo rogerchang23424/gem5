@@ -60,9 +60,7 @@ class Checkpoint;
 
 class Random : public Serializable
 {
-
   public:
-
     /**
      * @ingroup api_base_utils
      */
@@ -86,8 +84,7 @@ class Random : public Serializable
      * @ingroup api_base_utils
      */
     template <typename T>
-    typename std::enable_if_t<std::is_integral_v<T>, T>
-    random()
+    typename std::enable_if_t<std::is_integral_v<T>, T> random()
     {
         // [0, max_value] for integer types
         std::uniform_int_distribution<T> dist;
@@ -98,19 +95,18 @@ class Random : public Serializable
      * @ingroup api_base_utils
      */
     template <typename T>
-    typename std::enable_if_t<std::is_floating_point_v<T>, T>
-    random()
+    typename std::enable_if_t<std::is_floating_point_v<T>, T> random()
     {
         // [0, 1) for real types
         std::uniform_real_distribution<T> dist;
         return dist(gen);
     }
+
     /**
      * @ingroup api_base_utils
      */
     template <typename T>
-    typename std::enable_if_t<std::is_integral_v<T>, T>
-    random(T min, T max)
+    typename std::enable_if_t<std::is_integral_v<T>, T> random(T min, T max)
     {
         std::uniform_int_distribution<T> dist(min, max);
         return dist(gen);

@@ -42,7 +42,6 @@ namespace X86ISAInst
 class MicrocodeRom
 {
   protected:
-
     typedef StaticInstPtr (*GenFunc)(StaticInstPtr);
 
     static const MicroPC numMicroops;
@@ -50,17 +49,13 @@ class MicrocodeRom
     GenFunc *genFuncs;
 
   public:
-    //Constructor.
+    // Constructor.
     MicrocodeRom();
 
-    //Destructor.
-    ~MicrocodeRom()
-    {
-        delete [] genFuncs;
-    }
+    // Destructor.
+    ~MicrocodeRom() { delete[] genFuncs; }
 
-    StaticInstPtr
-    fetchMicroop(MicroPC microPC, StaticInstPtr curMacroop)
+    StaticInstPtr fetchMicroop(MicroPC microPC, StaticInstPtr curMacroop)
     {
         microPC = normalMicroPC(microPC);
         if (microPC >= numMicroops)

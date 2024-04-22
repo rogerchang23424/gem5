@@ -69,6 +69,7 @@ class IrregularStreamBuffer : public Queued
         Addr lastAddress;
         bool lastAddressSecure;
     };
+
     /** Map of PCs to Training unit entries */
     AssociativeSet<TrainingUnitEntry> trainingUnit;
 
@@ -77,8 +78,8 @@ class IrregularStreamBuffer : public Queued
     {
         Addr address;
         SatCounter8 counter;
-        AddressMapping(unsigned bits) : address(0), counter(bits)
-        {}
+
+        AddressMapping(unsigned bits) : address(0), counter(bits) {}
     };
 
     /**
@@ -88,13 +89,12 @@ class IrregularStreamBuffer : public Queued
     struct AddressMappingEntry : public TaggedEntry
     {
         std::vector<AddressMapping> mappings;
-        AddressMappingEntry(size_t num_mappings, unsigned counter_bits)
-          : TaggedEntry(), mappings(num_mappings, counter_bits)
-        {
-        }
 
-        void
-        invalidate() override
+        AddressMappingEntry(size_t num_mappings, unsigned counter_bits)
+            : TaggedEntry(), mappings(num_mappings, counter_bits)
+        {}
+
+        void invalidate() override
         {
             TaggedEntry::invalidate();
             for (auto &entry : mappings) {
@@ -131,7 +131,8 @@ class IrregularStreamBuffer : public Queued
      * @param is_secure whether this page is inside the secure memory area
      * @result reference to the entry
      */
-    AddressMapping& getPSMapping(Addr paddr, bool is_secure);
+    AddressMapping &getPSMapping(Addr paddr, bool is_secure);
+
   public:
     IrregularStreamBuffer(const IrregularStreamBufferPrefetcherParams &p);
     ~IrregularStreamBuffer() = default;
@@ -144,4 +145,4 @@ class IrregularStreamBuffer : public Queued
 } // namespace prefetch
 } // namespace gem5
 
-#endif//__MEM_CACHE_PREFETCH_IRREGULAR_STREAM_BUFFER_HH__
+#endif //__MEM_CACHE_PREFETCH_IRREGULAR_STREAM_BUFFER_HH__

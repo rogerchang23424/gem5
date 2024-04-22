@@ -79,7 +79,7 @@ class Device : public SimObject
      * @return true if there is data pending that can be read using
      * the readData() method.
      */
-    bool hostDataAvailable() const  { return !outBuffer.empty(); }
+    bool hostDataAvailable() const { return !outBuffer.empty(); }
 
     /**
      * Read a character from the device.
@@ -119,7 +119,9 @@ class Device : public SimObject
      * @param size Size of the data array
      */
     void send(const uint8_t *data, size_t size);
-    void send(const std::vector<uint8_t> &data) {
+
+    void send(const std::vector<uint8_t> &data)
+    {
         send(data.data(), data.size());
     }
 

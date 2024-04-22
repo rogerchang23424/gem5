@@ -59,6 +59,7 @@ class Args
         for (int i = 0; i < argc; i++)
             args.push_back(argv[i]);
     }
+
     Args(std::initializer_list<std::string> strings) : args(strings) {}
 
     /*
@@ -66,8 +67,7 @@ class Args
      *
      * Return whether that succeeded.
      */
-    static bool
-    stoi(const std::string &str, uint64_t &val)
+    static bool stoi(const std::string &str, uint64_t &val)
     {
         try {
             val = std::stoi(str, nullptr, 0);
@@ -84,8 +84,7 @@ class Args
      *
      * Return whether that suceeded. If not, val will be set to def.
      */
-    static bool
-    stoi(const std::string &str, uint64_t &val, uint64_t def)
+    static bool stoi(const std::string &str, uint64_t &val, uint64_t def)
     {
         val = def;
         return stoi(str, val);
@@ -103,8 +102,7 @@ class Args
      * If there are any arguments in the list, remove and return the first
      * one. If not, return def instead.
      */
-    const std::string &
-    pop(const std::string &def = "")
+    const std::string &pop(const std::string &def = "")
     {
         if (!size())
             return def;
@@ -117,8 +115,7 @@ class Args
      *
      * Return whether that succeeded.
      */
-    bool
-    pop(uint64_t &val)
+    bool pop(uint64_t &val)
     {
         if (!size() || !stoi(args[offset], val)) {
             return false;
@@ -136,8 +133,7 @@ class Args
      * Return true if there were no arguments, or there were and the conversion
      * succeeded.
      */
-    bool
-    pop(uint64_t &val, uint64_t def)
+    bool pop(uint64_t &val, uint64_t def)
     {
         val = def;
         if (!size())
@@ -156,8 +152,7 @@ class Args
      *
      * Return whether that succeeded.
      */
-    bool
-    pop(uint64_t regs[], int num_regs)
+    bool pop(uint64_t regs[], int num_regs)
     {
         if (!size() || !pack(args[offset], regs, num_regs)) {
             return false;
@@ -169,7 +164,7 @@ class Args
 
     size_t size() { return args.size() - offset; }
 
-    const std::string &operator [] (size_t idx) { return args[offset + idx]; }
+    const std::string &operator[](size_t idx) { return args[offset + idx]; }
 };
 
 #endif // __ARGS_HH__

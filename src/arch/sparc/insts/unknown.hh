@@ -43,25 +43,22 @@ namespace SparcISA
 class Unknown : public SparcStaticInst
 {
   public:
-
     // Constructor
-    Unknown(ExtMachInst _machInst) :
-            SparcStaticInst("unknown", _machInst, No_OpClass)
+    Unknown(ExtMachInst _machInst)
+        : SparcStaticInst("unknown", _machInst, No_OpClass)
     {}
 
-    Fault
-    execute(ExecContext *, trace::InstRecord *) const override
+    Fault execute(ExecContext *, trace::InstRecord *) const override
     {
         return std::make_shared<IllegalInstruction>();
     }
 
     std::string
-    generateDisassembly(
-            Addr pc, const loader::SymbolTable *symtab) const override
+    generateDisassembly(Addr pc,
+                        const loader::SymbolTable *symtab) const override
     {
         return "Unknown instruction";
     }
-
 };
 
 } // namespace SparcISA

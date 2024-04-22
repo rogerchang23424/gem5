@@ -40,8 +40,7 @@ namespace SparcISA
 class StackTrace : public BaseStackTrace
 {
   protected:
-    void
-    trace(ThreadContext *tc, bool is_call) override
+    void trace(ThreadContext *tc, bool is_call) override
     {
         panic("StackTrace::trace not implemented for SPARC.");
     }

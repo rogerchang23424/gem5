@@ -58,7 +58,6 @@ class ClockedObject;
 class PowerModelState : public SimObject
 {
   public:
-
     typedef PowerModelStateParams Params;
     PowerModelState(const Params &p);
 
@@ -83,17 +82,14 @@ class PowerModelState : public SimObject
      */
     virtual void setTemperature(Temperature temp) { _temp = temp; }
 
-    void setClockedObject(ClockedObject * clkobj) {
-        clocked_object = clkobj;
-    }
+    void setClockedObject(ClockedObject *clkobj) { clocked_object = clkobj; }
 
   protected:
-
     /** Current temperature */
     Temperature _temp;
 
     /** The clocked object we belong to */
-    ClockedObject * clocked_object;
+    ClockedObject *clocked_object;
 
     statistics::Value dynamicPower, staticPower;
 };
@@ -107,7 +103,6 @@ class PowerModelState : public SimObject
 class PowerModel : public SimObject
 {
   public:
-
     typedef PowerModelParams Params;
     PowerModel(const Params &p);
 
@@ -137,8 +132,9 @@ class PowerModel : public SimObject
     {
       public:
         ThermalProbeListener(PowerModel &_pm, ProbeManager *pm,
-                      const std::string &name)
-            : ProbeListenerArgBase(pm, name), pm(_pm) {}
+                             const std::string &name)
+            : ProbeListenerArgBase(pm, name), pm(_pm)
+        {}
 
         void notify(const Temperature &temp)
         {
@@ -150,16 +146,16 @@ class PowerModel : public SimObject
     };
 
     /** Actual power models (one per power state) */
-    std::vector<PowerModelState*> states_pm;
+    std::vector<PowerModelState *> states_pm;
 
     /** Listener to catch temperature changes in the SubSystem */
     std::unique_ptr<ThermalProbeListener> thermalListener;
 
     /** The subsystem this power model belongs to */
-    SubSystem * subsystem;
+    SubSystem *subsystem;
 
     /** The clocked object we belong to */
-    ClockedObject * clocked_object;
+    ClockedObject *clocked_object;
 
     /** The type of power model - collects all power, static or dynamic only */
     enums::PMType power_model_type;

@@ -66,14 +66,14 @@ class DebugPrintk : public Base
 {
   public:
     using Base::Base;
-    void
-    process(ThreadContext *tc) override
+
+    void process(ThreadContext *tc) override
     {
         if (debug::DebugPrintf) {
             std::string str;
             std::function<int(ThreadContext *, Addr, PrintkVarArgs)> func =
                 [&str](ThreadContext *tc, Addr format_ptr,
-                    PrintkVarArgs args) -> int {
+                       PrintkVarArgs args) -> int {
                 return printk(str, tc, format_ptr, args);
             };
             invokeSimcall<ABI>(tc, func);
@@ -100,10 +100,9 @@ class PanicOrOopsEvent : public PCEvent
     PanicOrOopsEvent(PCEventScope *s, const std::string &desc, Addr addr,
                      const std::string &_fname,
                      const KernelPanicOopsBehaviour _behaviour)
-        : PCEvent(s, desc, addr)
-        , fname(_fname)
-        , behaviour(_behaviour)
+        : PCEvent(s, desc, addr), fname(_fname), behaviour(_behaviour)
     {}
+
     void process(ThreadContext *tc) override;
 };
 
@@ -136,19 +135,18 @@ class SkipUDelay : public Base
 
   public:
     SkipUDelay(PCEventScope *s, const std::string &desc, Addr addr,
-            uint64_t mult, uint64_t div) :
-        Base(s, desc, addr), argDivToNs(div), argMultToNs(mult)
+               uint64_t mult, uint64_t div)
+        : Base(s, desc, addr), argDivToNs(div), argMultToNs(mult)
     {}
 
-    void
-    process(ThreadContext *tc) override
+    void process(ThreadContext *tc) override
     {
         // Use Addr since it's handled specially and will act as a natively
         // sized data type.
         std::function<void(ThreadContext *, Addr)> call_udelay =
             [this](ThreadContext *tc, Addr time) {
-            onUDelay(tc, argDivToNs, argMultToNs, time);
-        };
+                onUDelay(tc, argDivToNs, argMultToNs, time);
+            };
         invokeSimcall<ABI>(tc, call_udelay);
         Base::process(tc);
     }

@@ -70,13 +70,19 @@ class PCState : public GenericISA::UPCState<4>
     uint32_t _vl = 0;
 
   public:
-    PCState(const PCState &other) : Base(other),
-        _rvType(other._rvType), _vlenb(other._vlenb),
-        _vtype(other._vtype), _vl(other._vl)
+    PCState(const PCState &other)
+        : Base(other),
+          _rvType(other._rvType),
+          _vlenb(other._vlenb),
+          _vtype(other._vtype),
+          _vl(other._vl)
     {}
+
     PCState &operator=(const PCState &other) = default;
     PCState() = default;
+
     explicit PCState(Addr addr) { set(addr); }
+
     explicit PCState(Addr addr, RiscvType rvType, uint64_t vlenb)
     {
         set(addr);
@@ -86,8 +92,7 @@ class PCState : public GenericISA::UPCState<4>
 
     PCStateBase *clone() const override { return new PCState(*this); }
 
-    void
-    update(const PCStateBase &other) override
+    void update(const PCStateBase &other) override
     {
         Base::update(other);
         auto &pcstate = other.as<PCState>();
@@ -99,40 +104,40 @@ class PCState : public GenericISA::UPCState<4>
     }
 
     void compressed(bool c) { _compressed = c; }
+
     bool compressed() const { return _compressed; }
 
     void rvType(RiscvType rvType) { _rvType = rvType; }
+
     RiscvType rvType() const { return _rvType; }
 
     void vlenb(uint64_t v) { _vlenb = v; }
+
     uint64_t vlenb() const { return _vlenb; }
 
     void vtype(VTYPE v) { _vtype = v; }
+
     VTYPE vtype() const { return _vtype; }
 
     void vl(uint32_t v) { _vl = v; }
+
     uint32_t vl() const { return _vl; }
 
     uint64_t size() const { return _compressed ? 2 : 4; }
 
-    bool
-    branching() const override
+    bool branching() const override
     {
         return npc() != pc() + size() || nupc() != upc() + 1;
     }
 
-    bool
-    equals(const PCStateBase &other) const override
+    bool equals(const PCStateBase &other) const override
     {
         auto &opc = other.as<PCState>();
-        return Base::equals(other) &&
-            _vlenb == opc._vlenb &&
-            _vtype == opc._vtype &&
-            _vl == opc._vl;
+        return Base::equals(other) && _vlenb == opc._vlenb &&
+               _vtype == opc._vtype && _vl == opc._vl;
     }
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         Base::serialize(cp);
         SERIALIZE_SCALAR(_rvType);
@@ -142,8 +147,7 @@ class PCState : public GenericISA::UPCState<4>
         SERIALIZE_SCALAR(_compressed);
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         Base::unserialize(cp);
         UNSERIALIZE_SCALAR(_rvType);

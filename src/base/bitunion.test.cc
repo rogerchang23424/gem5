@@ -36,7 +36,8 @@
 
 using namespace gem5;
 
-namespace {
+namespace
+{
 
 BitUnion64(SixtyFour)
     Bitfield<39, 32> byte5;
@@ -78,8 +79,7 @@ class SplitField
         Bitfield<3, 0> low;
     EndBitUnion(Out)
   public:
-    uint64_t
-    getter(const uint64_t &storage) const
+    uint64_t getter(const uint64_t &storage) const
     {
         Out out = 0;
         In in = storage;
@@ -88,8 +88,7 @@ class SplitField
         return out;
     }
 
-    void
-    setter(uint64_t &storage, uint64_t val)
+    void setter(uint64_t &storage, uint64_t val)
     {
         Out out = val;
         In in = 0;
@@ -139,14 +138,20 @@ class BitUnionData : public testing::Test
     SixtyFour sixtyFour;
     Split split;
 
-    void SetUp() override { sixtyFour = 0; split = 0; }
+    void SetUp() override
+    {
+        sixtyFour = 0;
+        split = 0;
+    }
 
     template <typename T>
-    uint64_t templatedFunction(T) { return 0; }
+    uint64_t templatedFunction(T)
+    {
+        return 0;
+    }
 
     template <typename T>
-    uint64_t
-    templatedFunction(BitUnionType<T> u)
+    uint64_t templatedFunction(BitUnionType<T> u)
     {
         BitUnionBaseType<T> b = u;
         return b;
@@ -258,16 +263,18 @@ TEST_F(BitUnionData, Templating)
     EXPECT_EQ(templatedFunction((uint64_t)sixtyFour), 0);
 
     BitUnion(uint64_t, Dummy64)
-    EndBitUnion(Dummy64);
+EndBitUnion
+(Dummy64);
 
-    BitUnion(uint32_t, Dummy32)
-    EndBitUnion(Dummy32);
+BitUnion(uint32_t, Dummy32)
+EndBitUnion
+(Dummy32);
 
-    bool is64;
-    is64 = std::is_same_v<BitUnionBaseType<Dummy64>, uint64_t>;
-    EXPECT_TRUE(is64);
-    is64 = std::is_same_v<BitUnionBaseType<Dummy32>, uint64_t>;
-    EXPECT_FALSE(is64);
+bool is64;
+is64 = std::is_same_v<BitUnionBaseType<Dummy64>, uint64_t>;
+EXPECT_TRUE(is64);
+is64 = std::is_same_v<BitUnionBaseType<Dummy32>, uint64_t>;
+EXPECT_FALSE(is64);
 }
 
 TEST_F(BitUnionData, Output)

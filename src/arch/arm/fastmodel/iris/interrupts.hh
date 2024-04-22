@@ -46,7 +46,9 @@ class Interrupts : public BaseInterrupts
     Interrupts(const Params &p) : BaseInterrupts(p) {}
 
     bool checkInterrupts() const override { return false; }
+
     Fault getInterrupt() override { return NoFault; }
+
     void updateIntrInfo() override {}
 
     void clearAll() override {}

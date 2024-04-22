@@ -99,9 +99,7 @@ class FUPool : public SimObject
     {
       public:
         /** Constructs a circular queue of FU indices. */
-        FUIdxQueue()
-            : idx(0), size(0)
-        { }
+        FUIdxQueue() : idx(0), size(0) {}
 
         /** Adds a FU to the queue. */
         inline void addFU(int fu_idx);
@@ -166,20 +164,19 @@ class FUPool : public SimObject
     void dump();
 
     /** Returns the operation execution latency of the given capability. */
-    Cycles getOpLatency(OpClass capability) {
+    Cycles getOpLatency(OpClass capability)
+    {
         return maxOpLatencies[capability];
     }
 
     /** Returns the issue latency of the given capability. */
-    bool isPipelined(OpClass capability) {
-        return pipelined[capability];
-    }
+    bool isPipelined(OpClass capability) { return pipelined[capability]; }
 
     /** Have all the FUs drained? */
     bool isDrained() const;
 
     /** Takes over from another CPU's thread. */
-    void takeOverFrom() {};
+    void takeOverFrom(){};
 };
 
 } // namespace o3

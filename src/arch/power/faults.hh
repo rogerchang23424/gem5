@@ -43,67 +43,45 @@ class PowerFault : public FaultBase
   protected:
     FaultName _name;
 
-    PowerFault(FaultName name)
-        : _name(name)
-    {
-    }
+    PowerFault(FaultName name) : _name(name) {}
 
-    FaultName
-    name() const
-    {
-        return _name;
-    }
+    FaultName name() const { return _name; }
 };
-
 
 class UnimplementedOpcodeFault : public PowerFault
 {
   public:
-    UnimplementedOpcodeFault()
-        : PowerFault("Unimplemented Opcode")
-    {
-    }
+    UnimplementedOpcodeFault() : PowerFault("Unimplemented Opcode") {}
 
-    void invoke(ThreadContext *tc, const StaticInstPtr &inst =
-                nullStaticInstPtr) override;
+    void invoke(ThreadContext *tc,
+                const StaticInstPtr &inst = nullStaticInstPtr) override;
 };
-
 
 class MachineCheckFault : public PowerFault
 {
   public:
-    MachineCheckFault()
-        : PowerFault("Machine Check")
-    {
-    }
+    MachineCheckFault() : PowerFault("Machine Check") {}
 };
-
 
 class AlignmentFault : public PowerFault
 {
   private:
     Addr vaddr;
+
   public:
-    AlignmentFault(Addr va)
-        : PowerFault("Alignment"), vaddr(va)
-    {
-    }
+    AlignmentFault(Addr va) : PowerFault("Alignment"), vaddr(va) {}
 
-    void invoke(ThreadContext *tc, const StaticInstPtr &inst =
-                nullStaticInstPtr) override;
+    void invoke(ThreadContext *tc,
+                const StaticInstPtr &inst = nullStaticInstPtr) override;
 };
-
 
 class TrapFault : public PowerFault
 {
   public:
-    TrapFault()
-        : PowerFault("Trap")
-    {
-    }
+    TrapFault() : PowerFault("Trap") {}
 
-    void invoke(ThreadContext *tc, const StaticInstPtr &inst =
-                nullStaticInstPtr) override;
+    void invoke(ThreadContext *tc,
+                const StaticInstPtr &inst = nullStaticInstPtr) override;
 };
 
 } // namespace PowerISA

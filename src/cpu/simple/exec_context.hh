@@ -59,7 +59,7 @@ class SimpleExecContext : public ExecContext
 {
   public:
     BaseSimpleCPU *cpu;
-    SimpleThread* thread;
+    SimpleThread *thread;
 
     // This is the offset from the current pc that fetch should be performed
     Addr fetchOffset;
@@ -83,9 +83,9 @@ class SimpleExecContext : public ExecContext
     struct ExecContextStats : public statistics::Group
     {
         ExecContextStats(BaseSimpleCPU *cpu, SimpleThread *thread)
-            : statistics::Group(cpu,
-                           csprintf("exec_context.thread_%i",
-                                    thread->threadId()).c_str()),
+            : statistics::Group(
+                  cpu, csprintf("exec_context.thread_%i", thread->threadId())
+                           .c_str()),
               ADD_STAT(numMatAluAccesses, statistics::units::Count::get(),
                        "Number of matrix alu accesses"),
               ADD_STAT(numCallsReturns, statistics::units::Count::get(),
@@ -128,11 +128,9 @@ class SimpleExecContext : public ExecContext
             numIdleCycles = idleFraction * cpu->baseStats.numCycles;
             numBusyCycles = notIdleFraction * cpu->baseStats.numCycles;
 
-            numPredictedBranches
-                .prereq(numPredictedBranches);
+            numPredictedBranches.prereq(numPredictedBranches);
 
-            numBranchMispred
-                .prereq(numBranchMispred);
+            numBranchMispred.prereq(numBranchMispred);
         }
 
         // Number of matrix alu accesses
@@ -172,14 +170,20 @@ class SimpleExecContext : public ExecContext
 
   public:
     /** Constructor */
-    SimpleExecContext(BaseSimpleCPU* _cpu, SimpleThread* _thread)
-        : cpu(_cpu), thread(_thread), fetchOffset(0), stayAtPC(false),
-        numInst(0), numOp(0), numLoad(0), lastIcacheStall(0),
-        lastDcacheStall(0), execContextStats(cpu, thread)
-    { }
+    SimpleExecContext(BaseSimpleCPU *_cpu, SimpleThread *_thread)
+        : cpu(_cpu),
+          thread(_thread),
+          fetchOffset(0),
+          stayAtPC(false),
+          numInst(0),
+          numOp(0),
+          numLoad(0),
+          lastIcacheStall(0),
+          lastDcacheStall(0),
+          execContextStats(cpu, thread)
+    {}
 
-    RegVal
-    getRegOperand(const StaticInst *si, int idx) override
+    RegVal getRegOperand(const StaticInst *si, int idx) override
     {
         const RegId &reg = si->srcRegIdx(idx);
         if (reg.is(InvalidRegClass))
@@ -188,24 +192,21 @@ class SimpleExecContext : public ExecContext
         return thread->getReg(reg);
     }
 
-    void
-    getRegOperand(const StaticInst *si, int idx, void *val) override
+    void getRegOperand(const StaticInst *si, int idx, void *val) override
     {
         const RegId &reg = si->srcRegIdx(idx);
         (*execContextStats.numRegReads[reg.classValue()])++;
         thread->getReg(reg, val);
     }
 
-    void *
-    getWritableRegOperand(const StaticInst *si, int idx) override
+    void *getWritableRegOperand(const StaticInst *si, int idx) override
     {
         const RegId &reg = si->destRegIdx(idx);
         (*execContextStats.numRegWrites[reg.classValue()])++;
         return thread->getWritableReg(reg);
     }
 
-    void
-    setRegOperand(const StaticInst *si, int idx, RegVal val) override
+    void setRegOperand(const StaticInst *si, int idx, RegVal val) override
     {
         const RegId &reg = si->destRegIdx(idx);
         if (reg.is(InvalidRegClass))
@@ -214,28 +215,25 @@ class SimpleExecContext : public ExecContext
         thread->setReg(reg, val);
     }
 
-    void
-    setRegOperand(const StaticInst *si, int idx, const void *val) override
+    void setRegOperand(const StaticInst *si, int idx, const void *val) override
     {
         const RegId &reg = si->destRegIdx(idx);
         (*execContextStats.numRegWrites[reg.classValue()])++;
         thread->setReg(reg, val);
     }
 
-    RegVal
-    readMiscRegOperand(const StaticInst *si, int idx) override
+    RegVal readMiscRegOperand(const StaticInst *si, int idx) override
     {
         cpu->executeStats[thread->threadId()]->numMiscRegReads++;
-        const RegId& reg = si->srcRegIdx(idx);
+        const RegId &reg = si->srcRegIdx(idx);
         assert(reg.is(MiscRegClass));
         return thread->readMiscReg(reg.index());
     }
 
-    void
-    setMiscRegOperand(const StaticInst *si, int idx, RegVal val) override
+    void setMiscRegOperand(const StaticInst *si, int idx, RegVal val) override
     {
         cpu->executeStats[thread->threadId()]->numMiscRegWrites++;
-        const RegId& reg = si->destRegIdx(idx);
+        const RegId &reg = si->destRegIdx(idx);
         assert(reg.is(MiscRegClass));
         thread->setMiscReg(reg.index(), val);
     }
@@ -244,8 +242,7 @@ class SimpleExecContext : public ExecContext
      * Reads a miscellaneous register, handling any architectural
      * side effects due to reading that register.
      */
-    RegVal
-    readMiscReg(int misc_reg) override
+    RegVal readMiscReg(int misc_reg) override
     {
         cpu->executeStats[thread->threadId()]->numMiscRegReads++;
         return thread->readMiscReg(misc_reg);
@@ -255,73 +252,52 @@ class SimpleExecContext : public ExecContext
      * Sets a miscellaneous register, handling any architectural
      * side effects due to writing that register.
      */
-    void
-    setMiscReg(int misc_reg, RegVal val) override
+    void setMiscReg(int misc_reg, RegVal val) override
     {
         cpu->executeStats[thread->threadId()]->numMiscRegWrites++;
         thread->setMiscReg(misc_reg, val);
     }
 
-    const PCStateBase &
-    pcState() const override
-    {
-        return thread->pcState();
-    }
+    const PCStateBase &pcState() const override { return thread->pcState(); }
 
-    void
-    pcState(const PCStateBase &val) override
-    {
-        thread->pcState(val);
-    }
+    void pcState(const PCStateBase &val) override { thread->pcState(val); }
 
-    Fault
-    readMem(Addr addr, uint8_t *data, unsigned int size,
-            Request::Flags flags,
-            const std::vector<bool>& byte_enable)
-        override
+    Fault readMem(Addr addr, uint8_t *data, unsigned int size,
+                  Request::Flags flags,
+                  const std::vector<bool> &byte_enable) override
     {
         assert(byte_enable.size() == size);
         return cpu->readMem(addr, data, size, flags, byte_enable);
     }
 
-    Fault
-    initiateMemRead(Addr addr, unsigned int size,
-                    Request::Flags flags,
-                    const std::vector<bool>& byte_enable)
-        override
+    Fault initiateMemRead(Addr addr, unsigned int size, Request::Flags flags,
+                          const std::vector<bool> &byte_enable) override
     {
         assert(byte_enable.size() == size);
         return cpu->initiateMemRead(addr, size, flags, byte_enable);
     }
 
-    Fault
-    writeMem(uint8_t *data, unsigned int size, Addr addr,
-             Request::Flags flags, uint64_t *res,
-             const std::vector<bool>& byte_enable)
-        override
+    Fault writeMem(uint8_t *data, unsigned int size, Addr addr,
+                   Request::Flags flags, uint64_t *res,
+                   const std::vector<bool> &byte_enable) override
     {
         assert(byte_enable.size() == size);
-        return cpu->writeMem(data, size, addr, flags, res,
-            byte_enable);
+        return cpu->writeMem(data, size, addr, flags, res, byte_enable);
     }
 
-    Fault
-    amoMem(Addr addr, uint8_t *data, unsigned int size,
-           Request::Flags flags, AtomicOpFunctorPtr amo_op) override
+    Fault amoMem(Addr addr, uint8_t *data, unsigned int size,
+                 Request::Flags flags, AtomicOpFunctorPtr amo_op) override
     {
         return cpu->amoMem(addr, data, size, flags, std::move(amo_op));
     }
 
-    Fault
-    initiateMemAMO(Addr addr, unsigned int size,
-                   Request::Flags flags,
-                   AtomicOpFunctorPtr amo_op) override
+    Fault initiateMemAMO(Addr addr, unsigned int size, Request::Flags flags,
+                         AtomicOpFunctorPtr amo_op) override
     {
         return cpu->initiateMemAMO(addr, size, flags, std::move(amo_op));
     }
 
-    Fault
-    initiateMemMgmtCmd(Request::Flags flags) override
+    Fault initiateMemMgmtCmd(Request::Flags flags) override
     {
         return cpu->initiateMemMgmtCmd(flags);
     }
@@ -329,8 +305,7 @@ class SimpleExecContext : public ExecContext
     /**
      * Sets the number of consecutive store conditional failures.
      */
-    void
-    setStCondFailures(unsigned int sc_failures) override
+    void setStCondFailures(unsigned int sc_failures) override
     {
         thread->setStCondFailures(sc_failures);
     }
@@ -338,8 +313,7 @@ class SimpleExecContext : public ExecContext
     /**
      * Returns the number of consecutive store conditional failures.
      */
-    unsigned int
-    readStCondFailures() const override
+    unsigned int readStCondFailures() const override
     {
         return thread->readStCondFailures();
     }
@@ -347,14 +321,9 @@ class SimpleExecContext : public ExecContext
     /** Returns a pointer to the ThreadContext. */
     ThreadContext *tcBase() const override { return thread->getTC(); }
 
-    bool
-    readPredicate() const override
-    {
-        return thread->readPredicate();
-    }
+    bool readPredicate() const override { return thread->readPredicate(); }
 
-    void
-    setPredicate(bool val) override
+    void setPredicate(bool val) override
     {
         thread->setPredicate(val);
 
@@ -363,38 +332,32 @@ class SimpleExecContext : public ExecContext
         }
     }
 
-    bool
-    readMemAccPredicate() const override
+    bool readMemAccPredicate() const override
     {
         return thread->readMemAccPredicate();
     }
 
-    void
-    setMemAccPredicate(bool val) override
+    void setMemAccPredicate(bool val) override
     {
         thread->setMemAccPredicate(val);
     }
 
-    uint64_t
-    getHtmTransactionUid() const override
+    uint64_t getHtmTransactionUid() const override
     {
         return tcBase()->getHtmCheckpointPtr()->getHtmUid();
     }
 
-    uint64_t
-    newHtmTransactionUid() const override
+    uint64_t newHtmTransactionUid() const override
     {
         return tcBase()->getHtmCheckpointPtr()->newHtmUid();
     }
 
-    bool
-    inHtmTransactionalState() const override
+    bool inHtmTransactionalState() const override
     {
         return (getHtmTransactionalDepth() > 0);
     }
 
-    uint64_t
-    getHtmTransactionalDepth() const override
+    uint64_t getHtmTransactionalDepth() const override
     {
         assert(thread->htmTransactionStarts >= thread->htmTransactionStops);
         return (thread->htmTransactionStarts - thread->htmTransactionStops);
@@ -403,32 +366,27 @@ class SimpleExecContext : public ExecContext
     /**
      * Invalidate a page in the DTLB <i>and</i> ITLB.
      */
-    void
-    demapPage(Addr vaddr, uint64_t asn) override
+    void demapPage(Addr vaddr, uint64_t asn) override
     {
         thread->demapPage(vaddr, asn);
     }
 
-    void
-    armMonitor(Addr address) override
+    void armMonitor(Addr address) override
     {
         cpu->armMonitor(thread->threadId(), address);
     }
 
-    bool
-    mwait(PacketPtr pkt) override
+    bool mwait(PacketPtr pkt) override
     {
         return cpu->mwait(thread->threadId(), pkt);
     }
 
-    void
-    mwaitAtomic(ThreadContext *tc) override
+    void mwaitAtomic(ThreadContext *tc) override
     {
         cpu->mwaitAtomic(thread->threadId(), tc, thread->mmu);
     }
 
-    AddressMonitor *
-    getAddrMonitor() override
+    AddressMonitor *getAddrMonitor() override
     {
         return cpu->getCpuAddrMonitor(thread->threadId());
     }

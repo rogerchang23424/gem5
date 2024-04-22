@@ -56,41 +56,32 @@ class ISA : public BaseISA
     RegVal miscRegs[NUM_MISCREGS];
 
   public:
-    PCStateBase *
-    newPCState(Addr new_inst_addr=0) const override
+    PCStateBase *newPCState(Addr new_inst_addr = 0) const override
     {
         return new PCState(new_inst_addr);
     }
 
-    RegVal
-    readMiscRegNoEffect(RegIndex idx) const override
+    RegVal readMiscRegNoEffect(RegIndex idx) const override
     {
         fatal("Power does not currently have any misc regs defined\n");
     }
 
-    RegVal
-    readMiscReg(RegIndex idx) override
+    RegVal readMiscReg(RegIndex idx) override
     {
         fatal("Power does not currently have any misc regs defined\n");
     }
 
-    void
-    setMiscRegNoEffect(RegIndex idx, RegVal val) override
+    void setMiscRegNoEffect(RegIndex idx, RegVal val) override
     {
         fatal("Power does not currently have any misc regs defined\n");
     }
 
-    void
-    setMiscReg(RegIndex idx, RegVal val) override
+    void setMiscReg(RegIndex idx, RegVal val) override
     {
         fatal("Power does not currently have any misc regs defined\n");
     }
 
-    bool
-    inUserMode() const override
-    {
-        return false;
-    }
+    bool inUserMode() const override { return false; }
 
     void copyRegsFrom(ThreadContext *src) override;
 

@@ -42,27 +42,22 @@ class NopStaticInst : public StaticInst
   public:
     NopStaticInst() : StaticInst("gem5 nop", No_OpClass) {}
 
-    Fault
-    execute(ExecContext *xc, trace::InstRecord *traceData) const override
+    Fault execute(ExecContext *xc, trace::InstRecord *traceData) const override
     {
         return NoFault;
     }
 
-    void
-    advancePC(PCStateBase &pc) const override
-    {
-        pc.advance();
-    }
+    void advancePC(PCStateBase &pc) const override { pc.advance(); }
 
     std::string
     generateDisassembly(Addr pc,
-            const loader::SymbolTable *symtab) const override
+                        const loader::SymbolTable *symtab) const override
     {
         return mnemonic;
     }
 };
 
-}
+} // namespace
 
 StaticInstPtr nopStaticInstPtr = new NopStaticInst;
 

@@ -48,13 +48,14 @@ class TesterDma : public DmaDevice
 {
   public:
     typedef TesterDmaParams Params;
-    TesterDma(const Params &p) : DmaDevice(p) { }
-    virtual ~TesterDma() { }
+
+    TesterDma(const Params &p) : DmaDevice(p) {}
+
+    virtual ~TesterDma() {}
 
     // The tester does not use a huge memory range. The range itself is
     // choosen arbitrarily
-    AddrRangeList
-    getAddrRanges() const override
+    AddrRangeList getAddrRanges() const override
     {
         AddrRangeList ranges;
         ranges.push_back(RangeSize(0, 0xc0000000));
@@ -63,6 +64,7 @@ class TesterDma : public DmaDevice
 
     // These latencies are not important. Return any integer.
     Tick read(PacketPtr) override { return 10; }
+
     Tick write(PacketPtr) override { return 10; }
 };
 

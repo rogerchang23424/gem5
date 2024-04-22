@@ -43,7 +43,8 @@
 namespace gem5
 {
 
-namespace ArmISA {
+namespace ArmISA
+{
 
 class Crypto
 {
@@ -99,33 +100,24 @@ class Crypto
         return (((Y ^ Z) & X) ^ Z);
     }
 
-    uint32_t parity(uint32_t X, uint32_t Y, uint32_t Z)
-    {
-        return (X ^ Y ^ Z);
-    }
+    uint32_t parity(uint32_t X, uint32_t Y, uint32_t Z) { return (X ^ Y ^ Z); }
 
     uint32_t majority(uint32_t X, uint32_t Y, uint32_t Z)
     {
         return ((X & Y) | ((X | Y) & Z));
     }
 
-    uint32_t sigma0(uint32_t X)
-    {
-        return ror(X,2) ^ ror(X,13) ^ ror(X,22);
-    }
+    uint32_t sigma0(uint32_t X) { return ror(X, 2) ^ ror(X, 13) ^ ror(X, 22); }
 
-    uint32_t sigma1(uint32_t X)
-    {
-        return ror(X,6) ^ ror(X,11) ^ ror(X,25);
-    }
+    uint32_t sigma1(uint32_t X) { return ror(X, 6) ^ ror(X, 11) ^ ror(X, 25); }
 
     void sha256Op(uint32_t *X, uint32_t *Y, uint32_t *Z);
     void sha1Op(uint8_t *output, uint8_t *input, uint8_t *input2, SHAOp op);
     void _sha1Op(uint32_t *X, uint32_t *Y, uint32_t *Z, SHAOp op);
 
     void load2Reg(uint32_t *X, uint32_t *Y, uint8_t *output, uint8_t *input);
-    void load3Reg(uint32_t *X, uint32_t *Y, uint32_t *Z,
-                  uint8_t *output, uint8_t *input, uint8_t *input2);
+    void load3Reg(uint32_t *X, uint32_t *Y, uint32_t *Z, uint8_t *output,
+                  uint8_t *input, uint8_t *input2);
     void store1Reg(uint8_t *output, uint32_t *X);
 
   public:

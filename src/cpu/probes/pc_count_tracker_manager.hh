@@ -40,8 +40,8 @@
 namespace gem5
 {
 
-
-class PcCountTrackerManager : public SimObject {
+class PcCountTrackerManager : public SimObject
+{
   public:
     PcCountTrackerManager(const PcCountTrackerManagerParams &params);
 
@@ -59,8 +59,7 @@ class PcCountTrackerManager : public SimObject {
     /** a set that stores all the PC Count pairs that should raise an
      * exit event at
      */
-    std::unordered_set<PcCountPair,
-                        PcCountPair::HashFunction> targetPair;
+    std::unordered_set<PcCountPair, PcCountPair::HashFunction> targetPair;
 
     /** the current PC Count pair */
     PcCountPair currentPair;
@@ -73,7 +72,6 @@ class PcCountTrackerManager : public SimObject {
     bool ifListNotEmpty;
 
   public:
-
     /** this function returns the corresponding value of count for the
      * inputted Program Counter address. If the PC address does not
      * exist in the counter, then it returns a -1.
@@ -82,8 +80,7 @@ class PcCountTrackerManager : public SimObject {
      * @return the corresponding value of count for the inputted Program
      * Counter address
      */
-    int
-    getPcCount(Addr pc) const
+    int getPcCount(Addr pc) const
     {
         if (counter.find(pc) != counter.end()) {
             return counter.find(pc)->second;
@@ -95,23 +92,16 @@ class PcCountTrackerManager : public SimObject {
      *
      * @return current PC Count pair
      */
-    PcCountPair
-    getCurrentPcCountPair() const
-    {
-        return currentPair;
-    }
+    PcCountPair getCurrentPcCountPair() const { return currentPair; }
 
     /** this function print all targets
      *
      * @return formatted string that contains all targets
      */
-    std::string
-    printAllTargets() const
+    std::string printAllTargets() const
     {
         std::string s;
-        for(auto itr = targetPair.begin();
-            itr != targetPair.end();
-            ++itr) {
+        for (auto itr = targetPair.begin(); itr != targetPair.end(); ++itr) {
             s += itr->to_string();
             s += "\n";
         }
@@ -119,6 +109,6 @@ class PcCountTrackerManager : public SimObject {
     }
 };
 
-}
+} // namespace gem5
 
 #endif // __CPU_PROBES_PC_COUNT_TRACKER_MANAGER_HH__

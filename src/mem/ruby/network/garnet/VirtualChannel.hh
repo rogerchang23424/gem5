@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef __MEM_RUBY_NETWORK_GARNET_0_VIRTUALCHANNEL_HH__
 #define __MEM_RUBY_NETWORK_GARNET_0_VIRTUALCHANNEL_HH__
 
@@ -55,45 +54,34 @@ class VirtualChannel
     bool need_stage(flit_stage stage, Tick time);
     void set_idle(Tick curTime);
     void set_active(Tick curTime);
-    void set_outvc(int outvc)               { m_output_vc = outvc; }
-    inline int get_outvc()                  { return m_output_vc; }
-    void set_outport(int outport)           { m_output_port = outport; };
-    inline int get_outport()                  { return m_output_port; }
 
-    inline Tick get_enqueue_time()          { return m_enqueue_time; }
+    void set_outvc(int outvc) { m_output_vc = outvc; }
+
+    inline int get_outvc() { return m_output_vc; }
+
+    void set_outport(int outport) { m_output_port = outport; };
+
+    inline int get_outport() { return m_output_port; }
+
+    inline Tick get_enqueue_time() { return m_enqueue_time; }
+
     inline void set_enqueue_time(Tick time) { m_enqueue_time = time; }
-    inline VC_state_type get_state()        { return m_vc_state.first; }
 
-    inline bool
-    isReady(Tick curTime)
-    {
-        return inputBuffer.isReady(curTime);
-    }
+    inline VC_state_type get_state() { return m_vc_state.first; }
 
-    inline void
-    insertFlit(flit *t_flit)
-    {
-        inputBuffer.insert(t_flit);
-    }
+    inline bool isReady(Tick curTime) { return inputBuffer.isReady(curTime); }
 
-    inline void
-    set_state(VC_state_type m_state, Tick curTime)
+    inline void insertFlit(flit *t_flit) { inputBuffer.insert(t_flit); }
+
+    inline void set_state(VC_state_type m_state, Tick curTime)
     {
         m_vc_state.first = m_state;
         m_vc_state.second = curTime;
     }
 
-    inline flit*
-    peekTopFlit()
-    {
-        return inputBuffer.peekTopFlit();
-    }
+    inline flit *peekTopFlit() { return inputBuffer.peekTopFlit(); }
 
-    inline flit*
-    getTopFlit()
-    {
-        return inputBuffer.getTopFlit();
-    }
+    inline flit *getTopFlit() { return inputBuffer.getTopFlit(); }
 
     bool functionalRead(Packet *pkt, WriteMask &mask);
     uint32_t functionalWrite(Packet *pkt);

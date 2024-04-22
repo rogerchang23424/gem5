@@ -89,16 +89,15 @@ class VncMouse
 class VncInput : public SimObject
 {
   public:
-
     /** Client -> Server message IDs */
     enum ClientMessages
     {
-        ClientSetPixelFormat    = 0,
-        ClientSetEncodings      = 2,
+        ClientSetPixelFormat = 0,
+        ClientSetEncodings = 2,
         ClientFrameBufferUpdate = 3,
-        ClientKeyEvent          = 4,
-        ClientPointerEvent      = 5,
-        ClientCutText           = 6
+        ClientKeyEvent = 4,
+        ClientPointerEvent = 5,
+        ClientCutText = 6
     };
 
     struct GEM5_PACKED PixelFormat
@@ -173,8 +172,8 @@ class VncInput : public SimObject
      */
     virtual void setFrameBuffer(const FrameBuffer *rfb);
 
-    /** Set up the device that would like to receive notifications when keys are
-     * pressed in the vnc client keyboard
+    /** Set up the device that would like to receive notifications when keys
+     * are pressed in the vnc client keyboard
      * @param _keyboard an object that derrives from VncKeyboard
      */
     void setKeyboard(VncKeyboard *_keyboard) { keyboard = _keyboard; }
@@ -200,13 +199,13 @@ class VncInput : public SimObject
     uint16_t videoHeight() const { return _videoHeight; }
 
     /** The frame buffer uses this call to notify the vnc server that
-     * the frame buffer has been updated and a new image needs to be sent to the
-     * client
+     * the frame buffer has been updated and a new image needs to be sent to
+     * the client
      */
     virtual void setDirty();
 
   protected:
-    virtual void frameBufferResized() {};
+    virtual void frameBufferResized(){};
 
     /** The device to notify when we get key events */
     VncKeyboard *keyboard;

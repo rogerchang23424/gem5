@@ -47,15 +47,24 @@ class EmuLinux : public SEWorkload
     using Params = ArmEmuLinuxParams;
 
     EmuLinux(const Params &p) : SEWorkload(p, PageShift) {}
+
     ByteOrder byteOrder() const override { return ByteOrder::little; }
 
-    struct BaseSyscallABI {};
-    struct SyscallABI32 : public SEWorkload::SyscallABI32,
-                          public BaseSyscallABI
-    {};
-    struct SyscallABI64 : public SEWorkload::SyscallABI64,
-                          public BaseSyscallABI
-    {};
+    struct BaseSyscallABI
+    {
+    };
+
+    struct SyscallABI32 :
+        public SEWorkload::SyscallABI32,
+        public BaseSyscallABI
+    {
+    };
+
+    struct SyscallABI64 :
+        public SEWorkload::SyscallABI64,
+        public BaseSyscallABI
+    {
+    };
 
     void syscall(ThreadContext *tc) override;
 };
@@ -67,11 +76,10 @@ namespace guest_abi
 
 template <typename ABI>
 struct Result<ABI, SyscallReturn,
-    typename std::enable_if_t<std::is_base_of_v<
-        ArmISA::EmuLinux::BaseSyscallABI, ABI>>>
+              typename std::enable_if_t<
+                  std::is_base_of_v<ArmISA::EmuLinux::BaseSyscallABI, ABI>>>
 {
-    static void
-    store(ThreadContext *tc, const SyscallReturn &ret)
+    static void store(ThreadContext *tc, const SyscallReturn &ret)
     {
         tc->setReg(ArmISA::ReturnValueReg, ret.encodedValue());
         if (ret.count() > 1)

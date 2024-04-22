@@ -84,8 +84,7 @@ class Decoder : public InstDecoder
         std::vector<MachInst> masks;
         int lastOffset;
 
-        InstBytes() : lastOffset(0)
-        {}
+        InstBytes() : lastOffset(0) {}
     };
 
     static InstBytes dummy;
@@ -113,14 +112,9 @@ class Decoder : public InstDecoder
 
     uint8_t cpl = 0;
 
-    uint8_t
-    getNextByte()
-    {
-        return ((uint8_t *)&fetchChunk)[offset];
-    }
+    uint8_t getNextByte() { return ((uint8_t *)&fetchChunk)[offset]; }
 
-    void
-    getImmediate(int &collected, uint64_t &current, int size)
+    void getImmediate(int &collected, uint64_t &current, int size)
     {
         // Figure out how many bytes we still need to get for the
         // immediate.
@@ -143,8 +137,7 @@ class Decoder : public InstDecoder
         consumeBytes(toGet);
     }
 
-    void
-    updateOffsetState()
+    void updateOffsetState()
     {
         assert(offset <= sizeof(MachInst));
         if (offset == sizeof(MachInst)) {
@@ -161,15 +154,13 @@ class Decoder : public InstDecoder
         }
     }
 
-    void
-    consumeByte()
+    void consumeByte()
     {
         offset++;
         updateOffsetState();
     }
 
-    void
-    consumeBytes(int numBytes)
+    void consumeBytes(int numBytes)
     {
         offset += numBytes;
         updateOffsetState();
@@ -242,8 +233,8 @@ class Decoder : public InstDecoder
     AddrCacheMap addrCacheMap;
 
     decode_cache::InstMap<ExtMachInst> *instMap = nullptr;
-    typedef std::unordered_map<
-            CacheKey, decode_cache::InstMap<ExtMachInst> *> InstCacheMap;
+    typedef std::unordered_map<CacheKey, decode_cache::InstMap<ExtMachInst> *>
+        InstCacheMap;
     static InstCacheMap instCacheMap;
 
     StaticInstPtr decodeInst(ExtMachInst mach_inst);
@@ -264,8 +255,7 @@ class Decoder : public InstDecoder
         emi.mode.submode = submode;
     }
 
-    void
-    setM5Reg(HandyM5Reg m5Reg)
+    void setM5Reg(HandyM5Reg m5Reg)
     {
         cpl = m5Reg.cpl;
         mode = (X86Mode)(uint64_t)m5Reg.mode;
@@ -296,8 +286,7 @@ class Decoder : public InstDecoder
         }
     }
 
-    void
-    takeOverFrom(InstDecoder *old) override
+    void takeOverFrom(InstDecoder *old) override
     {
         InstDecoder::takeOverFrom(old);
 
@@ -317,8 +306,7 @@ class Decoder : public InstDecoder
         stack = dec->stack;
     }
 
-    void
-    reset() override
+    void reset() override
     {
         InstDecoder::reset();
         state = ResetState;
@@ -326,8 +314,7 @@ class Decoder : public InstDecoder
 
     // Use this to give data to the decoder. This should be used
     // when there is control flow.
-    void
-    moreBytes(const PCStateBase &pc, Addr fetchPC) override
+    void moreBytes(const PCStateBase &pc, Addr fetchPC) override
     {
         DPRINTF(Decoder, "Getting more bytes.\n");
         basePC = fetchPC;
@@ -337,8 +324,7 @@ class Decoder : public InstDecoder
         process();
     }
 
-    void
-    updateNPC(X86ISA::PCState &nextPC)
+    void updateNPC(X86ISA::PCState &nextPC)
     {
         if (!nextPC.size()) {
             int size = basePC + offset - origPC;
@@ -354,8 +340,8 @@ class Decoder : public InstDecoder
   public:
     StaticInstPtr decode(PCStateBase &next_pc) override;
 
-    StaticInstPtr fetchRomMicroop(
-            MicroPC micropc, StaticInstPtr curMacroop) override;
+    StaticInstPtr fetchRomMicroop(MicroPC micropc,
+                                  StaticInstPtr curMacroop) override;
 };
 
 } // namespace X86ISA

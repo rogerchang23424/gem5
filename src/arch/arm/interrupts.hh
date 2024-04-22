@@ -81,14 +81,9 @@ class Interrupts : public BaseInterrupts
   public:
     using Params = ArmInterruptsParams;
 
-    Interrupts(const Params &p) : BaseInterrupts(p)
-    {
-        clearAll();
-    }
+    Interrupts(const Params &p) : BaseInterrupts(p) { clearAll(); }
 
-
-    void
-    post(int int_num, int index) override
+    void post(int int_num, int index) override
     {
         DPRINTF(Interrupt, "Interrupt %d:%d posted\n", int_num, index);
 
@@ -102,8 +97,7 @@ class Interrupts : public BaseInterrupts
         intStatus |= 1ULL << int_num;
     }
 
-    void
-    clear(int int_num, int index) override
+    void clear(int int_num, int index) override
     {
         DPRINTF(Interrupt, "Interrupt %d:%d cleared\n", int_num, index);
 
@@ -117,8 +111,7 @@ class Interrupts : public BaseInterrupts
         intStatus &= ~(1ULL << int_num);
     }
 
-    void
-    clearAll() override
+    void clearAll() override
     {
         DPRINTF(Interrupt, "Interrupts all cleared\n");
         intStatus = 0;
@@ -140,10 +133,9 @@ class Interrupts : public BaseInterrupts
     bool takeVirtualInt32(InterruptTypes int_type) const;
     bool takeVirtualInt64(InterruptTypes int_type) const;
 
-    bool
-    checkInterrupts() const override
+    bool checkInterrupts() const override
     {
-        HCR  hcr  = tc->readMiscReg(MISCREG_HCR_EL2);
+        HCR hcr = tc->readMiscReg(MISCREG_HCR_EL2);
 
         if (!(intStatus || hcr.va || hcr.vi || hcr.vf))
             return false;
@@ -152,13 +144,11 @@ class Interrupts : public BaseInterrupts
                 (interrupts[INT_FIQ] && takeInt(INT_FIQ)) ||
                 (interrupts[INT_ABT] && takeInt(INT_ABT)) ||
                 ((interrupts[INT_VIRT_IRQ] || hcr.vi) &&
-                    takeVirtualInt(INT_VIRT_IRQ)) ||
+                 takeVirtualInt(INT_VIRT_IRQ)) ||
                 ((interrupts[INT_VIRT_FIQ] || hcr.vf) &&
-                    takeVirtualInt(INT_VIRT_FIQ)) ||
+                 takeVirtualInt(INT_VIRT_FIQ)) ||
                 (hcr.va && takeVirtualInt(INT_VIRT_ABT)) ||
-                (interrupts[INT_RST]) ||
-                (interrupts[INT_SEV])
-               );
+                (interrupts[INT_RST]) || (interrupts[INT_SEV]));
     }
 
     /**
@@ -166,32 +156,32 @@ class Interrupts : public BaseInterrupts
      * is an interrupt pending, even if it's masked, wfi doesn't sleep.
      * @return any interrupts pending
      */
-    bool
-    checkWfiWake(HCR hcr, CPSR cpsr, SCR scr) const
+    bool checkWfiWake(HCR hcr, CPSR cpsr, SCR scr) const
     {
         uint64_t masked_int_status;
-        bool     virt_wake;
+        bool virt_wake;
 
-        masked_int_status = intStatus & ~((1 << INT_VIRT_IRQ) |
-                                          (1 << INT_VIRT_FIQ));
-        virt_wake  = (hcr.vi || interrupts[INT_VIRT_IRQ]) && hcr.imo;
+        masked_int_status =
+            intStatus & ~((1 << INT_VIRT_IRQ) | (1 << INT_VIRT_FIQ));
+        virt_wake = (hcr.vi || interrupts[INT_VIRT_IRQ]) && hcr.imo;
         virt_wake |= (hcr.vf || interrupts[INT_VIRT_FIQ]) && hcr.fmo;
-        virt_wake |=  hcr.va                              && hcr.amo;
+        virt_wake |= hcr.va && hcr.amo;
         virt_wake &= currEL(cpsr) < EL2 && EL2Enabled(tc);
         return masked_int_status || virt_wake;
     }
 
-    uint32_t
-    getISR(HCR hcr, CPSR cpsr, SCR scr)
+    uint32_t getISR(HCR hcr, CPSR cpsr, SCR scr)
     {
         bool use_hcr_mux = currEL(cpsr) < EL2 && EL2Enabled(tc);
         ISR isr = 0;
 
-        isr.i = (use_hcr_mux & hcr.imo) ? (interrupts[INT_VIRT_IRQ] || hcr.vi)
-                                        :  interrupts[INT_IRQ];
-        isr.f = (use_hcr_mux & hcr.fmo) ? (interrupts[INT_VIRT_FIQ] || hcr.vf)
-                                        :  interrupts[INT_FIQ];
-        isr.a = (use_hcr_mux & hcr.amo) ?  hcr.va : interrupts[INT_ABT];
+        isr.i = (use_hcr_mux & hcr.imo) ?
+                    (interrupts[INT_VIRT_IRQ] || hcr.vi) :
+                    interrupts[INT_IRQ];
+        isr.f = (use_hcr_mux & hcr.fmo) ?
+                    (interrupts[INT_VIRT_FIQ] || hcr.vf) :
+                    interrupts[INT_FIQ];
+        isr.a = (use_hcr_mux & hcr.amo) ? hcr.va : interrupts[INT_ABT];
         return isr;
     }
 
@@ -205,8 +195,7 @@ class Interrupts : public BaseInterrupts
      * @param interrupt Interrupt type to check the state of.
      * @return true if the interrupt is asserted, false otherwise.
      */
-    bool
-    checkRaw(InterruptTypes interrupt) const
+    bool checkRaw(InterruptTypes interrupt) const
     {
         if (interrupt >= NumInterruptTypes)
             panic("Interrupt number out of range.\n");
@@ -214,12 +203,11 @@ class Interrupts : public BaseInterrupts
         return interrupts[interrupt];
     }
 
-    Fault
-    getInterrupt() override
+    Fault getInterrupt() override
     {
         assert(checkInterrupts());
 
-        HCR  hcr  = tc->readMiscReg(MISCREG_HCR_EL2);
+        HCR hcr = tc->readMiscReg(MISCREG_HCR_EL2);
 
         if (interrupts[INT_IRQ] && takeInt(INT_IRQ))
             return std::make_shared<Interrupt>();
@@ -247,22 +235,20 @@ class Interrupts : public BaseInterrupts
 
     void updateIntrInfo() override {} // nothing to do
 
-    void
-    serialize(CheckpointOut &cp) const override
+    void serialize(CheckpointOut &cp) const override
     {
         SERIALIZE_ARRAY(interrupts, NumInterruptTypes);
         SERIALIZE_SCALAR(intStatus);
     }
 
-    void
-    unserialize(CheckpointIn &cp) override
+    void unserialize(CheckpointIn &cp) override
     {
         UNSERIALIZE_ARRAY(interrupts, NumInterruptTypes);
         UNSERIALIZE_SCALAR(intStatus);
     }
 };
 
-} // namespace ARM_ISA
+} // namespace ArmISA
 } // namespace gem5
 
 #endif // __ARCH_ARM_INTERRUPT_HH__

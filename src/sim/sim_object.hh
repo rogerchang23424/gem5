@@ -143,8 +143,12 @@ class SimObjectResolver;
  *     PARAMS(DerivSimObject);
  * \endcode
  */
-class SimObject : public EventManager, public Serializable, public Drainable,
-                  public statistics::Group, public Named
+class SimObject :
+    public EventManager,
+    public Serializable,
+    public Drainable,
+    public statistics::Group,
+    public Named
 {
   private:
     typedef std::vector<SimObject *> SimObjectList;
@@ -168,6 +172,7 @@ class SimObject : public EventManager, public Serializable, public Drainable,
 
   public:
     typedef SimObjectParams Params;
+
     /**
      * @return This function returns the cached copy of the object parameters.
      *
@@ -267,7 +272,7 @@ class SimObject : public EventManager, public Serializable, public Drainable,
      * @ingroup api_simobject
      */
     virtual Port &getPort(const std::string &if_name,
-                          PortID idx=InvalidPortID);
+                          PortID idx = InvalidPortID);
 
     /**
      * startup() is the final initialization call before simulation.
@@ -295,7 +300,7 @@ class SimObject : public EventManager, public Serializable, public Drainable,
      *
      * @ingroup api_simobject
      */
-    virtual void memWriteback() {};
+    virtual void memWriteback(){};
 
     /**
      * Invalidate the contents of memory buffers.
@@ -310,10 +315,10 @@ class SimObject : public EventManager, public Serializable, public Drainable,
      *
      * @ingroup api_simobject
      */
-    virtual void memInvalidate() {};
+    virtual void memInvalidate(){};
 
-    void serialize(CheckpointOut &cp) const override {};
-    void unserialize(CheckpointIn &cp) override {};
+    void serialize(CheckpointOut &cp) const override{};
+    void unserialize(CheckpointIn &cp) override{};
 
     /**
      * Create a checkpoint by serializing all SimObjects in the system.
@@ -362,12 +367,11 @@ class SimObject : public EventManager, public Serializable, public Drainable,
  * related by inheritance, but since the target type may be
  * incomplete, the compiler does not know the relation.
  */
-#define PARAMS(type)                                     \
-    using Params = type ## Params;                       \
-    const Params &                                       \
-    params() const                                       \
-    {                                                    \
-        return reinterpret_cast<const Params&>(_params); \
+#define PARAMS(type)                                                          \
+    using Params = type##Params;                                              \
+    const Params &params() const                                              \
+    {                                                                         \
+        return reinterpret_cast<const Params &>(_params);                     \
     }
 
 /**
@@ -379,7 +383,7 @@ class SimObject : public EventManager, public Serializable, public Drainable,
 class SimObjectResolver
 {
   public:
-    virtual ~SimObjectResolver() { }
+    virtual ~SimObjectResolver() {}
 
     /**
      * Find a SimObject given a full path name
@@ -389,14 +393,13 @@ class SimObjectResolver
     virtual SimObject *resolveSimObject(const std::string &name) = 0;
 };
 
-
 /**
  * To avoid circular dependencies the unserialization of SimObjects must be
  * implemented here.
  *
  * @ingroup api_serialize
  */
-void objParamIn(CheckpointIn &cp, const std::string &name, SimObject * &param);
+void objParamIn(CheckpointIn &cp, const std::string &name, SimObject *&param);
 
 void debug_serialize(const std::string &cpt_dir);
 

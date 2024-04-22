@@ -57,8 +57,8 @@ class M5DebugFault : public FaultBase
   protected:
     std::string _message;
     virtual void debugFunc() = 0;
-    void
-    advancePC(ThreadContext *tc, const StaticInstPtr &inst)
+
+    void advancePC(ThreadContext *tc, const StaticInstPtr &inst)
     {
         if (inst) {
             std::unique_ptr<PCStateBase> pc(tc->pcState().clone());
@@ -70,16 +70,15 @@ class M5DebugFault : public FaultBase
   public:
     M5DebugFault(std::string _m) : _message(_m) {}
 
-    template <class ...Args>
-    M5DebugFault(const std::string &format, const Args &...args) :
-        _message(csprintf(format, args...))
+    template <class... Args>
+    M5DebugFault(const std::string &format, const Args &...args)
+        : _message(csprintf(format, args...))
     {}
 
     std::string message() { return _message; }
 
-    void
-    invoke(ThreadContext *tc, const StaticInstPtr &inst =
-           nullStaticInstPtr) override
+    void invoke(ThreadContext *tc,
+                const StaticInstPtr &inst = nullStaticInstPtr) override
     {
         debugFunc();
         advancePC(tc, inst);
@@ -95,23 +94,21 @@ class M5DebugOnceFault : public M5DebugFault
     bool &once;
 
     template <class F, class OnceToken>
-    static bool &
-    lookUpToken(const OnceToken &token)
+    static bool &lookUpToken(const OnceToken &token)
     {
         static std::map<OnceToken, bool> tokenMap;
         return tokenMap[token];
     }
 
   public:
-    template <class OnceToken, class ...Args>
+    template <class OnceToken, class... Args>
     M5DebugOnceFault(const OnceToken &token, const std::string &format,
-            const Args &...args) :
-        M5DebugFault(format, args...), once(lookUpToken<Flavor>(token))
+                     const Args &...args)
+        : M5DebugFault(format, args...), once(lookUpToken<Flavor>(token))
     {}
 
-    void
-    invoke(ThreadContext *tc, const StaticInstPtr &inst =
-           nullStaticInstPtr) override
+    void invoke(ThreadContext *tc,
+                const StaticInstPtr &inst = nullStaticInstPtr) override
     {
         if (!once) {
             once = true;
@@ -125,7 +122,9 @@ class M5PanicFault : public M5DebugFault
 {
   public:
     using M5DebugFault::M5DebugFault;
+
     void debugFunc() override { panic(message()); }
+
     FaultName name() const override { return "panic fault"; }
 };
 
@@ -133,7 +132,9 @@ class M5FatalFault : public M5DebugFault
 {
   public:
     using M5DebugFault::M5DebugFault;
+
     void debugFunc() override { fatal(message()); }
+
     FaultName name() const override { return "fatal fault"; }
 };
 
@@ -142,7 +143,9 @@ class M5WarnFaultBase : public Base
 {
   public:
     using Base::Base;
+
     void debugFunc() override { warn(this->message()); }
+
     FaultName name() const override { return "warn fault"; }
 };
 
@@ -154,7 +157,9 @@ class M5HackFaultBase : public Base
 {
   public:
     using Base::Base;
+
     void debugFunc() override { hack(this->message()); }
+
     FaultName name() const override { return "hack fault"; }
 };
 
@@ -166,13 +171,14 @@ class M5InformFaultBase : public Base
 {
   public:
     using Base::Base;
+
     void debugFunc() override { inform(this->message()); }
+
     FaultName name() const override { return "inform fault"; }
 };
 
 using M5InformFault = M5InformFaultBase<M5DebugFault>;
-using M5InformOnceFault =
-    M5InformFaultBase<M5DebugOnceFault<M5InformFault>>;
+using M5InformOnceFault = M5InformFaultBase<M5DebugOnceFault<M5InformFault>>;
 
 } // namespace GenericISA
 } // namespace gem5

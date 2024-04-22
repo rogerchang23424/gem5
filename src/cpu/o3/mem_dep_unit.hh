@@ -59,8 +59,7 @@ namespace gem5
 
 struct SNHash
 {
-    size_t
-    operator()(const InstSeqNum &seq_num) const
+    size_t operator()(const InstSeqNum &seq_num) const
     {
         unsigned a = (unsigned)seq_num;
         unsigned hash = (((a >> 14) ^ ((a >> 2) & 0xffff))) & 0x7FFFFFFF;
@@ -162,7 +161,6 @@ class MemDepUnit
     void dumpLists();
 
   private:
-
     /** Completes a memory instruction. */
     void completed(const DynInstPtr &inst);
 
@@ -218,7 +216,7 @@ class MemDepUnit
     };
 
     /** Finds the memory dependence entry in the hash map. */
-    MemDepEntryPtr &findInHash(const DynInstConstPtr& inst);
+    MemDepEntryPtr &findInHash(const DynInstConstPtr &inst);
 
     /** Moves an entry to the ready list. */
     void moveToReady(MemDepEntryPtr &ready_inst_entry);
@@ -263,6 +261,7 @@ class MemDepUnit
 
     /** The thread id of this memory dependence unit. */
     int id;
+
     struct MemDepUnitStats : public statistics::Group
     {
         MemDepUnitStats(statistics::Group *parent);

@@ -63,15 +63,17 @@ class FwCfgItem
     bool _archSpecific;
 
     FwCfgItem(const std::string &new_path, bool arch_specific,
-            uint16_t new_index=0) :
-        _index(new_index), _path(new_path), _archSpecific(arch_specific)
+              uint16_t new_index = 0)
+        : _index(new_index), _path(new_path), _archSpecific(arch_specific)
     {}
 
   public:
     uint16_t index() const { return _index; }
+
     void index(uint16_t new_index) { _index = new_index; }
 
     const std::string &path() const { return _path; }
+
     bool archSpecific() const { return _archSpecific; }
 
     virtual uint64_t length() const = 0;
@@ -99,15 +101,16 @@ class FwCfgItemFile : public FwCfgItemFixed
 
   public:
     FwCfgItemFile(const std::string &new_path, bool arch_specific,
-            const std::string path, uint16_t new_index=0) :
-        FwCfgItemFixed(new_path, arch_specific, new_index), data(path)
+                  const std::string path, uint16_t new_index = 0)
+        : FwCfgItemFixed(new_path, arch_specific, new_index), data(path)
     {}
 
-    FwCfgItemFile(const QemuFwCfgItemFileParams &p) :
-        FwCfgItemFile(p.path, p.arch_specific, p.file, p.index)
+    FwCfgItemFile(const QemuFwCfgItemFileParams &p)
+        : FwCfgItemFile(p.path, p.arch_specific, p.file, p.index)
     {}
 
     const void *bytes() const override { return data.data(); }
+
     uint64_t length() const override { return data.len(); }
 };
 
@@ -119,17 +122,17 @@ class FwCfgItemString : public FwCfgItemFixed
 
   public:
     FwCfgItemString(const std::string &new_path, bool arch_specific,
-            const std::string _str, uint16_t new_index=0) :
-        FwCfgItemFixed(new_path, arch_specific, new_index), str(_str)
+                    const std::string _str, uint16_t new_index = 0)
+        : FwCfgItemFixed(new_path, arch_specific, new_index), str(_str)
     {}
 
-    FwCfgItemString(const QemuFwCfgItemStringParams &p) :
-        FwCfgItemString(p.path, p.arch_specific, p.string, p.index)
+    FwCfgItemString(const QemuFwCfgItemStringParams &p)
+        : FwCfgItemString(p.path, p.arch_specific, p.string, p.index)
     {}
 
     const void *bytes() const override { return (void *)str.data(); }
-    uint64_t
-    length() const override
+
+    uint64_t length() const override
     {
         return sizeof(std::string::value_type) * str.length();
     }
@@ -143,15 +146,16 @@ class FwCfgItemBytes : public FwCfgItemFixed
 
   public:
     FwCfgItemBytes(const std::string &new_path, bool arch_specific,
-            const std::vector<uint8_t> &_data, uint16_t new_index=0) :
-        FwCfgItemFixed(new_path, arch_specific, new_index), data(_data)
+                   const std::vector<uint8_t> &_data, uint16_t new_index = 0)
+        : FwCfgItemFixed(new_path, arch_specific, new_index), data(_data)
     {}
 
-    FwCfgItemBytes(const QemuFwCfgItemBytesParams &p) :
-        FwCfgItemBytes(p.path, p.arch_specific, p.data, p.index)
+    FwCfgItemBytes(const QemuFwCfgItemBytesParams &p)
+        : FwCfgItemBytes(p.path, p.arch_specific, p.data, p.index)
     {}
 
     const void *bytes() const override { return (void *)data.data(); }
+
     uint64_t length() const override { return data.size(); }
 };
 
@@ -163,6 +167,7 @@ class FwCfgItemFactoryBase : public SimObject
 {
   public:
     PARAMS(QemuFwCfgItem);
+
     FwCfgItemFactoryBase(const Params &p) : SimObject(p) {}
 
     virtual FwCfgItem &item() = 0;
@@ -176,8 +181,9 @@ class FwCfgItemFactory : public FwCfgItemFactoryBase
 
   public:
     template <class PType, class = typename std::enable_if_t<
-        std::is_base_of_v<SimObjectParams, PType>>>
-    FwCfgItemFactory(const PType &p) : FwCfgItemFactoryBase(p), _item(p) {}
+                               std::is_base_of_v<SimObjectParams, PType>>>
+    FwCfgItemFactory(const PType &p) : FwCfgItemFactoryBase(p), _item(p)
+    {}
 
     FwCfgItem &item() override { return _item; }
 };
@@ -211,9 +217,10 @@ class FwCfg : public PioDevice
         Directory();
 
         void update(const std::map<std::string, uint16_t> &names,
-                const std::map<uint16_t, FwCfgItem *> &numbers);
+                    const std::map<uint16_t, FwCfgItem *> &numbers);
 
         const void *bytes() const override { return (void *)data.data(); }
+
         uint64_t length() const override { return data.size(); }
     };
 

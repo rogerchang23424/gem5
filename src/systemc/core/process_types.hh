@@ -37,14 +37,13 @@ namespace sc_gem5
 class Method : public Process
 {
   public:
-    Method(const char *name, ProcessFuncWrapper *func, bool internal=false) :
-        Process(name, func, internal)
+    Method(const char *name, ProcessFuncWrapper *func, bool internal = false)
+        : Process(name, func, internal)
     {}
 
     const char *kind() const override { return "sc_method_process"; }
 
-    sc_core::sc_curr_proc_kind
-    procKind() const override
+    sc_core::sc_curr_proc_kind procKind() const override
     {
         return sc_core::SC_METHOD_PROC_;
     }
@@ -53,22 +52,20 @@ class Method : public Process
 class Thread : public Process
 {
   public:
-    Thread(const char *name, ProcessFuncWrapper *func, bool internal=false) :
-        Process(name, func, internal), ctx(nullptr)
+    Thread(const char *name, ProcessFuncWrapper *func, bool internal = false)
+        : Process(name, func, internal), ctx(nullptr)
     {}
 
     ~Thread() { delete ctx; }
 
     const char *kind() const override { return "sc_thread_process"; }
 
-    sc_core::sc_curr_proc_kind
-    procKind() const override
+    sc_core::sc_curr_proc_kind procKind() const override
     {
         return sc_core::SC_THREAD_PROC_;
     }
 
-    gem5::Fiber *
-    fiber() override
+    gem5::Fiber *fiber() override
     {
         if (!ctx)
             ctx = new Context(this, stackSize);
@@ -80,14 +77,13 @@ class Thread : public Process
     {
       public:
         Context(Thread *thread, size_t size)
-          : gem5::Fiber(size), thread(thread)
+            : gem5::Fiber(size), thread(thread)
         {}
 
       private:
         Thread *thread;
 
-        void
-        main() override
+        void main() override
         {
             thread->_needsStart = false;
             try {
@@ -109,8 +105,8 @@ class Thread : public Process
 class CThread : public Thread
 {
   public:
-    CThread(const char *name, ProcessFuncWrapper *func, bool internal=false) :
-        Thread(name, func, internal)
+    CThread(const char *name, ProcessFuncWrapper *func, bool internal = false)
+        : Thread(name, func, internal)
     {
         // We'll be in the initialization list now, but we shouldn't be.
         popListNode();
@@ -118,8 +114,7 @@ class CThread : public Thread
 
     const char *kind() const override { return "sc_cthread_process"; }
 
-    sc_core::sc_curr_proc_kind
-    procKind() const override
+    sc_core::sc_curr_proc_kind procKind() const override
     {
         return sc_core::SC_CTHREAD_PROC_;
     }
@@ -127,4 +122,4 @@ class CThread : public Thread
 
 } // namespace sc_gem5
 
-#endif  //__SYSTEMC_CORE_PROCESS_TYPES_HH__
+#endif //__SYSTEMC_CORE_PROCESS_TYPES_HH__

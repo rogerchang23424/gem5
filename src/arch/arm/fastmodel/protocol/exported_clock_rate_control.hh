@@ -39,12 +39,15 @@ namespace gem5
 // fast models. It's identical to the original, except it has some extra info
 // which lets it be exported into systemc.
 
-struct ClockRateControlDummyProtocolType {};
+struct ClockRateControlDummyProtocolType
+{
+};
 
 class ClockRateControlFwIf : public virtual sc_core::sc_interface
 {
   public:
     virtual ~ClockRateControlFwIf() {}
+
     virtual void set_mul_div(uint64_t mul, uint64_t div) = 0;
 };
 
@@ -69,7 +72,8 @@ class ClockRateControlInitiatorSocket :
 
   public:
     typedef tlm::tlm_base_initiator_socket<64, ClockRateControlFwIf,
-                                           ClockRateControlBwIf> Base;
+                                           ClockRateControlBwIf>
+        Base;
 
     using Base::bind;
     using Base::operator();
@@ -78,19 +82,18 @@ class ClockRateControlInitiatorSocket :
     {
         get_base_export().bind(dummyBwIf);
     }
+
     ClockRateControlInitiatorSocket(const char *name) : Base(name)
     {
         get_base_export().bind(dummyBwIf);
     }
 
-    const char *
-    kind() const override
+    const char *kind() const override
     {
         return "ClockRateControlInitiatorSocket";
     }
 
-    std::type_index
-    get_protocol_types() const override
+    std::type_index get_protocol_types() const override
     {
         return typeid(ClockRateControlDummyProtocolType);
     }
@@ -102,21 +105,20 @@ class ClockRateControlTargetSocket :
 {
   public:
     typedef tlm::tlm_base_target_socket<64, ClockRateControlFwIf,
-                                        ClockRateControlBwIf> Base;
+                                        ClockRateControlBwIf>
+        Base;
 
     using Base::bind;
     using Base::operator();
 
     using Base::Base;
 
-    const char *
-    kind() const override
+    const char *kind() const override
     {
         return "ClockRateControlInitiatorSocket";
     }
 
-    std::type_index
-    get_protocol_types() const override
+    std::type_index get_protocol_types() const override
     {
         return typeid(ClockRateControlDummyProtocolType);
     }

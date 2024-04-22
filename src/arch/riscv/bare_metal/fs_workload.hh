@@ -56,25 +56,23 @@ class BareMetal : public Workload
 
     void initState() override;
 
-    void
-    setSystem(System *sys) override
+    void setSystem(System *sys) override
     {
         Workload::setSystem(sys);
-        gdb = BaseRemoteGDB::build<RemoteGDB>(
-                params().remote_gdb_port, system);
+        gdb =
+            BaseRemoteGDB::build<RemoteGDB>(params().remote_gdb_port, system);
     }
 
     loader::Arch getArch() const override { return bootloader->getArch(); }
+
     ByteOrder byteOrder() const override { return ByteOrder::little; }
 
-    const loader::SymbolTable &
-    symtab(ThreadContext *tc) override
+    const loader::SymbolTable &symtab(ThreadContext *tc) override
     {
         return bootloaderSymtab;
     }
 
-    bool
-    insertSymbol(const loader::Symbol &symbol) override
+    bool insertSymbol(const loader::Symbol &symbol) override
     {
         return bootloaderSymtab.insert(symbol);
     }

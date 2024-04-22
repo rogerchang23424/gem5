@@ -97,8 +97,10 @@ class FrameBuffer : public Serializable
 
     /** Frame buffer width in pixels */
     unsigned width() const { return _width; }
+
     /** Frame buffer height in pixels */
     unsigned height() const { return _height; }
+
     /** Total number of pixels in frame buffer */
     unsigned area() const { return _width * _height; }
 
@@ -121,6 +123,7 @@ class FrameBuffer : public Serializable
      * @param conv Pixel conversion helper
      */
     void copyIn(const uint8_t *fb, const PixelConverter &conv);
+
     /**
      * Fill the frame buffer with pixel data from an external buffer
      * of the same width and height as this frame buffer.
@@ -128,7 +131,8 @@ class FrameBuffer : public Serializable
      * @param fb External frame buffer
      * @param conv Pixel conversion helper
      */
-    void copyIn(const std::vector<uint8_t> &fb, const PixelConverter &conv) {
+    void copyIn(const std::vector<uint8_t> &fb, const PixelConverter &conv)
+    {
         copyIn(fb.data(), conv);
     }
 
@@ -140,6 +144,7 @@ class FrameBuffer : public Serializable
      * @param conv Pixel conversion helper
      */
     void copyOut(uint8_t *fb, const PixelConverter &conv) const;
+
     /**
      * Store the contents of this frame buffer in an external buffer
      * of the same width and height as this frame buffer.
@@ -147,7 +152,8 @@ class FrameBuffer : public Serializable
      * @param fb External frame buffer
      * @param conv Pixel conversion helper
      */
-    void copyOut(std::vector<uint8_t> &fb, const PixelConverter &conv) const {
+    void copyOut(std::vector<uint8_t> &fb, const PixelConverter &conv) const
+    {
         copyOut(fb.data(), conv);
     }
 
@@ -157,7 +163,8 @@ class FrameBuffer : public Serializable
      * @param x Distance from the left margin.
      * @param y Distance from the top of the frame.
      */
-    const Pixel &pixel(unsigned x, unsigned y) const {
+    const Pixel &pixel(unsigned x, unsigned y) const
+    {
         assert(x < _width);
         assert(y < _height);
 
@@ -170,7 +177,8 @@ class FrameBuffer : public Serializable
      * @param x Distance from the left margin.
      * @param y Distance from the top of the frame.
      */
-    Pixel &pixel(unsigned x, unsigned y) {
+    Pixel &pixel(unsigned x, unsigned y)
+    {
         assert(x < _width);
         assert(y < _height);
 

@@ -79,8 +79,7 @@ class Scoreboard
     std::string name() const { return _name; };
 
     /** Checks if the register is ready. */
-    bool
-    getReg(PhysRegIdPtr phys_reg) const
+    bool getReg(PhysRegIdPtr phys_reg) const
     {
         if (phys_reg->isFixedMapping()) {
             // Fixed mapping regs are always ready
@@ -93,8 +92,7 @@ class Scoreboard
     }
 
     /** Sets the register as ready. */
-    void
-    setReg(PhysRegIdPtr phys_reg)
+    void setReg(PhysRegIdPtr phys_reg)
     {
         if (phys_reg->isFixedMapping()) {
             // Fixed mapping regs are always ready, ignore attempts to change
@@ -111,8 +109,7 @@ class Scoreboard
     }
 
     /** Sets the register as not ready. */
-    void
-    unsetReg(PhysRegIdPtr phys_reg)
+    void unsetReg(PhysRegIdPtr phys_reg)
     {
         if (phys_reg->isFixedMapping()) {
             // Fixed mapping regs are always ready, ignore attempts to
@@ -124,7 +121,6 @@ class Scoreboard
 
         regScoreBoard[phys_reg->flatIndex()] = false;
     }
-
 };
 
 } // namespace o3
