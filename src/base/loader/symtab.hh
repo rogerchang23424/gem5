@@ -81,43 +81,39 @@ class Symbol
     };
 
     Symbol(const Binding binding, const SymbolType type,
-           const std::string & name, const Addr addr, const size_t size)
-        : _binding(binding), _type(type), _name(name), _address(addr),
-          _size(size), _sizeIsValid(true)
+           const std::string &name, const Addr addr, const size_t size)
+        : _binding(binding),
+          _type(type),
+          _name(name),
+          _address(addr),
+          _size(size),
+          _sizeIsValid(true)
     {}
 
     Symbol(const Binding binding, const SymbolType type,
-           const std::string & name, const Addr addr)
-        : _binding(binding), _type(type), _name(name), _address(addr),
-          _size(0x0), _sizeIsValid(false)
+           const std::string &name, const Addr addr)
+        : _binding(binding),
+          _type(type),
+          _name(name),
+          _address(addr),
+          _size(0x0),
+          _sizeIsValid(false)
     {}
 
-    Symbol(const Symbol & other) = default;
-    Symbol & operator=(const Symbol & other) = default;
+    Symbol(const Symbol &other) = default;
+    Symbol &operator=(const Symbol &other) = default;
 
-    Binding binding() const {
-        return _binding;
-    }
+    Binding binding() const { return _binding; }
 
-    SymbolType type() const {
-        return _type;
-    }
+    SymbolType type() const { return _type; }
 
-    std::string name() const {
-        return _name;
-    }
+    std::string name() const { return _name; }
 
-    void rename(const std::string & new_name) {
-        _name = new_name;
-    }
+    void rename(const std::string &new_name) { _name = new_name; }
 
-    Addr address() const {
-        return _address;
-    }
+    Addr address() const { return _address; }
 
-    void relocate(const Addr new_addr) {
-        _address = new_addr;
-    }
+    void relocate(const Addr new_addr) { _address = new_addr; }
 
     /**
      * Return the Symbol size if it is valid, otherwise return the
@@ -127,16 +123,15 @@ class Symbol
      * that the `SymbolTable` may contain `Symbol`s that do not have
      * valid sizes.
      */
-    size_t sizeOrDefault(const size_t default_size) const {
+    size_t sizeOrDefault(const size_t default_size) const
+    {
         return _sizeIsValid ? _size : default_size;
     }
 
     /**
      * Return whether the Symbol size is valid or not.
      */
-    bool sizeIsValid() const {
-        return _sizeIsValid;
-    }
+    bool sizeIsValid() const { return _sizeIsValid; }
 
   private:
     Binding _binding;
@@ -146,7 +141,6 @@ class Symbol
     size_t _size;
     bool _sizeIsValid;
 };
-
 
 class SymbolTable
 {
@@ -172,8 +166,7 @@ class SymbolTable
      * @param iter An iterator to the larger-address entry.
      * @return True if successful; false if no larger addresses exist.
      */
-    bool
-    upperBound(Addr addr, AddrMap::const_iterator &iter) const
+    bool upperBound(Addr addr, AddrMap::const_iterator &iter) const
     {
         // find first key *larger* than desired address
         iter = addrMap.upper_bound(addr);
@@ -190,8 +183,8 @@ class SymbolTable
      * symbol table. The operation can, for example, simply add the symbol
      * to the table; modify and insert the symbol; do nothing at all; etc.
      */
-    typedef std::function<void(SymbolTable &symtab,
-                               const Symbol &symbol)> SymTabOp;
+    typedef std::function<void(SymbolTable &symtab, const Symbol &symbol)>
+        SymTabOp;
 
     /**
      * Create a derived symbol table by applying an operation on the symbols
@@ -200,11 +193,10 @@ class SymbolTable
      * @param op The operation to be applied to the new table.
      * @return The new table.
      */
-    SymbolTablePtr
-    operate(SymTabOp op) const
+    SymbolTablePtr operate(SymTabOp op) const
     {
         SymbolTablePtr symtab(new SymbolTable);
-        for (const auto &symbol: symbols)
+        for (const auto &symbol : symbols)
             op(*symtab, symbol);
         return symtab;
     }
@@ -223,11 +215,10 @@ class SymbolTable
      * @param filter The filter to be applied.
      * @return A new table, filtered.
      */
-    SymbolTablePtr
-    filter(SymTabFilter filter) const
+    SymbolTablePtr filter(SymTabFilter filter) const
     {
-        SymTabOp apply_filter =
-            [filter](SymbolTable &symtab, const Symbol &symbol) {
+        SymTabOp apply_filter = [filter](SymbolTable &symtab,
+                                         const Symbol &symbol) {
             if (filter(symbol)) {
                 symtab.insert(symbol);
             }
@@ -242,8 +233,7 @@ class SymbolTable
      * @param The binding that must be matched.
      * @return A new table, filtered by binding.
      */
-    SymbolTablePtr
-    filterByBinding(Symbol::Binding binding) const
+    SymbolTablePtr filterByBinding(Symbol::Binding binding) const
     {
         auto filt = [binding](const Symbol &symbol) {
             return symbol.binding() == binding;
@@ -259,7 +249,7 @@ class SymbolTable
      * @return A new table, filtered by type.
      */
     SymbolTablePtr
-    filterBySymbolType(const Symbol::SymbolType& symbol_type) const
+    filterBySymbolType(const Symbol::SymbolType &symbol_type) const
     {
         auto filt = [symbol_type](const Symbol &symbol) {
             return symbol.type() == symbol_type;
@@ -312,15 +302,14 @@ class SymbolTable
      * @param addr_offset The offset to be applied.
      * @return The new table.
      */
-    SymbolTablePtr
-    offset(Addr addr_offset) const
+    SymbolTablePtr offset(Addr addr_offset) const
     {
-        SymTabOp op =
-            [addr_offset](SymbolTable &symtab, const Symbol &symbol) {
-                symtab.insert(
-                    Symbol(symbol.binding(), symbol.type(), symbol.name(),
-                           symbol.address() + addr_offset));
-            };
+        SymTabOp op = [addr_offset](SymbolTable &symtab,
+                                    const Symbol &symbol) {
+            symtab.insert(Symbol(symbol.binding(), symbol.type(),
+                                 symbol.name(),
+                                 symbol.address() + addr_offset));
+        };
         return operate(op);
     }
 
@@ -331,13 +320,11 @@ class SymbolTable
      * @param m The mask to be applied.
      * @return The new table.
      */
-    SymbolTablePtr
-    mask(Addr m) const
+    SymbolTablePtr mask(Addr m) const
     {
         SymTabOp op = [m](SymbolTable &symtab, const Symbol &symbol) {
-            symtab.insert(
-                Symbol(symbol.binding(), symbol.type(), symbol.name(),
-                       symbol.address() & m));
+            symtab.insert(Symbol(symbol.binding(), symbol.type(),
+                                 symbol.name(), symbol.address() & m));
         };
         return operate(op);
     }
@@ -350,7 +337,7 @@ class SymbolTable
      * @retval SymbolTablePtr A pointer to the modified SymbolTable copy.
      */
     SymbolTablePtr
-    rename(std::function<std::string (const std::string&)> func) const
+    rename(std::function<std::string(const std::string &)> func) const
     {
         SymTabOp op = [func](SymbolTable &symtab, const Symbol &symbol) {
             Symbol sym = symbol;
@@ -365,8 +352,7 @@ class SymbolTable
      *
      * @return The new table.
      */
-    SymbolTablePtr
-    globals() const
+    SymbolTablePtr globals() const
     {
         return filterByBinding(Symbol::Binding::Global);
     }
@@ -376,8 +362,7 @@ class SymbolTable
      *
      * @return The new table.
      */
-    SymbolTablePtr
-    locals() const
+    SymbolTablePtr locals() const
     {
         return filterByBinding(Symbol::Binding::Local);
     }
@@ -387,8 +372,7 @@ class SymbolTable
      *
      * @return The new table.
      */
-    SymbolTablePtr
-    weaks() const
+    SymbolTablePtr weaks() const
     {
         return filterByBinding(Symbol::Binding::Weak);
     }
@@ -398,8 +382,7 @@ class SymbolTable
      *
      * @return The new table.
      */
-    SymbolTablePtr
-    functionSymbols() const
+    SymbolTablePtr functionSymbols() const
     {
         return filterBySymbolType(Symbol::SymbolType::Function);
     }
@@ -420,8 +403,9 @@ class SymbolTable
      * @param default_binding The binding to be used if an unserialized
      *                        symbol's binding is not found.
      */
-    void unserialize(const std::string &base, CheckpointIn &cp,
-                     Symbol::Binding default_binding=Symbol::Binding::Global);
+    void
+    unserialize(const std::string &base, CheckpointIn &cp,
+                Symbol::Binding default_binding = Symbol::Binding::Global);
 
     /**
      * Search for a symbol by its address. Since many symbols can map to the
@@ -431,8 +415,7 @@ class SymbolTable
      * @param address The address of the symbol being searched for.
      * @return A const iterator to the symbol. end() if not found.
      */
-    const_iterator
-    find(Addr address) const
+    const_iterator find(Addr address) const
     {
         AddrMap::const_iterator i = addrMap.find(address);
         if (i == addrMap.end())
@@ -450,8 +433,7 @@ class SymbolTable
      * @param name The name of the symbol being searched for.
      * @return A const iterator to the symbol. end() if not found.
      */
-    const_iterator
-    find(const std::string &name) const
+    const_iterator find(const std::string &name) const
     {
         NameMap::const_iterator i = nameMap.find(name);
         if (i == nameMap.end())
@@ -470,8 +452,7 @@ class SymbolTable
      *                  range of the symbol).
      * @retval A const_iterator which points to the symbol if found, or end.
      */
-    const_iterator
-    findNearest(Addr addr, Addr &next_addr) const
+    const_iterator findNearest(Addr addr, Addr &next_addr) const
     {
         AddrMap::const_iterator i = addrMap.end();
         if (!upperBound(addr, i))
@@ -492,8 +473,7 @@ class SymbolTable
      * Overload for findNearestSymbol() for callers who don't care
      * about nextaddr.
      */
-    const_iterator
-    findNearest(Addr addr) const
+    const_iterator findNearest(Addr addr) const
     {
         AddrMap::const_iterator i = addrMap.end();
         if (!upperBound(addr, i))

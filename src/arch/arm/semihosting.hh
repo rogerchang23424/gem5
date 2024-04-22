@@ -101,8 +101,8 @@ class ArmSemihosting : public SimObject
             ByteOrder endian;
 
           public:
-            StateBase(const ThreadContext *tc, Addr arg_pointer) :
-                argPointer(arg_pointer), endian(ArmISA::byteOrder(tc))
+            StateBase(const ThreadContext *tc, Addr arg_pointer)
+                : argPointer(arg_pointer), endian(ArmISA::byteOrder(tc))
             {}
 
             /*
@@ -114,8 +114,7 @@ class ArmSemihosting : public SimObject
              */
 
             // Return the address of an argument slot and move past it.
-            Addr
-            getAddr()
+            Addr getAddr()
             {
                 Addr addr = argPointer;
                 argPointer += sizeof(Arg);
@@ -123,11 +122,10 @@ class ArmSemihosting : public SimObject
             }
 
             // Read the value in an argument slot and move past it.
-            Arg
-            get(ThreadContext *tc)
+            Arg get(ThreadContext *tc)
             {
-                Arg arg = ArmSemihosting::portProxy(tc).read<Arg>(
-                        argPointer, endian);
+                Arg arg = ArmSemihosting::portProxy(tc).read<Arg>(argPointer,
+                                                                  endian);
                 argPointer += sizeof(Arg);
                 return arg;
             }
@@ -144,8 +142,8 @@ class ArmSemihosting : public SimObject
         {
           public:
             // For 64 bit semihosting, the params are pointer to by X1.
-            explicit State(const ThreadContext *tc) :
-                StateBase<uint64_t>(tc, tc->getReg(ArmISA::int_reg::X1))
+            explicit State(const ThreadContext *tc)
+                : StateBase<uint64_t>(tc, tc->getReg(ArmISA::int_reg::X1))
             {}
         };
     };
@@ -158,8 +156,8 @@ class ArmSemihosting : public SimObject
         {
           public:
             // For 32 bit semihosting, the params are pointer to by R1.
-            explicit State(const ThreadContext *tc) :
-                StateBase<uint64_t>(tc, tc->getReg(ArmISA::int_reg::R1))
+            explicit State(const ThreadContext *tc)
+                : StateBase<uint64_t>(tc, tc->getReg(ArmISA::int_reg::R1))
             {}
         };
     };
@@ -176,8 +174,7 @@ class ArmSemihosting : public SimObject
 
         // A helper function to read the argument since the guest ABI mechanism
         // didn't do that for us.
-        uint64_t
-        read(ThreadContext *tc, ByteOrder endian)
+        uint64_t read(ThreadContext *tc, ByteOrder endian)
         {
             auto &proxy = ArmSemihosting::portProxy(tc);
             if (size == 8)
@@ -189,8 +186,7 @@ class ArmSemihosting : public SimObject
         }
 
         // A helper function to write to the argument's slot in the params.
-        void
-        write(ThreadContext *tc, uint64_t val, ByteOrder endian)
+        void write(ThreadContext *tc, uint64_t val, ByteOrder endian)
         {
             auto &proxy = ArmSemihosting::portProxy(tc);
             if (size == 8)
@@ -281,17 +277,20 @@ class ArmSemihosting : public SimObject
     {
       public:
         FileBase(ArmSemihosting &_parent, const char *name, const char *_mode)
-            : parent(_parent), _name(name), mode(_mode) {}
-        virtual ~FileBase() {};
+            : parent(_parent), _name(name), mode(_mode)
+        {}
+
+        virtual ~FileBase(){};
 
         FileBase() = delete;
         FileBase(FileBase &) = delete;
 
-        static std::unique_ptr<FileBase> create(
-            ArmSemihosting &parent, const std::string &fname,
-            const char *mode);
-        static std::unique_ptr<FileBase> create(
-            ArmSemihosting &parent, CheckpointIn &cp, const std::string &sec);
+        static std::unique_ptr<FileBase> create(ArmSemihosting &parent,
+                                                const std::string &fname,
+                                                const char *mode);
+        static std::unique_ptr<FileBase> create(ArmSemihosting &parent,
+                                                CheckpointIn &cp,
+                                                const std::string &sec);
 
         void serialize(CheckpointOut &cp) const override;
         void unserialize(CheckpointIn &cp) override;
@@ -371,8 +370,8 @@ class ArmSemihosting : public SimObject
     class FileFeatures : public FileBase
     {
       public:
-        FileFeatures(ArmSemihosting &_parent,
-                     const char *name, const char *mode);
+        FileFeatures(ArmSemihosting &_parent, const char *name,
+                     const char *mode);
 
         void serialize(CheckpointOut &cp) const override;
         void unserialize(CheckpointIn &cp) override;
@@ -394,6 +393,7 @@ class ArmSemihosting : public SimObject
         void unserialize(CheckpointIn &cp) override;
 
         int64_t open() override { return openImpl(false); }
+
         int64_t close() override;
         bool isTTY() const override;
         int64_t read(uint8_t *buffer, uint64_t size) override;
@@ -403,6 +403,7 @@ class ArmSemihosting : public SimObject
 
       protected:
         int64_t openImpl(bool unserialize);
+
         bool needClose() const { return !isTTY(); }
 
         FILE *file;
@@ -416,17 +417,14 @@ class ArmSemihosting : public SimObject
     FILE *stderr;
 
   protected: // Helper functions
-    unsigned
-    calcTickShift() const
+    unsigned calcTickShift() const
     {
         int msb = findMsbSet(sim_clock::Frequency);
         return msb > 31 ? msb - 31 : 0;
     }
-    uint64_t
-    semiTick(Tick tick) const
-    {
-        return tick >> tickShift;
-    }
+
+    uint64_t semiTick(Tick tick) const { return tick >> tickShift; }
+
     void semiExit(uint64_t code, uint64_t subcode);
     std::string readString(ThreadContext *tc, Addr ptr, size_t len);
 
@@ -434,17 +432,9 @@ class ArmSemihosting : public SimObject
     typedef std::pair<uint64_t, SemiErrno> RetErrno;
 
   private:
-    static RetErrno
-    retError(SemiErrno e)
-    {
-        return RetErrno((uint64_t)-1, e);
-    }
+    static RetErrno retError(SemiErrno e) { return RetErrno((uint64_t)-1, e); }
 
-    static RetErrno
-    retOK(uint64_t r)
-    {
-        return RetErrno(r, 0);
-    }
+    static RetErrno retOK(uint64_t r) { return RetErrno(r, 0); }
 
     /**
      * Semihosting call information structure.
@@ -459,13 +449,13 @@ class ArmSemihosting : public SimObject
         const char *name;
 
         // A type for member functions implementing semihosting calls.
-        template <typename ...Args>
-        using Implementation =
-            RetErrno (ArmSemihosting::*)(ThreadContext *tc, Args... args);
+        template <typename... Args>
+        using Implementation = RetErrno (ArmSemihosting::*)(ThreadContext *tc,
+                                                            Args... args);
 
         // Since guest ABI doesn't know how to call member function pointers,
         // this template builds a wrapper that takes care of that.
-        template <typename ...Args>
+        template <typename... Args>
         static inline std::function<RetErrno(ThreadContext *tc, Args... args)>
         wrapImpl(ArmSemihosting *sh, Implementation<Args...> impl)
         {
@@ -489,9 +479,8 @@ class ArmSemihosting : public SimObject
         Dumper dump64;
 
         // A function which builds a dispatcher for a semihosting call.
-        template <typename Abi, typename ...Args>
-        static inline Dispatcher
-        buildDispatcher(Implementation<Args...> impl)
+        template <typename Abi, typename... Args>
+        static inline Dispatcher buildDispatcher(Implementation<Args...> impl)
         {
             // This lambda is the dispatcher we're building.
             return [impl](ArmSemihosting *sh, ThreadContext *tc) {
@@ -501,9 +490,9 @@ class ArmSemihosting : public SimObject
         }
 
         // A function which builds a dumper for a semihosting call.
-        template <typename Abi, typename ...Args>
-        static inline Dumper
-        buildDumper(const char *name, Implementation<Args...> impl)
+        template <typename Abi, typename... Args>
+        static inline Dumper buildDumper(const char *name,
+                                         Implementation<Args...> impl)
         {
             // This lambda is the dumper we're building.
             return [name](ThreadContext *tc) -> std::string {
@@ -512,41 +501,43 @@ class ArmSemihosting : public SimObject
         }
 
         // When there's one implementation, use it for both 32 and 64 bits.
-        template <typename ...Args>
-        SemiCall(const char *_name, Implementation<Args...> common) :
-            name(_name), call32(buildDispatcher<Abi32>(common)),
-            call64(buildDispatcher<Abi64>(common)),
-            dump32(buildDumper<Abi32>(_name, common)),
-            dump64(buildDumper<Abi64>(_name, common))
+        template <typename... Args>
+        SemiCall(const char *_name, Implementation<Args...> common)
+            : name(_name),
+              call32(buildDispatcher<Abi32>(common)),
+              call64(buildDispatcher<Abi64>(common)),
+              dump32(buildDumper<Abi32>(_name, common)),
+              dump64(buildDumper<Abi64>(_name, common))
         {}
 
         // When there are two, use one for 32 bits and one for 64 bits.
-        template <typename ...Args32, typename ...Args64>
+        template <typename... Args32, typename... Args64>
         SemiCall(const char *_name, Implementation<Args32...> impl32,
-                 Implementation<Args64...> impl64) :
-            name(_name), call32(buildDispatcher<Abi32>(impl32)),
-            call64(buildDispatcher<Abi64>(impl64)),
-            dump32(buildDumper<Abi32>(_name, impl32)),
-            dump64(buildDumper<Abi64>(_name, impl64))
+                 Implementation<Args64...> impl64)
+            : name(_name),
+              call32(buildDispatcher<Abi32>(impl32)),
+              call64(buildDispatcher<Abi64>(impl64)),
+              dump32(buildDumper<Abi32>(_name, impl32)),
+              dump64(buildDumper<Abi64>(_name, impl64))
         {}
     };
 
-    RetErrno callOpen(ThreadContext *tc, const Addr name_base,
-                      int fmode, size_t name_size);
+    RetErrno callOpen(ThreadContext *tc, const Addr name_base, int fmode,
+                      size_t name_size);
     RetErrno callClose(ThreadContext *tc, Handle handle);
     RetErrno callWriteC(ThreadContext *tc, InPlaceArg c);
     RetErrno callWrite0(ThreadContext *tc, InPlaceArg str);
-    RetErrno callWrite(ThreadContext *tc, Handle handle,
-                       Addr buffer, size_t size);
-    RetErrno callRead(ThreadContext *tc, Handle handle,
-                      Addr buffer, size_t size);
+    RetErrno callWrite(ThreadContext *tc, Handle handle, Addr buffer,
+                       size_t size);
+    RetErrno callRead(ThreadContext *tc, Handle handle, Addr buffer,
+                      size_t size);
     RetErrno callReadC(ThreadContext *tc);
     RetErrno callIsError(ThreadContext *tc, int64_t status);
     RetErrno callIsTTY(ThreadContext *tc, Handle handle);
     RetErrno callSeek(ThreadContext *tc, Handle handle, uint64_t pos);
     RetErrno callFLen(ThreadContext *tc, Handle handle);
-    RetErrno callTmpNam(ThreadContext *tc, Addr buffer,
-                        uint64_t id, size_t size);
+    RetErrno callTmpNam(ThreadContext *tc, Addr buffer, uint64_t id,
+                        size_t size);
     RetErrno callRemove(ThreadContext *tc, Addr name_base, size_t name_size);
     RetErrno callRename(ThreadContext *tc, Addr from_addr, size_t from_size,
                         Addr to_addr, size_t to_size);
@@ -556,9 +547,8 @@ class ArmSemihosting : public SimObject
     RetErrno callErrno(ThreadContext *tc);
     RetErrno callGetCmdLine(ThreadContext *tc, Addr addr, InPlaceArg size_arg);
 
-    void gatherHeapInfo(ThreadContext *tc, bool aarch64,
-                        Addr &heap_base, Addr &heap_limit,
-                        Addr &stack_base, Addr &stack_limit);
+    void gatherHeapInfo(ThreadContext *tc, bool aarch64, Addr &heap_base,
+                        Addr &heap_limit, Addr &stack_base, Addr &stack_limit);
     RetErrno callHeapInfo32(ThreadContext *tc, Addr block_addr);
     RetErrno callHeapInfo64(ThreadContext *tc, Addr block_addr);
     RetErrno callExit32(ThreadContext *tc, InPlaceArg code);
@@ -574,17 +564,16 @@ class ArmSemihosting : public SimObject
     RetErrno callGem5PseudoOp64(ThreadContext *tc, uint64_t encoded_func);
 
     template <typename Abi>
-    void
-    unrecognizedCall(ThreadContext *tc, const char *format, uint64_t op)
+    void unrecognizedCall(ThreadContext *tc, const char *format, uint64_t op)
     {
         warn(format, op);
-        std::function<RetErrno(ThreadContext *tc)> retErr =
+        std::function<RetErrno(ThreadContext * tc)> retErr =
             [](ThreadContext *tc) { return retError(EINVAL); };
         invokeSimcall<Abi>(tc, retErr);
     }
 
-    static FILE *getSTDIO(const char *stream_name,
-                          const std::string &name, const char *mode);
+    static FILE *getSTDIO(const char *stream_name, const std::string &name,
+                          const char *mode);
 
     static const std::map<uint32_t, SemiCall> calls;
     static const std::vector<const char *> fmodes;
@@ -594,23 +583,21 @@ class ArmSemihosting : public SimObject
 
     // used in callTmpNam() to deterministically generate a temp filename
     uint16_t tmpNameIndex = 0;
-
 };
 
-std::ostream &operator << (
-        std::ostream &os, const ArmSemihosting::InPlaceArg &ipa);
+std::ostream &operator<<(std::ostream &os,
+                         const ArmSemihosting::InPlaceArg &ipa);
 
 namespace guest_abi
 {
 
 template <typename Arg>
 struct Argument<ArmSemihosting::Abi64, Arg,
-    typename std::enable_if_t<
-        (std::is_integral_v<Arg> ||
-         std::is_same<Arg,pseudo_inst::GuestAddr>::value)>>
+                typename std::enable_if_t<(
+                    std::is_integral_v<Arg> ||
+                    std::is_same<Arg, pseudo_inst::GuestAddr>::value)>>
 {
-    static Arg
-    get(ThreadContext *tc, ArmSemihosting::Abi64::State &state)
+    static Arg get(ThreadContext *tc, ArmSemihosting::Abi64::State &state)
     {
         return (Arg)state.get(tc);
     }
@@ -618,39 +605,37 @@ struct Argument<ArmSemihosting::Abi64, Arg,
 
 template <typename Arg>
 struct Argument<ArmSemihosting::Abi32, Arg,
-    typename std::enable_if_t<
-        (std::is_integral_v<Arg> ||
-         std::is_same<Arg,pseudo_inst::GuestAddr>::value)>>
+                typename std::enable_if_t<(
+                    std::is_integral_v<Arg> ||
+                    std::is_same<Arg, pseudo_inst::GuestAddr>::value)>>
 {
-    static Arg
-    get(ThreadContext *tc, ArmSemihosting::Abi32::State &state)
+    static Arg get(ThreadContext *tc, ArmSemihosting::Abi32::State &state)
     {
         if (std::is_signed_v<Arg>) {
             return (Arg)sext<32>(state.get(tc));
-        }
-        else {
+        } else {
             return (Arg)state.get(tc);
         }
     }
 };
 
 template <typename Abi>
-struct Argument<Abi, ArmSemihosting::InPlaceArg, typename std::enable_if_t<
-    std::is_base_of_v<ArmSemihosting::AbiBase, Abi>>>
+struct Argument<
+    Abi, ArmSemihosting::InPlaceArg,
+    typename std::enable_if_t<std::is_base_of_v<ArmSemihosting::AbiBase, Abi>>>
 {
-    static ArmSemihosting::InPlaceArg
-    get(ThreadContext *tc, typename Abi::State &state)
+    static ArmSemihosting::InPlaceArg get(ThreadContext *tc,
+                                          typename Abi::State &state)
     {
         return ArmSemihosting::InPlaceArg(
-                state.getAddr(), sizeof(typename Abi::State::ArgType));
+            state.getAddr(), sizeof(typename Abi::State::ArgType));
     }
 };
 
 template <>
 struct Result<ArmSemihosting::Abi32, ArmSemihosting::RetErrno>
 {
-    static void
-    store(ThreadContext *tc, const ArmSemihosting::RetErrno &err)
+    static void store(ThreadContext *tc, const ArmSemihosting::RetErrno &err)
     {
         tc->setReg(ArmISA::int_reg::R0, err.first);
     }
@@ -659,8 +644,7 @@ struct Result<ArmSemihosting::Abi32, ArmSemihosting::RetErrno>
 template <>
 struct Result<ArmSemihosting::Abi64, ArmSemihosting::RetErrno>
 {
-    static void
-    store(ThreadContext *tc, const ArmSemihosting::RetErrno &err)
+    static void store(ThreadContext *tc, const ArmSemihosting::RetErrno &err)
     {
         tc->setReg(ArmISA::int_reg::X0, err.first);
     }

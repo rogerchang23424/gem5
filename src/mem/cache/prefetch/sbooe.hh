@@ -30,7 +30,7 @@
  * Implementation of the 'Sandbox Based Optimal Offset Estimation'
  * Reference:
  *   Brown, N. T., & Sendag, R. Sandbox Based Optimal Offset Estimation.
-*/
+ */
 
 #ifndef __MEM_CACHE_PREFETCH_SBOOE_HH__
 #define __MEM_CACHE_PREFETCH_SBOOE_HH__
@@ -52,115 +52,113 @@ namespace prefetch
 
 class SBOOE : public Queued
 {
-    private:
+  private:
+    /** Prefetcher parameters */
+    const int sequentialPrefetchers;
 
-        /** Prefetcher parameters */
-        const int sequentialPrefetchers;
+    /** Threshold used to issue prefetchers */
+    const unsigned int scoreThreshold;
 
-        /** Threshold used to issue prefetchers */
-        const unsigned int scoreThreshold;
+    /**
+     * Holds the current demand addresses and tick. This is later used to
+     * calculate the average latency buffer when the address is filled in
+     * the cache.
+     */
+    std::unordered_map<Addr, Tick> demandAddresses;
 
-        /**
-         * Holds the current demand addresses and tick. This is later used to
-         * calculate the average latency buffer when the address is filled in
-         * the cache.
-         */
-        std::unordered_map<Addr, Tick> demandAddresses;
+    /**
+     * The latency buffer holds the elapsed ticks between the demand and
+     * the fill in the cache for the latest N accesses which are used to
+     * calculate the average access latency which is later used to
+     * predict if a prefetcher would be filled on time if issued.
+     */
+    CircularQueue<Tick> latencyBuffer;
 
-        /**
-         * The latency buffer holds the elapsed ticks between the demand and
-         * the fill in the cache for the latest N accesses which are used to
-         * calculate the average access latency which is later used to
-         * predict if a prefetcher would be filled on time if issued.
-         */
-        CircularQueue<Tick> latencyBuffer;
+    /** Holds the current average access latency */
+    Tick averageAccessLatency;
 
-        /** Holds the current average access latency */
-        Tick averageAccessLatency;
+    /** Holds the current sum of the latency buffer latency */
+    Tick latencyBufferSum;
 
-        /** Holds the current sum of the latency buffer latency */
-        Tick latencyBufferSum;
+    struct SandboxEntry
+    {
+        /** Cache line predicted by the candidate prefetcher */
+        Addr line;
+        /** Tick when the simulated prefetch is expected to be filled */
+        Tick expectedArrivalTick;
+        /** To indicate if it was initialized */
+        bool valid;
 
-        struct SandboxEntry
-        {
-            /** Cache line predicted by the candidate prefetcher */
-            Addr line;
-            /** Tick when the simulated prefetch is expected to be filled */
-            Tick expectedArrivalTick;
-            /** To indicate if it was initialized */
-            bool valid;
+        SandboxEntry() : valid(false) {}
+    };
 
-            SandboxEntry()
-                : valid(false)
-            {}
-        };
-
-        class Sandbox
-        {
-          private:
-            /** FIFO queue containing the sandbox entries. */
-            CircularQueue<SandboxEntry> entries;
-
-            /**
-             * Accesses during the eval period that were present
-             * in the sandbox
-             */
-            unsigned int sandboxScore;
-
-            /** Hits in the sandbox that wouldn't have been filled on time */
-            unsigned int lateScore;
-
-          public:
-            /** Sequential stride for this prefetcher */
-            const int stride;
-
-            Sandbox(unsigned int max_entries, int _stride)
-              : entries(max_entries), sandboxScore(0), lateScore(0),
-                stride(_stride)
-            {
-            }
-
-            /**
-             * Update score and insert the line address being accessed into the
-             * FIFO queue of the sandbox.
-             *
-             * @param line Line address being accessed
-             * @param tick Tick in which the access is expected to be filled
-             */
-            void access(Addr line, Tick tick);
-
-            /** Calculate the useful score
-             *  @return Useful score of the sandbox. Sandbox score adjusted by
-             *          by the late score
-             */
-            unsigned int score() const { return (sandboxScore - lateScore); }
-        };
-
-        std::vector<Sandbox> sandboxes;
-
-        /** Current best sandbox */
-        const Sandbox* bestSandbox;
-
-        /** Number of accesses notified to the prefetcher */
-        unsigned int accesses;
+    class Sandbox
+    {
+      private:
+        /** FIFO queue containing the sandbox entries. */
+        CircularQueue<SandboxEntry> entries;
 
         /**
-         * Process an access to the specified line address and update the
-         * sandbox counters counters.
-         * @param line Address of the line being accessed
-         * @return TRUE if the evaluation finished, FALSE otherwise
+         * Accesses during the eval period that were present
+         * in the sandbox
          */
-        bool access(Addr line);
+        unsigned int sandboxScore;
 
-        /** Update the latency buffer after a prefetch fill */
-        void notifyFill(const CacheAccessProbeArg &arg) override;
+        /** Hits in the sandbox that wouldn't have been filled on time */
+        unsigned int lateScore;
 
-    public:
-        SBOOE(const SBOOEPrefetcherParams &p);
+      public:
+        /** Sequential stride for this prefetcher */
+        const int stride;
 
-        void calculatePrefetch(const PrefetchInfo &pfi,
-                               std::vector<AddrPriority> &addresses,
-                               const CacheAccessor &cache) override;
+        Sandbox(unsigned int max_entries, int _stride)
+            : entries(max_entries),
+              sandboxScore(0),
+              lateScore(0),
+              stride(_stride)
+        {}
+
+        /**
+         * Update score and insert the line address being accessed into the
+         * FIFO queue of the sandbox.
+         *
+         * @param line Line address being accessed
+         * @param tick Tick in which the access is expected to be filled
+         */
+        void access(Addr line, Tick tick);
+
+        /** Calculate the useful score
+         *  @return Useful score of the sandbox. Sandbox score adjusted by
+         *          by the late score
+         */
+        unsigned int score() const { return (sandboxScore - lateScore); }
+    };
+
+    std::vector<Sandbox> sandboxes;
+
+    /** Current best sandbox */
+    const Sandbox *bestSandbox;
+
+    /** Number of accesses notified to the prefetcher */
+    unsigned int accesses;
+
+    /**
+     * Process an access to the specified line address and update the
+     * sandbox counters counters.
+     * @param line Address of the line being accessed
+     * @return TRUE if the evaluation finished, FALSE otherwise
+     */
+    bool access(Addr line);
+
+    /** Update the latency buffer after a prefetch fill */
+    void notifyFill(const CacheAccessProbeArg &arg) override;
+
+  public:
+    SBOOE(const SBOOEPrefetcherParams &p);
+
+    void calculatePrefetch(const PrefetchInfo &pfi,
+                           std::vector<AddrPriority> &addresses,
+                           const CacheAccessor &cache) override;
 };
 
 } // namespace prefetch

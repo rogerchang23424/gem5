@@ -42,13 +42,13 @@ namespace sc_gem5
 struct ListNode
 {
     ListNode() : nextListNode(nullptr), prevListNode(nullptr) {}
+
     virtual ~ListNode() {}
 
     ListNode *nextListNode;
     ListNode *prevListNode;
 
-    void
-    popListNode()
+    void popListNode()
     {
         if (nextListNode)
             nextListNode->prevListNode = prevListNode;
@@ -68,8 +68,7 @@ struct NodeList : public ListNode
         prevListNode = this;
     }
 
-    void
-    pushFirst(T *t)
+    void pushFirst(T *t)
     {
         // Make sure this node isn't currently in a different list.
         t->popListNode();
@@ -85,8 +84,7 @@ struct NodeList : public ListNode
         nextListNode = t;
     }
 
-    void
-    pushLast(T *t)
+    void pushLast(T *t)
     {
         // Make sure this node isn't currently in a different list.
         t->popListNode();
@@ -102,15 +100,11 @@ struct NodeList : public ListNode
         prevListNode = t;
     }
 
-    T *
-    getNext()
-    {
-        return empty() ? nullptr : static_cast<T *>(nextListNode);
-    }
+    T *getNext() { return empty() ? nullptr : static_cast<T *>(nextListNode); }
 
     bool empty() { return nextListNode == this; }
 };
 
 } // namespace sc_gem5
 
-#endif  //__SYSTEMC_CORE_LIST_HH__
+#endif //__SYSTEMC_CORE_LIST_HH__

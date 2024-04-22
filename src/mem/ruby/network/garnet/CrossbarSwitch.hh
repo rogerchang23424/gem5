@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef __MEM_RUBY_NETWORK_GARNET_0_CROSSBARSWITCH_HH__
 #define __MEM_RUBY_NETWORK_GARNET_0_CROSSBARSWITCH_HH__
 
@@ -57,10 +56,9 @@ class CrossbarSwitch : public Consumer
     ~CrossbarSwitch() = default;
     void wakeup();
     void init();
-    void print(std::ostream& out) const {};
+    void print(std::ostream &out) const {};
 
-    inline void
-    update_sw_winner(int inport, flit *t_flit)
+    inline void update_sw_winner(int inport, flit *t_flit)
     {
         switchBuffers[inport].insert(t_flit);
     }

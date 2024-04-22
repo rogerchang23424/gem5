@@ -55,12 +55,14 @@ class RemoteGDB : public BaseRemoteGDB
     static const int NumCSRs = 4096;
 
     bool acc(Addr addr, size_t len) override;
+
     // A breakpoint will be 2 bytes if it is compressed and 4 if not
     bool checkBpKind(size_t kind) override { return kind == 2 || kind == 4; }
 
     class Riscv32GdbRegCache : public BaseGdbRegCache
     {
-      using BaseGdbRegCache::BaseGdbRegCache;
+        using BaseGdbRegCache::BaseGdbRegCache;
+
       private:
         /**
          * RISC-V Register Cache
@@ -132,21 +134,25 @@ class RemoteGDB : public BaseRemoteGDB
             uint32_t hbadaddr;
             uint32_t hip;
         } r;
+
       public:
         char *data() const { return (char *)&r; }
-        size_t size() const { return sizeof(r); }
-        void getRegs(ThreadContext*);
-        void setRegs(ThreadContext*) const;
 
-        const std::string
-        name() const
+        size_t size() const { return sizeof(r); }
+
+        void getRegs(ThreadContext *);
+        void setRegs(ThreadContext *) const;
+
+        const std::string name() const
         {
             return gdb->name() + ".RiscvGdbRegCache";
         }
     };
+
     class Riscv64GdbRegCache : public BaseGdbRegCache
     {
-      using BaseGdbRegCache::BaseGdbRegCache;
+        using BaseGdbRegCache::BaseGdbRegCache;
+
       private:
         /**
          * RISC-V Register Cache
@@ -215,14 +221,16 @@ class RemoteGDB : public BaseRemoteGDB
             uint64_t hbadaddr;
             uint64_t hip;
         } r;
+
       public:
         char *data() const { return (char *)&r; }
-        size_t size() const { return sizeof(r); }
-        void getRegs(ThreadContext*);
-        void setRegs(ThreadContext*) const;
 
-        const std::string
-        name() const
+        size_t size() const { return sizeof(r); }
+
+        void getRegs(ThreadContext *);
+        void setRegs(ThreadContext *) const;
+
+        const std::string name() const
         {
             return gdb->name() + ".RiscvGdbRegCache";
         }
@@ -234,15 +242,16 @@ class RemoteGDB : public BaseRemoteGDB
   public:
     RemoteGDB(System *_system, ListenSocketConfig _listen_config);
     BaseGdbRegCache *gdbRegs() override;
+
     /**
      * Informs GDB remote serial protocol that XML features are supported
      * GDB then queries for xml blobs using qXfer:features:read:xxx.xml
      */
-    std::vector<std::string>
-    availableFeatures() const override
+    std::vector<std::string> availableFeatures() const override
     {
-        return {"qXfer:features:read+"};
+        return { "qXfer:features:read+" };
     };
+
     /**
      * Reply to qXfer:features:read:xxx.xml qeuries
      */

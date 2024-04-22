@@ -56,8 +56,7 @@ class UniqueNameGen
     std::string buf;
 
   public:
-    const char *
-    gen(std::string seed)
+    const char *gen(std::string seed)
     {
         std::ostringstream os;
         os << seed << "_" << counts[seed]++;
@@ -83,8 +82,7 @@ class Module
     Module(const char *name);
     ~Module();
 
-    static Module *
-    fromScModule(::sc_core::sc_module *mod)
+    static Module *fromScModule(::sc_core::sc_module *mod)
     {
         return mod->_gem5_module;
     }
@@ -92,25 +90,24 @@ class Module
     void finish(Object *this_obj);
 
     const char *name() const { return _name; }
+
     void endModule() { _ended = true; }
+
     void deprecatedConstructor() { _deprecatedConstructor = true; }
 
-    sc_core::sc_module *
-    sc_mod() const
+    sc_core::sc_module *sc_mod() const
     {
         assert(_sc_mod);
         return _sc_mod;
     }
 
-    void
-    sc_mod(sc_core::sc_module *sc_mod)
+    void sc_mod(sc_core::sc_module *sc_mod)
     {
         assert(!_sc_mod);
         _sc_mod = sc_mod;
     }
 
-    Object *
-    obj()
+    Object *obj()
     {
         assert(_obj);
         return _obj;
@@ -146,11 +143,13 @@ pickParentModule()
         return nullptr;
     return Module::fromScModule(mod);
 }
+
 static inline void
 pushParentModule(Module *m)
 {
     pushParentObj(m->obj()->sc_obj());
 }
+
 static inline void
 popParentModule()
 {
@@ -162,4 +161,4 @@ extern std::list<Module *> allModules;
 
 } // namespace sc_gem5
 
-#endif  //__SYSTEMC_CORE_MODULE_HH__
+#endif //__SYSTEMC_CORE_MODULE_HH__

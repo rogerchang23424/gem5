@@ -77,10 +77,10 @@ enum class MessageType
 };
 
 BitUnion32(MessageHeader)
-    Bitfield<27,18> token;
-    Bitfield<17,10> protocolId;
-    Bitfield<9,8> messageType;
-    Bitfield<7,0> messageId;
+    Bitfield<27, 18> token;
+    Bitfield<17, 10> protocolId;
+    Bitfield<9, 8> messageType;
+    Bitfield<7, 0> messageId;
 EndBitUnion(MessageHeader)
 
 union Payload
@@ -109,6 +109,7 @@ union Payload
             int32_t status;
             uint32_t messageId;
         };
+
         uint32_t attributes;
     } baseProtocolMessageAttributes;
 
@@ -137,8 +138,9 @@ union Payload
             uint32_t skip;
             int32_t status;
         };
+
         uint32_t numProtocols;
-        uint32_t protocols[(PROTOCOL_MAX - 1)/ 4];
+        uint32_t protocols[(PROTOCOL_MAX - 1) / 4];
     } baseDiscoverListProtocols;
 
     struct
@@ -148,6 +150,7 @@ union Payload
             uint32_t agentId;
             int32_t status;
         };
+
         uint8_t name[Protocol::MAX_STRING_SIZE + 1];
     } baseDiscoverAgent;
 
@@ -172,18 +175,17 @@ class VirtualChannel : public SimObject
 {
   public:
     VirtualChannel(const ScmiChannelParams &p)
-      : SimObject(p),
-        msgBuffer(), pendingMessage(false), shmem(p.shmem_range),
-        physID(p.phys_id), virtID(p.virt_id),
-        doorbell(p.doorbell)
+        : SimObject(p),
+          msgBuffer(),
+          pendingMessage(false),
+          shmem(p.shmem_range),
+          physID(p.phys_id),
+          virtID(p.virt_id),
+          doorbell(p.doorbell)
     {}
 
     /** Set a pointer to the SCMI platform */
-    void
-    setPlatform(Platform *_platform)
-    {
-        platform = _platform;
-    }
+    void setPlatform(Platform *_platform) { platform = _platform; }
 
     Message msgBuffer;
     bool pendingMessage;
@@ -253,8 +255,9 @@ class Communication : public SimObject
 {
   public:
     Communication(const ScmiCommunicationParams &p)
-      : SimObject(p), platformChan(p.platform_channel),
-        agentChan(p.agent_channel)
+        : SimObject(p),
+          platformChan(p.platform_channel),
+          agentChan(p.agent_channel)
     {}
 
     PlatformChannel *platformChan;
@@ -276,8 +279,7 @@ class Platform : public Scp
     uint32_t numAgents() const { return agents.size(); }
 
     /** Returns the name of an agent given an index */
-    const char*
-    getAgent(unsigned index) const
+    const char *getAgent(unsigned index) const
     {
         return agents[index].c_str();
     }
@@ -288,37 +290,30 @@ class Platform : public Scp
      */
     uint32_t numProtocols() const { return protocols.size() - 1; }
 
-    Port& getPort(const std::string &if_name, PortID idx) override;
+    Port &getPort(const std::string &if_name, PortID idx) override;
 
     void raiseInterrupt(const Doorbell *doorbell) override;
     void clearInterrupt(const Doorbell *doorbell) override;
 
-    static uint32_t
-    protocolID(const Message &msg)
+    static uint32_t protocolID(const Message &msg)
     {
         return bits(msg.header, 17, 10);
     }
 
-    static uint32_t
-    messageID(const Message &msg)
+    static uint32_t messageID(const Message &msg)
     {
         return bits(msg.header, 7, 0);
     }
 
-    static uint32_t
-    messageType(const Message &msg)
+    static uint32_t messageType(const Message &msg)
     {
         return bits(msg.header, 9, 8);
     }
 
-    const ProtocolList&
-    protocolList() const
-    {
-        return protocols;
-    }
+    const ProtocolList &protocolList() const { return protocols; }
 
-    AgentChannel* find(PlatformChannel* platform) const;
-    PlatformChannel* find(AgentChannel* agent) const;
+    AgentChannel *find(PlatformChannel *platform) const;
+    PlatformChannel *find(AgentChannel *agent) const;
 
   private:
     std::vector<Communication *> comms;

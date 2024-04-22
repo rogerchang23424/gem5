@@ -68,13 +68,14 @@ class Flag
     const char *_name;
     const char *_desc;
 
-    virtual void sync() { }
+    virtual void sync() {}
 
   public:
     Flag(const char *name, const char *desc);
     virtual ~Flag();
 
     std::string name() const { return _name; }
+
     std::string desc() const { return _desc; }
 
     bool tracing() const { return TRACING_ON && _tracing; }
@@ -99,10 +100,19 @@ class SimpleFlag : public Flag
     void sync() override { _tracing = _globalEnable && _enabled; }
 
   public:
-    SimpleFlag(const char *name, const char *desc, bool is_format=false);
+    SimpleFlag(const char *name, const char *desc, bool is_format = false);
 
-    void enable() override  { _enabled = true;  sync(); }
-    void disable() override { _enabled = false; sync(); }
+    void enable() override
+    {
+        _enabled = true;
+        sync();
+    }
+
+    void disable() override
+    {
+        _enabled = false;
+        sync();
+    }
 
     /**
      * Checks whether this flag is a conventional debug flag, or a flag that
@@ -119,13 +129,11 @@ class CompoundFlag : public Flag
     std::vector<Flag *> _kids;
 
   public:
-    template<typename... Args>
+    template <typename... Args>
     CompoundFlag(const char *name, const char *desc,
                  std::initializer_list<Flag *> flags)
-        : Flag(name, desc),
-          _kids(flags)
-    {
-    }
+        : Flag(name, desc), _kids(flags)
+    {}
 
     const std::vector<Flag *> &kids() const { return _kids; }
 
@@ -144,6 +152,7 @@ class AllFlagsFlag : public CompoundFlag
     void add(SimpleFlag *flag);
 
     static AllFlagsFlag &instance();
+
     static int version() { return _version; }
 };
 
@@ -160,7 +169,7 @@ void setDebugFlag(const char *string);
 
 void clearDebugFlag(const char *string);
 
-void dumpDebugFlags(std::ostream &os=std::cout);
+void dumpDebugFlags(std::ostream &os = std::cout);
 
 /**
  * \def DTRACE(x)
@@ -168,8 +177,8 @@ void dumpDebugFlags(std::ostream &os=std::cout);
  * @ingroup api_trace
  * @{
  */
-#define DTRACE(x) GEM5_DEPRECATED_MACRO(DTRACE, debug::x, \
-        "Replace DTRACE(x) with debug::x.")
+#define DTRACE(x)                                                             \
+    GEM5_DEPRECATED_MACRO(DTRACE, debug::x, "Replace DTRACE(x) with debug::x.")
 /** @} */ // end of api_trace
 
 } // namespace gem5

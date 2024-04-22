@@ -60,15 +60,16 @@ class InstResult
     const RegClass *_regClass = nullptr;
 
     bool blob() const { return std::holds_alternative<BlobPtr>(value); }
+
     bool valid() const { return _regClass != nullptr; }
 
     // Raw accessors with no safety checks.
     RegVal getRegVal() const { return std::get<RegVal>(value); }
+
     const void *getBlob() const { return std::get<BlobPtr>(value).get(); }
 
     // Store copies of blobs, not a pointer to the original.
-    void
-    set(const void *val)
+    void set(const void *val)
     {
         uint8_t *temp = nullptr;
         if (val) {
@@ -81,8 +82,7 @@ class InstResult
 
     void set(RegVal val) { value = val; }
 
-    void
-    set(const InstResult &other)
+    void set(const InstResult &other)
     {
         other.blob() ? set(other.getBlob()) : set(other.getRegVal());
     }
@@ -90,25 +90,24 @@ class InstResult
   public:
     /** Default constructor creates an invalid result. */
     InstResult() {}
+
     InstResult(const InstResult &other) : _regClass(other._regClass)
     {
         set(other);
     }
 
-    InstResult(const RegClass &reg_class, RegVal val) :
-        _regClass(&reg_class)
+    InstResult(const RegClass &reg_class, RegVal val) : _regClass(&reg_class)
     {
         set(val);
     }
 
-    InstResult(const RegClass &reg_class, const void *val) :
-        _regClass(&reg_class)
+    InstResult(const RegClass &reg_class, const void *val)
+        : _regClass(&reg_class)
     {
         set(val);
     }
 
-    InstResult &
-    operator=(const InstResult &that)
+    InstResult &operator=(const InstResult &that)
     {
         _regClass = that._regClass;
         set(that);
@@ -120,8 +119,7 @@ class InstResult
      * Result comparison
      * Two invalid results always differ.
      */
-    bool
-    operator==(const InstResult& that) const
+    bool operator==(const InstResult &that) const
     {
         if (blob() != that.blob() || _regClass != that._regClass)
             return false;
@@ -136,38 +134,33 @@ class InstResult
 
             // Check the contents of the blobs, not their addresses.
             return std::memcmp(getBlob(), that.getBlob(),
-                    _regClass->regBytes()) == 0;
+                               _regClass->regBytes()) == 0;
         } else {
             return getRegVal() == that.getRegVal();
         }
     }
 
-    bool
-    operator!=(const InstResult& that) const
-    {
-        return !operator==(that);
-    }
+    bool operator!=(const InstResult &that) const { return !operator==(that); }
 
     const RegClass &regClass() const { return *_regClass; }
+
     bool isValid() const { return valid(); }
+
     bool isBlob() const { return blob(); }
 
-    RegVal
-    asRegVal() const
+    RegVal asRegVal() const
     {
         assert(!blob());
         return getRegVal();
     }
 
-    const void *
-    asBlob() const
+    const void *asBlob() const
     {
         assert(blob());
         return getBlob();
     }
 
-    std::string
-    asString() const
+    std::string asString() const
     {
         if (blob()) {
             return _regClass->valString(getBlob());

@@ -67,7 +67,7 @@ class AddrMapper : public SimObject
     virtual ~AddrMapper() = default;
 
     Port &getPort(const std::string &if_name,
-                  PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 
     void init() override;
 
@@ -97,16 +97,13 @@ class AddrMapper : public SimObject
 
     class AddrMapperSenderState : public Packet::SenderState
     {
-
       public:
-
         /**
          * Construct a new sender state to remember the original address.
          *
          * @param _origAddr Address before remapping
          */
-        AddrMapperSenderState(Addr _origAddr) : origAddr(_origAddr)
-        {}
+        AddrMapperSenderState(Addr _origAddr) : origAddr(_origAddr) {}
 
         /** Destructor */
         ~AddrMapperSenderState() {}
@@ -118,55 +115,39 @@ class AddrMapper : public SimObject
     class MapperRequestPort : public RequestPort
     {
       public:
-        MapperRequestPort(const std::string& _name, AddrMapper& _mapper)
+        MapperRequestPort(const std::string &_name, AddrMapper &_mapper)
             : RequestPort(_name), mapper(_mapper)
-        { }
+        {}
 
       protected:
-        void
-        recvFunctionalSnoop(PacketPtr pkt) override
+        void recvFunctionalSnoop(PacketPtr pkt) override
         {
             mapper.recvFunctionalSnoop(pkt);
         }
 
-        Tick
-        recvAtomicSnoop(PacketPtr pkt) override
+        Tick recvAtomicSnoop(PacketPtr pkt) override
         {
             return mapper.recvAtomicSnoop(pkt);
         }
 
-        bool
-        recvTimingResp(PacketPtr pkt) override
+        bool recvTimingResp(PacketPtr pkt) override
         {
             return mapper.recvTimingResp(pkt);
         }
 
-        void
-        recvTimingSnoopReq(PacketPtr pkt) override
+        void recvTimingSnoopReq(PacketPtr pkt) override
         {
             mapper.recvTimingSnoopReq(pkt);
         }
 
-        void
-        recvRangeChange() override
-        {
-            mapper.recvRangeChange();
-        }
+        void recvRangeChange() override { mapper.recvRangeChange(); }
 
-        bool
-        isSnooping() const override
-        {
-            return mapper.isSnooping();
-        }
+        bool isSnooping() const override { return mapper.isSnooping(); }
 
-        void
-        recvReqRetry() override
-        {
-            mapper.recvReqRetry();
-        }
+        void recvReqRetry() override { mapper.recvReqRetry(); }
 
       private:
-        AddrMapper& mapper;
+        AddrMapper &mapper;
     };
 
     /** Instance of request port, facing the memory side */
@@ -175,13 +156,12 @@ class AddrMapper : public SimObject
     class MapperResponsePort : public ResponsePort
     {
       public:
-        MapperResponsePort(const std::string& _name, AddrMapper& _mapper)
+        MapperResponsePort(const std::string &_name, AddrMapper &_mapper)
             : ResponsePort(_name), mapper(_mapper)
         {}
 
       protected:
-        void
-        recvFunctional(PacketPtr pkt) override
+        void recvFunctional(PacketPtr pkt) override
         {
             mapper.recvFunctional(pkt);
         }
@@ -192,44 +172,36 @@ class AddrMapper : public SimObject
             mapper.recvMemBackdoorReq(req, backdoor);
         }
 
-        Tick
-        recvAtomic(PacketPtr pkt) override
+        Tick recvAtomic(PacketPtr pkt) override
         {
             return mapper.recvAtomic(pkt);
         }
 
-        Tick
-        recvAtomicBackdoor(PacketPtr pkt, MemBackdoorPtr& backdoor) override
+        Tick recvAtomicBackdoor(PacketPtr pkt,
+                                MemBackdoorPtr &backdoor) override
         {
             return mapper.recvAtomicBackdoor(pkt, backdoor);
         }
 
-        bool
-        recvTimingReq(PacketPtr pkt) override
+        bool recvTimingReq(PacketPtr pkt) override
         {
             return mapper.recvTimingReq(pkt);
         }
 
-        bool
-        recvTimingSnoopResp(PacketPtr pkt) override
+        bool recvTimingSnoopResp(PacketPtr pkt) override
         {
             return mapper.recvTimingSnoopResp(pkt);
         }
 
-        AddrRangeList
-        getAddrRanges() const override
+        AddrRangeList getAddrRanges() const override
         {
             return mapper.getAddrRanges();
         }
 
-        void
-        recvRespRetry() override
-        {
-            mapper.recvRespRetry();
-        }
+        void recvRespRetry() override { mapper.recvRespRetry(); }
 
       private:
-        AddrMapper& mapper;
+        AddrMapper &mapper;
     };
 
     /** Instance of response port, i.e. on the CPU side */
@@ -246,7 +218,7 @@ class AddrMapper : public SimObject
 
     Tick recvAtomicSnoop(PacketPtr pkt);
 
-    Tick recvAtomicBackdoor(PacketPtr pkt, MemBackdoorPtr& backdoor);
+    Tick recvAtomicBackdoor(PacketPtr pkt, MemBackdoorPtr &backdoor);
 
     bool recvTimingReq(PacketPtr pkt);
 
@@ -282,8 +254,7 @@ class RangeAddrMapper : public AddrMapper
 
     AddrRangeList getAddrRanges() const override;
 
-    void
-    init() override
+    void init() override
     {
         AddrMapper::init();
         cpuSidePort.sendRangeChange();
@@ -308,8 +279,7 @@ class RangeAddrMapper : public AddrMapper
     MemBackdoorPtr getRevertedBackdoor(MemBackdoorPtr &backdoor,
                                        const AddrRange &range) override;
 
-    void
-    recvRangeChange() override
+    void recvRangeChange() override
     {
         // TODO Check that our peer is actually expecting to receive accesses
         // in our output range(s).

@@ -56,20 +56,14 @@ class PlicIntDevice : public BasicPioDevice
   public:
     typedef PlicIntDeviceParams Params;
 
-    const Params &
-    params() const
+    const Params &params() const
     {
         return dynamic_cast<const Params &>(_params);
     }
 
     PlicIntDevice(const Params &params);
 
-    const int &
-    id()
-    {
-      return _interruptID;
-    }
-
+    const int &id() { return _interruptID; }
 };
 
 } // namespace gem5

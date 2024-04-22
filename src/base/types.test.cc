@@ -61,7 +61,6 @@ TEST(CyclesTest, PrefixIncrement)
     EXPECT_EQ(2, cycles);
 }
 
-
 TEST(CyclesTest, PrefixDecrement)
 {
     Cycles cycles(10);

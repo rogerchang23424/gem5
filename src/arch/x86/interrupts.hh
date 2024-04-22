@@ -129,8 +129,7 @@ class Interrupts : public BaseInterrupts
     uint8_t IRRV = 0;
     uint8_t ISRV = 0;
 
-    int
-    findRegArrayMSB(ApicRegIndex base)
+    int findRegArrayMSB(ApicRegIndex base)
     {
         int offset = 7;
         do {
@@ -141,32 +140,21 @@ class Interrupts : public BaseInterrupts
         return 0;
     }
 
-    void
-    updateIRRV()
-    {
-        IRRV = findRegArrayMSB(APIC_INTERRUPT_REQUEST_BASE);
-    }
+    void updateIRRV() { IRRV = findRegArrayMSB(APIC_INTERRUPT_REQUEST_BASE); }
 
-    void
-    updateISRV()
-    {
-        ISRV = findRegArrayMSB(APIC_IN_SERVICE_BASE);
-    }
+    void updateISRV() { ISRV = findRegArrayMSB(APIC_IN_SERVICE_BASE); }
 
-    void
-    setRegArrayBit(ApicRegIndex base, uint8_t vector)
+    void setRegArrayBit(ApicRegIndex base, uint8_t vector)
     {
         regs[base + (vector / 32)] |= (1 << (vector % 32));
     }
 
-    void
-    clearRegArrayBit(ApicRegIndex base, uint8_t vector)
+    void clearRegArrayBit(ApicRegIndex base, uint8_t vector)
     {
         regs[base + (vector / 32)] &= ~(1 << (vector % 32));
     }
 
-    bool
-    getRegArrayBit(ApicRegIndex base, uint8_t vector)
+    bool getRegArrayBit(ApicRegIndex base, uint8_t vector)
     {
         return bits(regs[base + (vector / 32)], vector % 32);
     }
@@ -192,7 +180,6 @@ class Interrupts : public BaseInterrupts
     Addr pioAddr = MaxAddr;
 
   public:
-
     int getInitialApicId() { return initialApicId; }
 
     /*
@@ -215,8 +202,7 @@ class Interrupts : public BaseInterrupts
     Tick recvMessage(PacketPtr pkt);
     void completeIPI(PacketPtr pkt);
 
-    bool
-    triggerTimerInterrupt()
+    bool triggerTimerInterrupt()
     {
         LVTEntry entry = regs[APIC_LVT_TIMER];
         if (!entry.masked)
@@ -230,9 +216,8 @@ class Interrupts : public BaseInterrupts
     void raiseInterruptPin(int number);
     void lowerInterruptPin(int number);
 
-    Port &
-    getPort(const std::string &if_name,
-            PortID idx=InvalidPortID) override
+    Port &getPort(const std::string &if_name,
+                  PortID idx = InvalidPortID) override
     {
         if (if_name == "int_requestor") {
             return intRequestPort;
@@ -255,11 +240,8 @@ class Interrupts : public BaseInterrupts
 
     uint32_t readReg(ApicRegIndex miscReg);
     void setReg(ApicRegIndex reg, uint32_t val);
-    void
-    setRegNoEffect(ApicRegIndex reg, uint32_t val)
-    {
-        regs[reg] = val;
-    }
+
+    void setRegNoEffect(ApicRegIndex reg, uint32_t val) { regs[reg] = val; }
 
     /*
      * Constructor.
@@ -279,12 +261,14 @@ class Interrupts : public BaseInterrupts
      * @return true if there are interrupts pending.
      */
     bool checkInterruptsRaw() const;
+
     /**
      * Check if there are pending unmaskable interrupts.
      *
      * @return true there are unmaskable interrupts pending.
      */
     bool hasPendingUnmaskable() const { return pendingUnmaskableInt; }
+
     Fault getInterrupt() override;
     void updateIntrInfo() override;
 
@@ -298,20 +282,17 @@ class Interrupts : public BaseInterrupts
      * Old functions needed for compatability but which will be phased out
      * eventually.
      */
-    void
-    post(int int_num, int index) override
+    void post(int int_num, int index) override
     {
         panic("Interrupts::post unimplemented!\n");
     }
 
-    void
-    clear(int int_num, int index) override
+    void clear(int int_num, int index) override
     {
         panic("Interrupts::clear unimplemented!\n");
     }
 
-    void
-    clearAll() override
+    void clearAll() override
     {
         panic("Interrupts::clearAll unimplemented!\n");
     }

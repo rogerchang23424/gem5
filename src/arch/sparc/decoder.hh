@@ -57,8 +57,7 @@ class Decoder : public InstDecoder
 
     // Use this to give data to the predecoder. This should be used
     // when there is control flow.
-    void
-    moreBytes(const PCStateBase &pc, Addr fetchPC) override
+    void moreBytes(const PCStateBase &pc, Addr fetchPC) override
     {
         emi = betoh(machInst);
         // The I bit, bit 13, is used to figure out where the ASI
@@ -66,8 +65,7 @@ class Decoder : public InstDecoder
         // slightly redundant, but it removes the need to put a condition
         // into all the execute functions
         if (emi & (1 << 13)) {
-            emi |= (static_cast<ExtMachInst>(
-                        asi << (sizeof(machInst) * 8)));
+            emi |= (static_cast<ExtMachInst>(asi << (sizeof(machInst) * 8)));
         } else {
             emi |= (static_cast<ExtMachInst>(bits(emi, 12, 5))
                     << (sizeof(machInst) * 8));
@@ -75,11 +73,7 @@ class Decoder : public InstDecoder
         instDone = true;
     }
 
-    void
-    setContext(RegVal _asi)
-    {
-        asi = _asi;
-    }
+    void setContext(RegVal _asi) { asi = _asi; }
 
   protected:
     /// A cache of decoded instruction objects.
@@ -91,18 +85,16 @@ class Decoder : public InstDecoder
     /// Decode a machine instruction.
     /// @param mach_inst The binary instruction to decode.
     /// @retval A pointer to the corresponding StaticInst object.
-    StaticInstPtr
-    decode(ExtMachInst mach_inst, Addr addr)
+    StaticInstPtr decode(ExtMachInst mach_inst, Addr addr)
     {
         StaticInstPtr si = defaultCache.decode(this, mach_inst, addr);
-        DPRINTF(Decode, "Decode: Decoded %s instruction: %#x\n",
-                si->getName(), mach_inst);
+        DPRINTF(Decode, "Decode: Decoded %s instruction: %#x\n", si->getName(),
+                mach_inst);
         return si;
     }
 
   public:
-    StaticInstPtr
-    decode(PCStateBase &next_pc) override
+    StaticInstPtr decode(PCStateBase &next_pc) override
     {
         if (!instDone)
             return NULL;

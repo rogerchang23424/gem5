@@ -105,26 +105,30 @@ class ObjectFile : public ImageFile
     ObjectFile(ImageFileDataPtr ifd);
 
   public:
-    virtual ~ObjectFile() {};
+    virtual ~ObjectFile(){};
 
     virtual ObjectFile *getInterpreter() const { return nullptr; }
+
     virtual bool relocatable() const { return false; }
-    virtual Addr
-    mapSize() const
+
+    virtual Addr mapSize() const
     {
         panic("mapSize() should only be called on relocatable objects\n");
     }
-    virtual void
-    updateBias(Addr bias_addr)
+
+    virtual void updateBias(Addr bias_addr)
     {
         panic("updateBias() should only be called on relocatable objects\n");
     }
+
     virtual Addr bias() const { return 0; }
 
     virtual bool hasTLS() { return false; }
 
-    Arch  getArch()  const { return arch; }
+    Arch getArch() const { return arch; }
+
     OpSys getOpSys() const { return opSys; }
+
     ByteOrder getByteOrder() const { return byteOrder; }
 
     const SymbolTable &symtab() const { return _symtab; }
@@ -148,11 +152,10 @@ class ObjectFileFormat
     virtual ObjectFile *load(ImageFileDataPtr data) = 0;
 };
 
-ObjectFile *createObjectFile(const std::string &fname, bool raw=false);
+ObjectFile *createObjectFile(const std::string &fname, bool raw = false);
 
 /** Determine whether the loader::Arch is 64-bit or 32-bit. */
-bool
-archIs64Bit(const Arch arch);
+bool archIs64Bit(const Arch arch);
 
 } // namespace loader
 } // namespace gem5

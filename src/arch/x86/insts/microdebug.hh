@@ -43,13 +43,12 @@ class MicroDebug : public X86ISA::X86MicroopBase
 
   public:
     MicroDebug(ExtMachInst mach_inst, const char *mnem, const char *inst_mnem,
-            uint64_t set_flags, GenericISA::M5DebugFault *_fault) :
-        X86MicroopBase(mach_inst, mnem, inst_mnem, set_flags, No_OpClass),
-        fault(_fault)
+               uint64_t set_flags, GenericISA::M5DebugFault *_fault)
+        : X86MicroopBase(mach_inst, mnem, inst_mnem, set_flags, No_OpClass),
+          fault(_fault)
     {}
 
-    Fault
-    execute(ExecContext *xc, trace::InstRecord *traceData) const override
+    Fault execute(ExecContext *xc, trace::InstRecord *traceData) const override
     {
         return fault;
     }

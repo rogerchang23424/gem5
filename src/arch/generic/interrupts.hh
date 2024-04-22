@@ -72,23 +72,17 @@ class BaseInterrupts : public SimObject
      * Old functions needed for compatability but which will be phased out
      * eventually.
      */
-    virtual void
-    post(int int_num, int index)
+    virtual void post(int int_num, int index)
     {
         panic("Interrupts::post unimplemented!\n");
     }
 
-    virtual void
-    clear(int int_num, int index)
+    virtual void clear(int int_num, int index)
     {
         panic("Interrupts::clear unimplemented!\n");
     }
 
-    virtual void
-    clearAll()
-    {
-        panic("Interrupts::clearAll unimplemented!\n");
-    }
+    virtual void clearAll() { panic("Interrupts::clearAll unimplemented!\n"); }
 };
 
 } // namespace gem5

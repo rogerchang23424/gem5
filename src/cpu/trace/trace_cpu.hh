@@ -143,7 +143,6 @@ namespace gem5
 
 class TraceCPU : public ClockedObject
 {
-
   public:
     TraceCPU(const TraceCPUParams &params);
 
@@ -191,7 +190,6 @@ class TraceCPU : public ClockedObject
     void schedDcacheNextEvent(Tick when);
 
   protected:
-
     /**
      * IcachePort class that interfaces with L1 Instruction Cache.
      */
@@ -199,8 +197,8 @@ class TraceCPU : public ClockedObject
     {
       public:
         /** Default constructor. */
-        IcachePort(TraceCPU* _cpu) :
-            RequestPort(_cpu->name() + ".icache_port"), owner(_cpu)
+        IcachePort(TraceCPU *_cpu)
+            : RequestPort(_cpu->name() + ".icache_port"), owner(_cpu)
         {}
 
       public:
@@ -228,7 +226,7 @@ class TraceCPU : public ClockedObject
         void recvReqRetry();
 
       private:
-        TraceCPU* owner;
+        TraceCPU *owner;
     };
 
     /**
@@ -236,15 +234,13 @@ class TraceCPU : public ClockedObject
      */
     class DcachePort : public RequestPort
     {
-
       public:
         /** Default constructor. */
-        DcachePort(TraceCPU* _cpu) :
-            RequestPort(_cpu->name() + ".dcache_port"), owner(_cpu)
+        DcachePort(TraceCPU *_cpu)
+            : RequestPort(_cpu->name() + ".dcache_port"), owner(_cpu)
         {}
 
       public:
-
         /**
          * Receive the timing reponse and call dcacheRecvTimingResp() method
          * of the dcacheGen to handle completing the load
@@ -282,7 +278,7 @@ class TraceCPU : public ClockedObject
         bool isSnooping() const { return true; }
 
       private:
-        TraceCPU* owner;
+        TraceCPU *owner;
     };
 
     /** Cache the cache line size that we get from the system */
@@ -311,15 +307,12 @@ class TraceCPU : public ClockedObject
      */
     class FixedRetryGen
     {
-
       private:
-
         /**
          * This struct stores a line in the trace file.
          */
         struct TraceElement
         {
-
             /** Specifies if the request is to be a read or a write */
             MemCmd cmd;
 
@@ -368,7 +361,7 @@ class TraceCPU : public ClockedObject
              *
              * @param filename Path to the file to read from
              */
-            InputStream(const std::string& filename);
+            InputStream(const std::string &filename);
 
             /**
              * Reset the stream such that it can be played once
@@ -384,24 +377,24 @@ class TraceCPU : public ClockedObject
              * @param element Trace element to populate
              * @return True if an element could be read successfully
              */
-            bool read(TraceElement* element);
+            bool read(TraceElement *element);
         };
 
       public:
         /* Constructor */
-        FixedRetryGen(TraceCPU& _owner, const std::string& _name,
-                   RequestPort& _port, RequestorID requestor_id,
-                   const std::string& trace_file) :
-            owner(_owner),
-            port(_port),
-            requestorId(requestor_id),
-            trace(trace_file),
-            genName(owner.name() + ".fixedretry." + _name),
-            retryPkt(nullptr),
-            delta(0),
-            traceComplete(false), fixedStats(&_owner, _name)
-        {
-        }
+        FixedRetryGen(TraceCPU &_owner, const std::string &_name,
+                      RequestPort &_port, RequestorID requestor_id,
+                      const std::string &trace_file)
+            : owner(_owner),
+              port(_port),
+              requestorId(requestor_id),
+              trace(trace_file),
+              genName(owner.name() + ".fixedretry." + _name),
+              retryPkt(nullptr),
+              delta(0),
+              traceComplete(false),
+              fixedStats(&_owner, _name)
+        {}
 
         /**
          * Called from TraceCPU init(). Reads the first message from the
@@ -420,7 +413,7 @@ class TraceCPU : public ClockedObject
         bool tryNext();
 
         /** Returns name of the FixedRetryGen instance. */
-        const std::string& name() const { return genName; }
+        const std::string &name() const { return genName; }
 
         /**
          * Creates a new request assigning the request parameters passed by the
@@ -435,8 +428,8 @@ class TraceCPU : public ClockedObject
          *
          * @return true if packet was sent successfully
          */
-        bool send(Addr addr, unsigned size, const MemCmd& cmd,
-              Request::FlagsType flags, Addr pc);
+        bool send(Addr addr, unsigned size, const MemCmd &cmd,
+                  Request::FlagsType flags, Addr pc);
 
         /** Exit the FixedRetryGen. */
         void exit();
@@ -462,10 +455,10 @@ class TraceCPU : public ClockedObject
 
       private:
         /** Reference of the TraceCPU. */
-        TraceCPU& owner;
+        TraceCPU &owner;
 
         /** Reference of the port to be used to issue memory requests. */
-        RequestPort& port;
+        RequestPort &port;
 
         /** RequestorID used for the requests being sent. */
         const RequestorID requestorId;
@@ -493,12 +486,13 @@ class TraceCPU : public ClockedObject
 
         /** Store an element read from the trace to send as the next packet. */
         TraceElement currElement;
+
       protected:
         struct FixedRetryGenStatGroup : public statistics::Group
         {
             /** name is the extension to the name for these stats */
             FixedRetryGenStatGroup(statistics::Group *parent,
-                                   const std::string& _name);
+                                   const std::string &_name);
             /** Stats for instruction accesses replayed. */
             statistics::Scalar numSendAttempted;
             statistics::Scalar numSendSucceeded;
@@ -507,7 +501,6 @@ class TraceCPU : public ClockedObject
             /** Last simulated tick by the FixedRetryGen */
             statistics::Scalar instLastTick;
         } fixedStats;
-
     };
 
     /**
@@ -554,10 +547,10 @@ class TraceCPU : public ClockedObject
             /** ROB occupancy number */
             NodeRobNum robNum;
 
-           /**
-            * Type of the node corresponding to the instruction modeled by
-            * it.
-            */
+            /**
+             * Type of the node corresponding to the instruction modeled by
+             * it.
+             */
             RecordType type;
 
             /** The address for the request if any */
@@ -613,11 +606,11 @@ class TraceCPU : public ClockedObject
             bool removeDepOnInst(NodeSeqNum done_seq_num);
 
             /** Return true if node has a request which is strictly ordered */
-            bool
-            isStrictlyOrdered() const
+            bool isStrictlyOrdered() const
             {
                 return (flags.isSet(Request::STRICT_ORDER));
             }
+
             /**
              * Write out element in trace-compatible format using debug flag
              * TraceCPUData.
@@ -654,21 +647,21 @@ class TraceCPU : public ClockedObject
              * @param max_loads size of Load Buffer
              */
             HardwareResource(uint16_t max_rob, uint16_t max_stores,
-                                uint16_t max_loads);
+                             uint16_t max_loads);
 
             /**
              * Occupy appropriate structures for an issued node.
              *
              * @param node_ptr pointer to the issued node
              */
-            void occupy(const GraphNode* new_node);
+            void occupy(const GraphNode *new_node);
 
             /**
              * Release appropriate structures for a completed node.
              *
              * @param node_ptr pointer to the completed node
              */
-            void release(const GraphNode* done_node);
+            void release(const GraphNode *done_node);
 
             /** Release store buffer entry for a completed store */
             void releaseStoreBuffer();
@@ -679,7 +672,7 @@ class TraceCPU : public ClockedObject
              * @param node_ptr pointer to the node ready to issue
              * @return true if resources are available
              */
-            bool isAvailable(const GraphNode* new_node) const;
+            bool isAvailable(const GraphNode *new_node) const;
 
             /**
              * Check if there are any outstanding requests, i.e. requests for
@@ -773,7 +766,7 @@ class TraceCPU : public ClockedObject
              * @param filename Path to the file to read from
              * @param time_multiplier used to scale the compute delays
              */
-            InputStream(const std::string& filename,
+            InputStream(const std::string &filename,
                         const double time_multiplier);
 
             /**
@@ -791,7 +784,7 @@ class TraceCPU : public ClockedObject
              * @param size of register dependency array stored in the element
              * @return True if an element could be read successfully
              */
-            bool read(GraphNode* element);
+            bool read(GraphNode *element);
 
             /** Get window size from trace */
             uint32_t getWindowSize() const { return windowSize; }
@@ -800,24 +793,25 @@ class TraceCPU : public ClockedObject
             uint64_t getMicroOpCount() const { return microOpCount; }
         };
 
-        public:
+      public:
         /* Constructor */
-        ElasticDataGen(TraceCPU& _owner, const std::string& _name,
-                   RequestPort& _port, RequestorID requestor_id,
-                   const std::string& trace_file,
-                   const TraceCPUParams &params) :
-            owner(_owner),
-            port(_port),
-            requestorId(requestor_id),
-            trace(trace_file, 1.0 / params.freqMultiplier),
-            genName(owner.name() + ".elastic." + _name),
-            retryPkt(nullptr),
-            traceComplete(false),
-            nextRead(false),
-            execComplete(false),
-            windowSize(trace.getWindowSize()),
-            hwResource(params.sizeROB, params.sizeStoreBuffer,
-                       params.sizeLoadBuffer), elasticStats(&_owner, _name)
+        ElasticDataGen(TraceCPU &_owner, const std::string &_name,
+                       RequestPort &_port, RequestorID requestor_id,
+                       const std::string &trace_file,
+                       const TraceCPUParams &params)
+            : owner(_owner),
+              port(_port),
+              requestorId(requestor_id),
+              trace(trace_file, 1.0 / params.freqMultiplier),
+              genName(owner.name() + ".elastic." + _name),
+              retryPkt(nullptr),
+              traceComplete(false),
+              nextRead(false),
+              execComplete(false),
+              windowSize(trace.getWindowSize()),
+              hwResource(params.sizeROB, params.sizeStoreBuffer,
+                         params.sizeLoadBuffer),
+              elasticStats(&_owner, _name)
         {
             DPRINTF(TraceCPUData, "Window size in the trace is %d.\n",
                     windowSize);
@@ -837,10 +831,10 @@ class TraceCPU : public ClockedObject
          *
          * @param trace_offset trace offset set by comparing both traces
          */
-        void adjustInitTraceOffset(Tick& offset);
+        void adjustInitTraceOffset(Tick &offset);
 
         /** Returns name of the ElasticDataGen instance. */
-        const std::string& name() const { return genName; }
+        const std::string &name() const { return genName; }
 
         /** Exit the ElasticDataGen. */
         void exit();
@@ -862,8 +856,8 @@ class TraceCPU : public ClockedObject
          * @tparam  dep_list    the dependency list of type rob or register,
          *                      that is to be iterated, and may get modified
          */
-        template<typename T>
-        void addDepsOnParent(GraphNode *new_node, T& dep_list);
+        template <typename T>
+        void addDepsOnParent(GraphNode *new_node, T &dep_list);
 
         /**
          * This is the main execute function which consumes nodes from the
@@ -886,7 +880,7 @@ class TraceCPU : public ClockedObject
          * @return packet pointer if the request failed and nullptr if it was
          *          sent successfully
          */
-        PacketPtr executeMemReq(GraphNode* node_ptr);
+        PacketPtr executeMemReq(GraphNode *node_ptr);
 
         /**
          * Add a ready node to the readyList. When inserting, ensure the nodes
@@ -925,17 +919,17 @@ class TraceCPU : public ClockedObject
          * @param first true if this is the first attempt to issue this node
          * @return true if node was added to readyList
          */
-        bool checkAndIssue(const GraphNode* node_ptr, bool first=true);
+        bool checkAndIssue(const GraphNode *node_ptr, bool first = true);
 
         /** Get number of micro-ops modelled in the TraceCPU replay */
         uint64_t getMicroOpCount() const { return trace.getMicroOpCount(); }
 
       private:
         /** Reference of the TraceCPU. */
-        TraceCPU& owner;
+        TraceCPU &owner;
 
         /** Reference of the port to be used to issue memory requests. */
-        RequestPort& port;
+        RequestPort &port;
 
         /** RequestorID used for the requests being sent. */
         const RequestorID requestorId;
@@ -976,7 +970,7 @@ class TraceCPU : public ClockedObject
         HardwareResource hwResource;
 
         /** Store the depGraph of GraphNodes */
-        std::unordered_map<NodeSeqNum, GraphNode*> depGraph;
+        std::unordered_map<NodeSeqNum, GraphNode *> depGraph;
 
         /**
          * Queue of dependency-free nodes that are pending issue because
@@ -985,7 +979,7 @@ class TraceCPU : public ClockedObject
          * into the queue in that order. Thus nodes are more likely to
          * issue in program order.
          */
-        std::queue<const GraphNode*> depFreeQueue;
+        std::queue<const GraphNode *> depFreeQueue;
 
         /** List of nodes that are ready to execute */
         std::list<ReadyNode> readyList;
@@ -996,7 +990,7 @@ class TraceCPU : public ClockedObject
         {
             /** name is the extension to the name for these stats */
             ElasticDataGenStatGroup(statistics::Group *parent,
-                                    const std::string& _name);
+                                    const std::string &_name);
             /** Stats for data memory accesses replayed. */
             statistics::Scalar maxDependents;
             statistics::Scalar maxReadyListSize;
@@ -1064,11 +1058,11 @@ class TraceCPU : public ClockedObject
      */
     static int numTraceCPUs;
 
-   /**
-    * A CountedExitEvent which when serviced decrements the counter. A sim
-    * exit event is scheduled when the counter equals zero, that is all
-    * instances of Trace CPU have had their execCompleteEvent serviced.
-    */
+    /**
+     * A CountedExitEvent which when serviced decrements the counter. A sim
+     * exit event is scheduled when the counter equals zero, that is all
+     * instances of Trace CPU have had their execCompleteEvent serviced.
+     */
     CountedExitEvent *execCompleteEvent;
 
     /**
@@ -1078,9 +1072,9 @@ class TraceCPU : public ClockedObject
     const bool enableEarlyExit;
 
     /**
-      * Interval of committed instructions specified by the user at which a
-      * progress info message is printed
-      */
+     * Interval of committed instructions specified by the user at which a
+     * progress info message is printed
+     */
     const uint64_t progressMsgInterval;
 
     /*
@@ -1089,6 +1083,7 @@ class TraceCPU : public ClockedObject
      * message is printed.
      */
     uint64_t progressMsgThreshold;
+
     struct TraceStats : public statistics::Group
     {
         TraceStats(TraceCPU *trace);
@@ -1105,7 +1100,6 @@ class TraceCPU : public ClockedObject
     } traceStats;
 
   public:
-
     /** Used to get a reference to the icache port. */
     Port &getInstPort() { return icachePort; }
 
@@ -1123,7 +1117,7 @@ class TraceCPU : public ClockedObject
      * @return a reference to the port with the given name
      */
     Port &getPort(const std::string &if_name,
-                  PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 };
 
 } // namespace gem5

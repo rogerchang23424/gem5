@@ -86,21 +86,29 @@ class Queued : public Base
          * @param prio This prefetch priority
          */
         DeferredPacket(Queued *o, PrefetchInfo const &pfi, Tick t,
-            int32_t prio, const CacheAccessor &_cache)
-            : owner(o), pfInfo(pfi), tick(t), pkt(nullptr),
-            priority(prio), translationRequest(), tc(nullptr),
-            ongoingTranslation(false), cache(&_cache) {
-        }
+                       int32_t prio, const CacheAccessor &_cache)
+            : owner(o),
+              pfInfo(pfi),
+              tick(t),
+              pkt(nullptr),
+              priority(prio),
+              translationRequest(),
+              tc(nullptr),
+              ongoingTranslation(false),
+              cache(&_cache)
+        {}
 
-        bool operator>(const DeferredPacket& that) const
+        bool operator>(const DeferredPacket &that) const
         {
             return priority > that.priority;
         }
-        bool operator<(const DeferredPacket& that) const
+
+        bool operator<(const DeferredPacket &that) const
         {
             return priority < that.priority;
         }
-        bool operator<=(const DeferredPacket& that) const
+
+        bool operator<=(const DeferredPacket &that) const
         {
             return !(*this > that);
         }
@@ -128,11 +136,10 @@ class Queued : public Base
             translationRequest = req;
         }
 
-        void markDelayed() override
-        {}
+        void markDelayed() override {}
 
         void finish(const Fault &fault, const RequestPtr &req,
-                            ThreadContext *tc, BaseMMU::Mode mode) override;
+                    ThreadContext *tc, BaseMMU::Mode mode) override;
 
         /**
          * Issues the translation request to the provided MMU
@@ -188,14 +195,15 @@ class Queued : public Base
         statistics::Scalar pfSpanPage;
         statistics::Scalar pfUsefulSpanPage;
     } statsQueued;
+
   public:
     using AddrPriority = std::pair<Addr, int32_t>;
 
     Queued(const QueuedPrefetcherParams &p);
     virtual ~Queued();
 
-    void
-    notify(const CacheAccessProbeArg &acc, const PrefetchInfo &pfi) override;
+    void notify(const CacheAccessProbeArg &acc,
+                const PrefetchInfo &pfi) override;
 
     void insert(const PacketPtr &pkt, PrefetchInfo &new_pfi, int32_t priority,
                 const CacheAccessor &cache);
@@ -213,7 +221,6 @@ class Queued : public Base
     void printQueue(const std::list<DeferredPacket> &queue) const;
 
   private:
-
     /**
      * Adds a DeferredPacket to the specified queue
      * @param queue selected queue to use
@@ -263,7 +270,7 @@ class Queued : public Base
     size_t getMaxPermittedPrefetches(size_t total) const;
 
     RequestPtr createPrefetchRequest(Addr addr, PrefetchInfo const &pfi,
-                                        PacketPtr pkt);
+                                     PacketPtr pkt);
 };
 
 } // namespace prefetch

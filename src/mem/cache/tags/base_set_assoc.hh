@@ -90,7 +90,7 @@ class BaseSetAssoc : public BaseTags
 
   public:
     /** Convenience typedef. */
-     typedef BaseSetAssocParams Params;
+    typedef BaseSetAssocParams Params;
 
     /**
      * Construct and initialize this tag store.
@@ -100,7 +100,7 @@ class BaseSetAssoc : public BaseTags
     /**
      * Destructor
      */
-    virtual ~BaseSetAssoc() {};
+    virtual ~BaseSetAssoc(){};
 
     /**
      * Initialize blocks as CacheBlk instances.
@@ -125,7 +125,7 @@ class BaseSetAssoc : public BaseTags
      * @param lat The latency of the tag lookup.
      * @return Pointer to the cache block if found.
      */
-    CacheBlk* accessBlock(const PacketPtr pkt, Cycles &lat) override
+    CacheBlk *accessBlock(const PacketPtr pkt, Cycles &lat) override
     {
         CacheBlk *blk = findBlock(pkt->getAddr(), pkt->isSecure());
 
@@ -167,13 +167,13 @@ class BaseSetAssoc : public BaseTags
      * @param partition_id Partition ID for resource management.
      * @return Cache block to be replaced.
      */
-    CacheBlk* findVictim(Addr addr, const bool is_secure,
+    CacheBlk *findVictim(Addr addr, const bool is_secure,
                          const std::size_t size,
-                         std::vector<CacheBlk*>& evict_blks,
-                         const uint64_t partition_id=0) override
+                         std::vector<CacheBlk *> &evict_blks,
+                         const uint64_t partition_id = 0) override
     {
         // Get possible entries to be victimized
-        std::vector<ReplaceableEntry*> entries =
+        std::vector<ReplaceableEntry *> entries =
             indexingPolicy->getPossibleEntries(addr);
 
         // Filter entries based on PartitionID
@@ -182,8 +182,10 @@ class BaseSetAssoc : public BaseTags
         }
 
         // Choose replacement victim from replacement candidates
-        CacheBlk* victim = entries.empty() ? nullptr :
-            static_cast<CacheBlk*>(replacementPolicy->getVictim(entries));
+        CacheBlk *victim =
+            entries.empty() ?
+                nullptr :
+                static_cast<CacheBlk *>(replacementPolicy->getVictim(entries));
 
         // There is only one eviction for this replacement
         evict_blks.push_back(victim);
@@ -230,10 +232,7 @@ class BaseSetAssoc : public BaseTags
      * Get the way allocation mask limit.
      * @return The maximum number of ways available for replacement.
      */
-    virtual int getWayAllocationMax() const override
-    {
-        return allocAssoc;
-    }
+    virtual int getWayAllocationMax() const override { return allocAssoc; }
 
     /**
      * Regenerate the block address from the tag and indexing location.
@@ -241,13 +240,14 @@ class BaseSetAssoc : public BaseTags
      * @param block The block.
      * @return the block address.
      */
-    Addr regenerateBlkAddr(const CacheBlk* blk) const override
+    Addr regenerateBlkAddr(const CacheBlk *blk) const override
     {
         return indexingPolicy->regenerateAddr(blk->getTag(), blk);
     }
 
-    bool anyBlk(std::function<bool(CacheBlk &)> visitor) override {
-        for (CacheBlk& blk : blks) {
+    bool anyBlk(std::function<bool(CacheBlk &)> visitor) override
+    {
+        for (CacheBlk &blk : blks) {
             if (visitor(blk)) {
                 return true;
             }

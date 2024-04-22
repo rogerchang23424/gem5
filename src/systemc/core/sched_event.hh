@@ -50,8 +50,7 @@ class ScEvent
 
     friend class Scheduler;
 
-    void
-    schedule(ScEvents &events, gem5::Tick w)
+    void schedule(ScEvents &events, gem5::Tick w)
     {
         when(w);
         assert(!scheduled());
@@ -61,27 +60,33 @@ class ScEvent
         _it--;
     }
 
-    void
-    deschedule()
+    void deschedule()
     {
         assert(scheduled());
         _events->erase(_it);
         _events = nullptr;
     }
+
   public:
-    ScEvent(std::function<void()> work) :
-        work(work), _when(gem5::MaxTick), _events(nullptr)
+    ScEvent(std::function<void()> work)
+        : work(work), _when(gem5::MaxTick), _events(nullptr)
     {}
 
     ~ScEvent();
 
     bool scheduled() { return _events != nullptr; }
+
     ScEvents *scheduledOn() { return _events; }
 
     void when(gem5::Tick w) { _when = w; }
+
     gem5::Tick when() { return _when; }
 
-    void run() { deschedule(); work(); }
+    void run()
+    {
+        deschedule();
+        work();
+    }
 };
 
 } // namespace sc_gem5

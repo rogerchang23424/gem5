@@ -59,56 +59,46 @@ namespace ruby
 class WriteMask
 {
   public:
-    typedef std::vector<std::pair<int, AtomicOpFunctor* >> AtomicOpVector;
+    typedef std::vector<std::pair<int, AtomicOpFunctor *>> AtomicOpVector;
 
     WriteMask();
 
-    WriteMask(int size)
-      : mSize(size), mMask(size, false), mAtomic(false)
-    {}
+    WriteMask(int size) : mSize(size), mMask(size, false), mAtomic(false) {}
 
-    WriteMask(int size, std::vector<bool> & mask)
-      : mSize(size), mMask(mask), mAtomic(false)
+    WriteMask(int size, std::vector<bool> &mask)
+        : mSize(size), mMask(mask), mAtomic(false)
     {}
 
     WriteMask(int size, std::vector<bool> &mask, AtomicOpVector atomicOp)
-      : mSize(size), mMask(mask), mAtomic(true), mAtomicOp(atomicOp)
+        : mSize(size), mMask(mask), mAtomic(true), mAtomicOp(atomicOp)
     {}
 
-    ~WriteMask()
-    {}
+    ~WriteMask() {}
 
-    void
-    clear()
-    {
-        mMask = std::vector<bool>(mSize, false);
-    }
+    void clear() { mMask = std::vector<bool>(mSize, false); }
 
-    bool
-    test(int offset) const
+    bool test(int offset) const
     {
         assert(offset < mSize);
         return mMask[offset];
     }
 
-    void
-    setMask(int offset, int len, bool val = true)
+    void setMask(int offset, int len, bool val = true)
     {
         assert(mSize >= (offset + len));
         for (int i = 0; i < len; i++) {
             mMask[offset + i] = val;
         }
     }
-    void
-    fillMask()
+
+    void fillMask()
     {
         for (int i = 0; i < mSize; i++) {
             mMask[i] = true;
         }
     }
 
-    bool
-    getMask(int offset, int len) const
+    bool getMask(int offset, int len) const
     {
         bool tmp = true;
         assert(mSize >= (offset + len));
@@ -118,8 +108,7 @@ class WriteMask
         return tmp;
     }
 
-    bool
-    isOverlap(const WriteMask &readMask) const
+    bool isOverlap(const WriteMask &readMask) const
     {
         bool tmp = false;
         assert(mSize == readMask.mSize);
@@ -131,8 +120,7 @@ class WriteMask
         return tmp;
     }
 
-    bool
-    containsMask(const WriteMask &readMask) const
+    bool containsMask(const WriteMask &readMask) const
     {
         bool tmp = true;
         assert(mSize == readMask.mSize);
@@ -154,8 +142,7 @@ class WriteMask
         return true;
     }
 
-    bool
-    isFull() const
+    bool isFull() const
     {
         for (int i = 0; i < mSize; i++) {
             if (!mMask.at(i)) {
@@ -165,8 +152,7 @@ class WriteMask
         return true;
     }
 
-    void
-    andMask(const WriteMask & writeMask)
+    void andMask(const WriteMask &writeMask)
     {
         assert(mSize == writeMask.mSize);
         for (int i = 0; i < mSize; i++) {
@@ -179,8 +165,7 @@ class WriteMask
         }
     }
 
-    void
-    orMask(const WriteMask & writeMask)
+    void orMask(const WriteMask &writeMask)
     {
         assert(mSize == writeMask.mSize);
         for (int i = 0; i < mSize; i++) {
@@ -193,8 +178,7 @@ class WriteMask
         }
     }
 
-    void
-    setInvertedMask(const WriteMask & writeMask)
+    void setInvertedMask(const WriteMask &writeMask)
     {
         assert(mSize == writeMask.mSize);
         for (int i = 0; i < mSize; i++) {
@@ -202,8 +186,7 @@ class WriteMask
         }
     }
 
-    int
-    firstBitSet(bool val, int offset = 0) const
+    int firstBitSet(bool val, int offset = 0) const
     {
         for (int i = offset; i < mSize; ++i)
             if (mMask[i] == val)
@@ -211,8 +194,7 @@ class WriteMask
         return mSize;
     }
 
-    int
-    count(int offset = 0) const
+    int count(int offset = 0) const
     {
         int count = 0;
         for (int i = offset; i < mSize; ++i)
@@ -220,7 +202,7 @@ class WriteMask
         return count;
     }
 
-    void print(std::ostream& out) const;
+    void print(std::ostream &out) const;
 
     /*
      * Performs atomic operations on the data block pointed to by p. The
@@ -229,18 +211,12 @@ class WriteMask
      * so that each individual atomic requestor may see the results of their
      * specific atomic operation.
      */
-    void performAtomic(uint8_t * p,
-            std::deque<uint8_t*>& atomicChangeLog,
-            bool isAtomicNoReturn=true) const;
+    void performAtomic(uint8_t *p, std::deque<uint8_t *> &atomicChangeLog,
+                       bool isAtomicNoReturn = true) const;
 
-    const AtomicOpVector&
-    getAtomicOps() const
-    {
-        return mAtomicOp;
-    }
+    const AtomicOpVector &getAtomicOps() const { return mAtomicOp; }
 
-    void
-    setAtomicOps(const AtomicOpVector& atomicOps)
+    void setAtomicOps(const AtomicOpVector &atomicOps)
     {
         mAtomic = true;
         mAtomicOp = std::move(atomicOps);
@@ -253,8 +229,8 @@ class WriteMask
     AtomicOpVector mAtomicOp;
 };
 
-inline std::ostream&
-operator<<(std::ostream& out, const WriteMask& obj)
+inline std::ostream &
+operator<<(std::ostream &out, const WriteMask &obj)
 {
     obj.print(out);
     out << std::flush;

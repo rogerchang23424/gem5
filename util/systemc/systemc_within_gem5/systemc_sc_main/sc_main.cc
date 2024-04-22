@@ -38,14 +38,11 @@ class Printer : public sc_core::sc_module
   public:
     sc_core::sc_in<const char *> input;
 
-    SC_CTOR(Printer)
-    {
-        SC_THREAD(print);
-    }
+    SC_CTOR(Printer) { SC_THREAD(print); }
 
     using sc_core::sc_object::print;
-    void
-    print()
+
+    void print()
     {
         int i = 0;
         while (true) {
@@ -64,15 +61,15 @@ class Feeder : public sc_core::sc_module
     std::vector<const char *> strings;
 
     SC_HAS_PROCESS(Feeder);
-    Feeder(sc_core::sc_module_name, std::vector<const char *> _strings) :
-        strings(_strings)
+
+    Feeder(sc_core::sc_module_name, std::vector<const char *> _strings)
+        : strings(_strings)
     {
         SC_THREAD(feed);
         sensitive << clk.pos();
     }
 
-    void
-    feed()
+    void feed()
     {
         int i = 0;
         while (true) {

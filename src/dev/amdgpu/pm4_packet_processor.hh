@@ -46,9 +46,6 @@ namespace gem5
 
 class AMDGPUDevice;
 
-
-
-
 class PM4PacketProcessor : public DmaVirtDevice
 {
     AMDGPUDevice *gpuDevice;
@@ -76,7 +73,9 @@ class PM4PacketProcessor : public DmaVirtDevice
      * Inherited methods.
      */
     Tick write(PacketPtr pkt) override { return 0; }
+
     Tick read(PacketPtr pkt) override { return 0; }
+
     AddrRangeList getAddrRanges() const override;
     void serialize(CheckpointOut &cp) const override;
     void unserialize(CheckpointIn &cp) override;
@@ -87,6 +86,7 @@ class PM4PacketProcessor : public DmaVirtDevice
     TranslationGenPtr translate(Addr vaddr, Addr size) override;
 
     uint32_t getKiqDoorbellOffset() { return kiq.doorbell & 0x1ffffffc; }
+
     uint32_t getPqDoorbellOffset() { return pq.doorbellOffset; }
 
     Addr getGARTAddr(Addr addr) const;
@@ -95,7 +95,7 @@ class PM4PacketProcessor : public DmaVirtDevice
      * Based on an offset communicated through doorbell write, the
      * PM4PacketProcessor identifies which queue needs processing.
      */
-    PM4Queue* getQueue(Addr offset, bool gfx = false);
+    PM4Queue *getQueue(Addr offset, bool gfx = false);
     /**
      * The first graphics queue, the Primary Queueu a.k.a. RB0, needs to be
      * mapped since all queue details are communicated through MMIOs to
@@ -194,6 +194,7 @@ class PM4PacketProcessor : public DmaVirtDevice
     void setRbDoorbellRangeHi(uint32_t data);
 
     int getIpId() const { return _ipId; }
+
     AddrRange getMMIORange() const { return _mmioRange; }
 };
 

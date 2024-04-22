@@ -54,7 +54,7 @@ namespace gem5
  *
  * The data in the cricular buffer is stored in a standard vector.
  */
-template<typename T>
+template <typename T>
 class CircleBuf
 {
   private:
@@ -69,14 +69,15 @@ class CircleBuf
     explicit CircleBuf(size_t size) : buffer(size), maxSize(size) {}
 
     bool empty() const { return used == 0; }
+
     size_t size() const { return used; }
+
     size_t capacity() const { return maxSize; }
 
     /**
      * Throw away any data in the buffer.
      */
-    void
-    flush()
+    void flush()
     {
         start = 0;
         used = 0;
@@ -89,8 +90,7 @@ class CircleBuf
      * @param len Number of elements to copy
      */
     template <class OutputIterator>
-    void
-    peek(OutputIterator out, size_t len) const
+    void peek(OutputIterator out, size_t len) const
     {
         peek(out, 0, len);
     }
@@ -103,8 +103,7 @@ class CircleBuf
      * @param len Number of elements to copy
      */
     template <class OutputIterator>
-    void
-    peek(OutputIterator out, off_t offset, size_t len) const
+    void peek(OutputIterator out, off_t offset, size_t len) const
     {
         panic_if(offset + len > used,
                  "Trying to read past end of circular buffer.");
@@ -136,8 +135,7 @@ class CircleBuf
      * @param len Number of elements to read
      */
     template <class OutputIterator>
-    void
-    read(OutputIterator out, size_t len)
+    void read(OutputIterator out, size_t len)
     {
         peek(out, len);
         used -= len;
@@ -154,8 +152,7 @@ class CircleBuf
      * @param len Number of elements to read
      */
     template <class InputIterator>
-    void
-    write(InputIterator in, size_t len)
+    void write(InputIterator in, size_t len)
     {
         if (!len)
             return;
@@ -171,8 +168,8 @@ class CircleBuf
 
         // How much existing data will be overwritten?
         const size_t total_bytes = used + len;
-        const size_t overflow = total_bytes > maxSize ?
-                                total_bytes - maxSize : 0;
+        const size_t overflow =
+            total_bytes > maxSize ? total_bytes - maxSize : 0;
         // The iterator of the next byte to add.
         auto next_it = buffer.begin() + (start + used) % maxSize;
         // How much there is to copy to the end of the buffer.
@@ -209,7 +206,7 @@ class CircleBuf
  *        in the buffer.
  * </ul>
  */
-template<typename T>
+template <typename T>
 class Fifo
 {
   public:
@@ -219,19 +216,27 @@ class Fifo
     Fifo(size_t size) : buf(size) {}
 
     bool empty() const { return buf.empty(); }
+
     size_t size() const { return buf.size(); }
+
     size_t capacity() const { return buf.capacity(); }
 
     void flush() { buf.flush(); }
 
     template <class OutputIterator>
-    void peek(OutputIterator out, size_t len) const { buf.peek(out, len); }
+    void peek(OutputIterator out, size_t len) const
+    {
+        buf.peek(out, len);
+    }
+
     template <class OutputIterator>
-    void read(OutputIterator out, size_t len) { buf.read(out, len); }
+    void read(OutputIterator out, size_t len)
+    {
+        buf.read(out, len);
+    }
 
     template <class InputIterator>
-    void
-    write(InputIterator in, size_t len)
+    void write(InputIterator in, size_t len)
     {
         panic_if(size() + len > capacity(), "Trying to overfill FIFO buffer.");
         buf.write(in, len);
@@ -240,7 +245,6 @@ class Fifo
   private:
     CircleBuf<value_type> buf;
 };
-
 
 template <typename T>
 void

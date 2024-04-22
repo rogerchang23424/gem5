@@ -44,19 +44,20 @@ class BasicDecodeCache
 {
   private:
     decode_cache::InstMap<EMI> instMap;
+
     struct AddrMapEntry
     {
         StaticInstPtr inst;
         EMI machInst;
     };
+
     decode_cache::AddrMap<AddrMapEntry> decodePages;
 
   public:
     /// Decode a machine instruction.
     /// @param mach_inst The binary instruction to decode.
     /// @retval A pointer to the corresponding StaticInst object.
-    StaticInstPtr
-    decode(Decoder *const decoder, EMI mach_inst, Addr addr)
+    StaticInstPtr decode(Decoder *const decoder, EMI mach_inst, Addr addr)
     {
         auto &entry = decodePages.lookup(addr);
         if (entry.inst && (entry.machInst == mach_inst))

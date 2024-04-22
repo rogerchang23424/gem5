@@ -62,9 +62,11 @@ class BaseISADevice
 {
   public:
     BaseISADevice();
+
     virtual ~BaseISADevice() {}
 
     virtual void setISA(ISA *isa);
+
     virtual void setThreadContext(ThreadContext *tc) {}
 
     /**
@@ -97,8 +99,8 @@ class BaseISADevice
 class DummyISADevice : public BaseISADevice
 {
   public:
-    DummyISADevice()
-        : BaseISADevice() {}
+    DummyISADevice() : BaseISADevice() {}
+
     ~DummyISADevice() {}
 
     void setMiscReg(int misc_reg, RegVal val) override;

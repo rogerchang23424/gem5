@@ -53,7 +53,6 @@ namespace gem5
 class MemCheckerMonitor : public SimObject
 {
   public:
-
     /** Parameters of memchecker monitor */
     using Params = MemCheckerMonitorParams;
 
@@ -68,12 +67,11 @@ class MemCheckerMonitor : public SimObject
     ~MemCheckerMonitor();
 
     Port &getPort(const std::string &if_name,
-                  PortID idx=InvalidPortID) override;
+                  PortID idx = InvalidPortID) override;
 
     void init() override;
 
   private:
-
     struct MemCheckerMonitorSenderState : public Packet::SenderState
     {
         MemCheckerMonitorSenderState(MemChecker::Serial _serial)
@@ -91,15 +89,12 @@ class MemCheckerMonitor : public SimObject
      */
     class MonitorRequestPort : public RequestPort
     {
-
       public:
-
-        MonitorRequestPort(const std::string& _name, MemCheckerMonitor& _mon)
+        MonitorRequestPort(const std::string &_name, MemCheckerMonitor &_mon)
             : RequestPort(_name), mon(_mon)
-        { }
+        {}
 
       protected:
-
         void recvFunctionalSnoop(PacketPtr pkt)
         {
             mon.recvFunctionalSnoop(pkt);
@@ -110,35 +105,18 @@ class MemCheckerMonitor : public SimObject
             return mon.recvAtomicSnoop(pkt);
         }
 
-        bool recvTimingResp(PacketPtr pkt)
-        {
-            return mon.recvTimingResp(pkt);
-        }
+        bool recvTimingResp(PacketPtr pkt) { return mon.recvTimingResp(pkt); }
 
-        void recvTimingSnoopReq(PacketPtr pkt)
-        {
-            mon.recvTimingSnoopReq(pkt);
-        }
+        void recvTimingSnoopReq(PacketPtr pkt) { mon.recvTimingSnoopReq(pkt); }
 
-        void recvRangeChange()
-        {
-            mon.recvRangeChange();
-        }
+        void recvRangeChange() { mon.recvRangeChange(); }
 
-        bool isSnooping() const
-        {
-            return mon.isSnooping();
-        }
+        bool isSnooping() const { return mon.isSnooping(); }
 
-        void recvReqRetry()
-        {
-            mon.recvReqRetry();
-        }
+        void recvReqRetry() { mon.recvReqRetry(); }
 
       private:
-
-        MemCheckerMonitor& mon;
-
+        MemCheckerMonitor &mon;
     };
 
     /** Instance of request port, facing the memory side */
@@ -152,49 +130,29 @@ class MemCheckerMonitor : public SimObject
      */
     class MonitorResponsePort : public ResponsePort
     {
-
       public:
-
-        MonitorResponsePort(const std::string& _name, MemCheckerMonitor& _mon)
+        MonitorResponsePort(const std::string &_name, MemCheckerMonitor &_mon)
             : ResponsePort(_name), mon(_mon)
-        { }
+        {}
 
       protected:
+        void recvFunctional(PacketPtr pkt) { mon.recvFunctional(pkt); }
 
-        void recvFunctional(PacketPtr pkt)
-        {
-            mon.recvFunctional(pkt);
-        }
+        Tick recvAtomic(PacketPtr pkt) { return mon.recvAtomic(pkt); }
 
-        Tick recvAtomic(PacketPtr pkt)
-        {
-            return mon.recvAtomic(pkt);
-        }
-
-        bool recvTimingReq(PacketPtr pkt)
-        {
-            return mon.recvTimingReq(pkt);
-        }
+        bool recvTimingReq(PacketPtr pkt) { return mon.recvTimingReq(pkt); }
 
         bool recvTimingSnoopResp(PacketPtr pkt)
         {
             return mon.recvTimingSnoopResp(pkt);
         }
 
-        AddrRangeList getAddrRanges() const
-        {
-            return mon.getAddrRanges();
-        }
+        AddrRangeList getAddrRanges() const { return mon.getAddrRanges(); }
 
-        void recvRespRetry()
-        {
-            mon.recvRespRetry();
-        }
+        void recvRespRetry() { mon.recvRespRetry(); }
 
       private:
-
-        MemCheckerMonitor& mon;
-
+        MemCheckerMonitor &mon;
     };
 
     /** Instance of response port, i.e. on the CPU side */

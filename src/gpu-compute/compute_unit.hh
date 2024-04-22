@@ -91,39 +91,24 @@ enum TLB_CACHE
 class WFBarrier
 {
   public:
-    WFBarrier() : _numAtBarrier(0), _maxBarrierCnt(0)
-    {
-    }
+    WFBarrier() : _numAtBarrier(0), _maxBarrierCnt(0) {}
 
     static const int InvalidID = -1;
 
-    int
-    numAtBarrier() const
-    {
-        return _numAtBarrier;
-    }
+    int numAtBarrier() const { return _numAtBarrier; }
 
     /**
      * Number of WFs that have not yet reached the barrier.
      */
-    int
-    numYetToReachBarrier() const
-    {
-        return _maxBarrierCnt - _numAtBarrier;
-    }
+    int numYetToReachBarrier() const { return _maxBarrierCnt - _numAtBarrier; }
 
-    int
-    maxBarrierCnt() const
-    {
-        return _maxBarrierCnt;
-    }
+    int maxBarrierCnt() const { return _maxBarrierCnt; }
 
     /**
      * Set the maximum barrier count (i.e., the number of WFs that are
      * participating in the barrier).
      */
-    void
-    setMaxBarrierCnt(int max_barrier_cnt)
+    void setMaxBarrierCnt(int max_barrier_cnt)
     {
         _maxBarrierCnt = max_barrier_cnt;
     }
@@ -131,8 +116,7 @@ class WFBarrier
     /**
      * Mark that a WF has reached the barrier.
      */
-    void
-    incNumAtBarrier()
+    void incNumAtBarrier()
     {
         assert(_numAtBarrier < _maxBarrierCnt);
         ++_numAtBarrier;
@@ -143,18 +127,13 @@ class WFBarrier
      * If so, then the barrier is satisfied and WFs may proceed past
      * the barrier.
      */
-    bool
-    allAtBarrier() const
-    {
-        return _numAtBarrier == _maxBarrierCnt;
-    }
+    bool allAtBarrier() const { return _numAtBarrier == _maxBarrierCnt; }
 
     /**
      * Decrement the number of WFs that are participating in this barrier.
      * This should be called when a WF exits.
      */
-    void
-    decMaxBarrierCnt()
+    void decMaxBarrierCnt()
     {
         assert(_maxBarrierCnt > 0);
         --_maxBarrierCnt;
@@ -164,8 +143,7 @@ class WFBarrier
      * Release this barrier resource so it can be used by other WGs. This
      * is generally called when a WG has finished.
      */
-    void
-    release()
+    void release()
     {
         _numAtBarrier = 0;
         _maxBarrierCnt = 0;
@@ -175,11 +153,7 @@ class WFBarrier
      * Reset the barrier. This is used to reset the barrier, usually when
      * a dynamic instance of a barrier has been satisfied.
      */
-    void
-    reset()
-    {
-        _numAtBarrier = 0;
-    }
+    void reset() { _numAtBarrier = 0; }
 
   private:
     /**
@@ -202,8 +176,6 @@ class WFBarrier
 class ComputeUnit : public ClockedObject
 {
   public:
-
-
     // Execution resources
     //
     // The ordering of units is:
@@ -266,9 +238,9 @@ class ComputeUnit : public ClockedObject
     // index into readyList of Scalar Memory unit used by wavefront
     int mapWaveToScalarMem(Wavefront *w) const;
 
-    int vrfToCoalescerBusWidth; // VRF->Coalescer data bus width in bytes
-    int coalescerToVrfBusWidth; // Coalescer->VRF data bus width in bytes
-    int numCyclesPerStoreTransfer;  // number of cycles per vector store
+    int vrfToCoalescerBusWidth;    // VRF->Coalescer data bus width in bytes
+    int coalescerToVrfBusWidth;    // Coalescer->VRF data bus width in bytes
+    int numCyclesPerStoreTransfer; // number of cycles per vector store
     int numCyclesPerLoadTransfer;  // number of cycles per vector load
 
     // track presence of dynamic instructions in the Schedule pipeline
@@ -276,7 +248,7 @@ class ComputeUnit : public ClockedObject
     // non-dispatched instruction of every WF in the Scoreboard stage.
     std::unordered_set<uint64_t> pipeMap;
 
-    RegisterManager* registerManager;
+    RegisterManager *registerManager;
 
     FetchStage fetchStage;
     ScoreboardCheckStage scoreboardCheckStage;
@@ -289,15 +261,15 @@ class ComputeUnit : public ClockedObject
     EventFunctionWrapper tickEvent;
 
     typedef ComputeUnitParams Params;
-    std::vector<std::vector<Wavefront*>> wfList;
+    std::vector<std::vector<Wavefront *>> wfList;
     int cu_id;
 
     // array of vector register files, one per SIMD
-    std::vector<VectorRegisterFile*> vrf;
+    std::vector<VectorRegisterFile *> vrf;
     // array of scalar register files, one per SIMD
-    std::vector<ScalarRegisterFile*> srf;
+    std::vector<ScalarRegisterFile *> srf;
 
-    std::vector<RegisterFileCache*> rfc;
+    std::vector<RegisterFileCache *> rfc;
 
     // Width per VALU/SIMD unit: number of work items that can be executed
     // on the vector ALU simultaneously in a SIMD unit
@@ -392,13 +364,21 @@ class ComputeUnit : public ClockedObject
 
     // Timing Functions
     int oprNetPipeLength() const { return operandNetworkLength; }
+
     int simdUnitWidth() const { return simdWidth; }
+
     int spBypassLength() const { return spBypassPipeLength; }
+
     int dpBypassLength() const { return dpBypassPipeLength; }
+
     int rfcLength() const { return rfcPipeLength; }
+
     int scalarPipeLength() const { return scalarPipeStages; }
+
     int storeBusLength() const { return numCyclesPerStoreTransfer; }
+
     int loadBusLength() const { return numCyclesPerLoadTransfer; }
+
     int wfSize() const { return wavefrontSize; }
 
     void exec();
@@ -408,7 +388,7 @@ class ComputeUnit : public ClockedObject
 
     void startWavefront(Wavefront *w, int waveId, LdsChunk *ldsChunk,
                         HSAQueueEntry *task, int bar_id,
-                        bool fetchContext=false);
+                        bool fetchContext = false);
 
     void doInvalidate(RequestPtr req, int kernId);
     void doFlush(GPUDynInstPtr gpuDynInst);
@@ -418,20 +398,19 @@ class ComputeUnit : public ClockedObject
     bool hasDispResources(HSAQueueEntry *task, int &num_wfs_in_wg);
 
     int cacheLineSize() const { return _cacheLineSize; }
+
     int getCacheLineBits() const { return cacheLineBits; }
 
     void resetRegisterPool();
 
   private:
-    WFBarrier&
-    barrierSlot(int bar_id)
+    WFBarrier &barrierSlot(int bar_id)
     {
         assert(bar_id > WFBarrier::InvalidID);
         return wfBarrierSlots.at(bar_id);
     }
 
-    int
-    getFreeBarrierId()
+    int getFreeBarrierId()
     {
         assert(freeBarrierIds.size());
         auto free_bar_id = freeBarrierIds.begin();
@@ -450,23 +429,24 @@ class ComputeUnit : public ClockedObject
     void decMaxBarrierCnt(int bar_id);
     void releaseBarrier(int bar_id);
     void releaseWFsFromBarrier(int bar_id);
+
     int numBarrierSlots() const { return _numBarrierSlots; }
 
-    template<typename c0, typename c1>
+    template <typename c0, typename c1>
     void doSmReturn(GPUDynInstPtr gpuDynInst);
 
     virtual void init() override;
     void sendRequest(GPUDynInstPtr gpuDynInst, PortID index, PacketPtr pkt);
     void sendScalarRequest(GPUDynInstPtr gpuDynInst, PacketPtr pkt);
-    void injectGlobalMemFence(GPUDynInstPtr gpuDynInst,
-                              bool kernelMemSync,
-                              RequestPtr req=nullptr);
+    void injectGlobalMemFence(GPUDynInstPtr gpuDynInst, bool kernelMemSync,
+                              RequestPtr req = nullptr);
     void handleMemPacket(PacketPtr pkt, int memport_index);
     bool processTimingPacket(PacketPtr pkt);
     void processFetchReturn(PacketPtr pkt);
     void updatePageDivergenceDist(Addr addr);
 
     RequestorID requestorId() { return _requestorId; }
+
     RequestorID vramRequestorId();
 
     bool isDone() const;
@@ -482,14 +462,10 @@ class ComputeUnit : public ClockedObject
     LdsState &lds;
 
   public:
-    LdsState &
-    getLds() const
-    {
-        return lds;
-    }
+    LdsState &getLds() const { return lds; }
 
-    int32_t
-    getRefCounter(const uint32_t dispatchId, const uint32_t wgId) const;
+    int32_t getRefCounter(const uint32_t dispatchId,
+                          const uint32_t wgId) const;
 
     [[nodiscard]] bool sendToLds(GPUDynInstPtr gpuDynInst);
 
@@ -501,15 +477,17 @@ class ComputeUnit : public ClockedObject
     class GMTokenPort : public TokenRequestPort
     {
       public:
-        GMTokenPort(const std::string& name, SimObject *owner,
+        GMTokenPort(const std::string &name, SimObject *owner,
                     PortID id = InvalidPortID)
             : TokenRequestPort(name, owner, id)
-        { }
-        ~GMTokenPort() { }
+        {}
+
+        ~GMTokenPort() {}
 
       protected:
         bool recvTimingResp(PacketPtr) { return false; }
-        void recvReqRetry() { }
+
+        void recvReqRetry() {}
     };
 
     // Manager for the number of tokens available to this compute unit to
@@ -523,7 +501,8 @@ class ComputeUnit : public ClockedObject
     {
       public:
         DataPort(const std::string &_name, ComputeUnit *_cu, PortID id)
-            : RequestPort(_name, id), computeUnit(_cu) { }
+            : RequestPort(_name, id), computeUnit(_cu)
+        {}
 
         bool snoopRangeSent;
 
@@ -535,22 +514,22 @@ class ComputeUnit : public ClockedObject
             Packet::SenderState *saved;
 
             SenderState(GPUDynInstPtr gpuDynInst, PortID _port_index,
-                        Packet::SenderState *sender_state=nullptr)
+                        Packet::SenderState *sender_state = nullptr)
                 : _gpuDynInst(gpuDynInst),
                   port_index(_port_index),
-                  saved(sender_state) { }
+                  saved(sender_state)
+            {}
 
             SenderState(ComputeUnit *cu, PortID _port_index,
-                        Packet::SenderState *sender_state=nullptr)
-                : computeUnit(cu),
-                  port_index(_port_index),
-                  saved(sender_state) { }
+                        Packet::SenderState *sender_state = nullptr)
+                : computeUnit(cu), port_index(_port_index), saved(sender_state)
+            {}
         };
 
         class SystemHubEvent : public Event
         {
-          DataPort *dataPort;
-          PacketPtr reqPkt;
+            DataPort *dataPort;
+            PacketPtr reqPkt;
 
           public:
             SystemHubEvent(PacketPtr pkt, DataPort *_dataPort)
@@ -559,8 +538,7 @@ class ComputeUnit : public ClockedObject
                 setFlags(Event::AutoDelete);
             }
 
-            void
-            process()
+            void process()
             {
                 // DMAs do not operate on packets and therefore do not
                 // convert to a response. Do that here instead.
@@ -583,18 +561,20 @@ class ComputeUnit : public ClockedObject
         ComputeUnit *computeUnit;
 
         virtual bool recvTimingResp(PacketPtr pkt);
+
         virtual Tick recvAtomic(PacketPtr pkt) { return 0; }
-        virtual void recvFunctional(PacketPtr pkt) { }
-        virtual void recvRangeChange() { }
+
+        virtual void recvFunctional(PacketPtr pkt) {}
+
+        virtual void recvRangeChange() {}
+
         virtual void recvReqRetry();
 
-        virtual void
-        getDeviceAddressRanges(AddrRangeList &resp, bool &snoop)
+        virtual void getDeviceAddressRanges(AddrRangeList &resp, bool &snoop)
         {
             resp.clear();
             snoop = true;
         }
-
     };
 
     // Scalar data cache access port
@@ -603,8 +583,7 @@ class ComputeUnit : public ClockedObject
       public:
         ScalarDataPort(const std::string &_name, ComputeUnit *_cu)
             : RequestPort(_name), computeUnit(_cu)
-        {
-        }
+        {}
 
         bool recvTimingResp(PacketPtr pkt) override;
         void recvReqRetry() override;
@@ -612,10 +591,9 @@ class ComputeUnit : public ClockedObject
         struct SenderState : public Packet::SenderState
         {
             SenderState(GPUDynInstPtr gpuDynInst,
-                        Packet::SenderState *sender_state=nullptr)
+                        Packet::SenderState *sender_state = nullptr)
                 : _gpuDynInst(gpuDynInst), saved(sender_state)
-            {
-            }
+            {}
 
             GPUDynInstPtr _gpuDynInst;
             Packet::SenderState *saved;
@@ -631,7 +609,7 @@ class ComputeUnit : public ClockedObject
             MemReqEvent(ScalarDataPort &_scalar_data_port, PacketPtr _pkt)
                 : Event(), scalarDataPort(_scalar_data_port), pkt(_pkt)
             {
-              setFlags(Event::AutoDelete);
+                setFlags(Event::AutoDelete);
             }
 
             void process();
@@ -640,8 +618,8 @@ class ComputeUnit : public ClockedObject
 
         class SystemHubEvent : public Event
         {
-          ScalarDataPort *dataPort;
-          PacketPtr reqPkt;
+            ScalarDataPort *dataPort;
+            PacketPtr reqPkt;
 
           public:
             SystemHubEvent(PacketPtr pkt, ScalarDataPort *_dataPort)
@@ -650,8 +628,7 @@ class ComputeUnit : public ClockedObject
                 setFlags(Event::AutoDelete);
             }
 
-            void
-            process()
+            void process()
             {
                 // DMAs do not operate on packets and therefore do not
                 // convert to a response. Do that here instead.
@@ -673,7 +650,8 @@ class ComputeUnit : public ClockedObject
     {
       public:
         SQCPort(const std::string &_name, ComputeUnit *_cu)
-            : RequestPort(_name), computeUnit(_cu) { }
+            : RequestPort(_name), computeUnit(_cu)
+        {}
 
         bool snoopRangeSent;
 
@@ -684,10 +662,11 @@ class ComputeUnit : public ClockedObject
             // kernel id to be used in handling I-Cache invalidate response
             int kernId;
 
-            SenderState(Wavefront *_wavefront, Packet::SenderState
-                    *sender_state=nullptr, int _kernId=-1)
-                : wavefront(_wavefront), saved(sender_state),
-                kernId(_kernId){ }
+            SenderState(Wavefront *_wavefront,
+                        Packet::SenderState *sender_state = nullptr,
+                        int _kernId = -1)
+                : wavefront(_wavefront), saved(sender_state), kernId(_kernId)
+            {}
         };
 
         class MemReqEvent : public Event
@@ -700,43 +679,47 @@ class ComputeUnit : public ClockedObject
             MemReqEvent(SQCPort &_sqc_port, PacketPtr _pkt)
                 : Event(), sqcPort(_sqc_port), pkt(_pkt)
             {
-              setFlags(Event::AutoDelete);
+                setFlags(Event::AutoDelete);
             }
 
             void process();
             const char *description() const;
         };
 
-        std::deque<std::pair<PacketPtr, Wavefront*>> retries;
+        std::deque<std::pair<PacketPtr, Wavefront *>> retries;
 
       protected:
         ComputeUnit *computeUnit;
 
         virtual bool recvTimingResp(PacketPtr pkt);
+
         virtual Tick recvAtomic(PacketPtr pkt) { return 0; }
-        virtual void recvFunctional(PacketPtr pkt) { }
-        virtual void recvRangeChange() { }
+
+        virtual void recvFunctional(PacketPtr pkt) {}
+
+        virtual void recvRangeChange() {}
+
         virtual void recvReqRetry();
 
-        virtual void
-        getDeviceAddressRanges(AddrRangeList &resp, bool &snoop)
+        virtual void getDeviceAddressRanges(AddrRangeList &resp, bool &snoop)
         {
             resp.clear();
             snoop = true;
         }
-     };
+    };
 
     /** Data TLB port **/
     class DTLBPort : public RequestPort
     {
       public:
         DTLBPort(const std::string &_name, ComputeUnit *_cu, PortID id)
-            : RequestPort(_name, id), computeUnit(_cu),
-              stalled(false)
-        { }
+            : RequestPort(_name, id), computeUnit(_cu), stalled(false)
+        {}
 
         bool isStalled() { return stalled; }
+
         void stallPort() { stalled = true; }
+
         void unstallPort() { stalled = false; }
 
         /**
@@ -748,7 +731,7 @@ class ComputeUnit : public ClockedObject
         /** SenderState is information carried along with the packet
          * throughout the TLB hierarchy
          */
-        struct SenderState: public Packet::SenderState
+        struct SenderState : public Packet::SenderState
         {
             // the memInst that this is associated with
             GPUDynInstPtr _gpuDynInst;
@@ -759,8 +742,8 @@ class ComputeUnit : public ClockedObject
 
             // constructor used for packets involved in timing accesses
             SenderState(GPUDynInstPtr gpuDynInst, PortID port_index)
-                : _gpuDynInst(gpuDynInst), portIndex(port_index) { }
-
+                : _gpuDynInst(gpuDynInst), portIndex(port_index)
+            {}
         };
 
       protected:
@@ -768,9 +751,13 @@ class ComputeUnit : public ClockedObject
         bool stalled;
 
         virtual bool recvTimingResp(PacketPtr pkt);
+
         virtual Tick recvAtomic(PacketPtr pkt) { return 0; }
-        virtual void recvFunctional(PacketPtr pkt) { }
-        virtual void recvRangeChange() { }
+
+        virtual void recvFunctional(PacketPtr pkt) {}
+
+        virtual void recvRangeChange() {}
+
         virtual void recvReqRetry();
     };
 
@@ -779,20 +766,23 @@ class ComputeUnit : public ClockedObject
       public:
         ScalarDTLBPort(const std::string &_name, ComputeUnit *_cu)
             : RequestPort(_name), computeUnit(_cu), stalled(false)
-        {
-        }
+        {}
 
         struct SenderState : public Packet::SenderState
         {
-            SenderState(GPUDynInstPtr gpuDynInst) : _gpuDynInst(gpuDynInst) { }
+            SenderState(GPUDynInstPtr gpuDynInst) : _gpuDynInst(gpuDynInst) {}
+
             GPUDynInstPtr _gpuDynInst;
         };
 
         bool recvTimingResp(PacketPtr pkt) override;
+
         void recvReqRetry() override { assert(false); }
 
         bool isStalled() const { return stalled; }
+
         void stallPort() { stalled = true; }
+
         void unstallPort() { stalled = false; }
 
         std::deque<PacketPtr> retries;
@@ -806,11 +796,13 @@ class ComputeUnit : public ClockedObject
     {
       public:
         ITLBPort(const std::string &_name, ComputeUnit *_cu)
-            : RequestPort(_name), computeUnit(_cu), stalled(false) { }
-
+            : RequestPort(_name), computeUnit(_cu), stalled(false)
+        {}
 
         bool isStalled() { return stalled; }
+
         void stallPort() { stalled = true; }
+
         void unstallPort() { stalled = false; }
 
         /**
@@ -822,12 +814,12 @@ class ComputeUnit : public ClockedObject
         /** SenderState is information carried along with the packet
          * throughout the TLB hierarchy
          */
-        struct SenderState: public Packet::SenderState
+        struct SenderState : public Packet::SenderState
         {
             // The wavefront associated with this request
             Wavefront *wavefront;
 
-            SenderState(Wavefront *_wavefront) : wavefront(_wavefront) { }
+            SenderState(Wavefront *_wavefront) : wavefront(_wavefront) {}
         };
 
       protected:
@@ -835,9 +827,13 @@ class ComputeUnit : public ClockedObject
         bool stalled;
 
         virtual bool recvTimingResp(PacketPtr pkt);
+
         virtual Tick recvAtomic(PacketPtr pkt) { return 0; }
-        virtual void recvFunctional(PacketPtr pkt) { }
-        virtual void recvRangeChange() { }
+
+        virtual void recvFunctional(PacketPtr pkt) {}
+
+        virtual void recvRangeChange() {}
+
         virtual void recvReqRetry();
     };
 
@@ -848,12 +844,13 @@ class ComputeUnit : public ClockedObject
     {
       public:
         LDSPort(const std::string &_name, ComputeUnit *_cu)
-        : RequestPort(_name), computeUnit(_cu)
-        {
-        }
+            : RequestPort(_name), computeUnit(_cu)
+        {}
 
         bool isStalled() const { return stalled; }
+
         void stallPort() { stalled = true; }
+
         void unstallPort() { stalled = false; }
 
         /**
@@ -866,52 +863,34 @@ class ComputeUnit : public ClockedObject
          *  SenderState is information carried along with the packet, esp. the
          *  GPUDynInstPtr
          */
-        class SenderState: public Packet::SenderState
+        class SenderState : public Packet::SenderState
         {
           protected:
             // The actual read/write/atomic request that goes with this command
             GPUDynInstPtr _gpuDynInst = nullptr;
 
           public:
-            SenderState(GPUDynInstPtr gpuDynInst):
-              _gpuDynInst(gpuDynInst)
-            {
-            }
+            SenderState(GPUDynInstPtr gpuDynInst) : _gpuDynInst(gpuDynInst) {}
 
-            GPUDynInstPtr
-            getMemInst() const
-            {
-              return _gpuDynInst;
-            }
+            GPUDynInstPtr getMemInst() const { return _gpuDynInst; }
         };
 
-        virtual bool
-        sendTimingReq(PacketPtr pkt);
+        virtual bool sendTimingReq(PacketPtr pkt);
 
       protected:
-
         bool stalled = false; ///< whether or not it is stalled
 
         ComputeUnit *computeUnit;
 
-        virtual bool
-        recvTimingResp(PacketPtr pkt);
+        virtual bool recvTimingResp(PacketPtr pkt);
 
-        virtual Tick
-        recvAtomic(PacketPtr pkt) { return 0; }
+        virtual Tick recvAtomic(PacketPtr pkt) { return 0; }
 
-        virtual void
-        recvFunctional(PacketPtr pkt)
-        {
-        }
+        virtual void recvFunctional(PacketPtr pkt) {}
 
-        virtual void
-        recvRangeChange()
-        {
-        }
+        virtual void recvRangeChange() {}
 
-        virtual void
-        recvReqRetry();
+        virtual void recvReqRetry();
     };
 
     /** The port to access the Local Data Store
@@ -919,11 +898,7 @@ class ComputeUnit : public ClockedObject
      */
     LDSPort ldsPort;
 
-    TokenManager *
-    getTokenManager()
-    {
-        return memPortTokens;
-    }
+    TokenManager *getTokenManager() { return memPortTokens; }
 
     /** The memory port for SIMD data accesses.
      *  Can be connected to PhysMem for Ruby for timing simulations
@@ -940,8 +915,7 @@ class ComputeUnit : public ClockedObject
     // port to the SQC TLB (there's a separate TLB for each I-cache)
     ITLBPort sqcTLBPort;
 
-    Port &
-    getPort(const std::string &if_name, PortID idx) override
+    Port &getPort(const std::string &if_name, PortID idx) override
     {
         if (if_name == "memory_port" && idx < memPort.size()) {
             return memPort[idx];
@@ -1144,11 +1118,11 @@ class ComputeUnit : public ClockedObject
         statistics::Scalar numVecOpsExecutedTwoOpFP;
         // Total cycles that something is running on the GPU
         statistics::Scalar totalCycles;
-        statistics::Formula vpc; // vector ops per cycle
+        statistics::Formula vpc;     // vector ops per cycle
         statistics::Formula vpc_f16; // vector ops per cycle
         statistics::Formula vpc_f32; // vector ops per cycle
         statistics::Formula vpc_f64; // vector ops per cycle
-        statistics::Formula ipc; // vector instructions per cycle
+        statistics::Formula ipc;     // vector instructions per cycle
         statistics::Distribution controlFlowDivergenceDist;
         statistics::Distribution activeLanesPerGMemInstrDist;
         statistics::Distribution activeLanesPerLMemInstrDist;

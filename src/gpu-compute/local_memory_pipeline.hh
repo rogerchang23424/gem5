@@ -59,27 +59,24 @@ class LocalMemPipeline
   public:
     LocalMemPipeline(const ComputeUnitParams &p, ComputeUnit &cu);
     void exec();
+
     std::queue<GPUDynInstPtr> &getLMRespFIFO() { return lmReturnedRequests; }
 
     void issueRequest(GPUDynInstPtr gpuDynInst);
 
-
-    bool
-    isLMRespFIFOWrRdy() const
+    bool isLMRespFIFOWrRdy() const
     {
         return lmReturnedRequests.size() < lmQueueSize;
     }
 
-    bool
-    isLMReqFIFOWrRdy(uint32_t pendReqs=0) const
+    bool isLMReqFIFOWrRdy(uint32_t pendReqs = 0) const
     {
         return (lmIssuedRequests.size() + pendReqs) < lmQueueSize;
     }
 
-    const std::string& name() const { return _name; }
+    const std::string &name() const { return _name; }
 
-    void
-    incLoadVRFBankConflictCycles(int num_cycles)
+    void incLoadVRFBankConflictCycles(int num_cycles)
     {
         stats.loadVrfBankConflictCycles += num_cycles;
     }

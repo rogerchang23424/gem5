@@ -158,7 +158,7 @@ enum : RegIndex
 } // namespace float_reg
 
 inline constexpr RegClass floatRegClass(FloatRegClass, FloatRegClassName,
-        float_reg::NumRegs, debug::FloatRegs);
+                                        float_reg::NumRegs, debug::FloatRegs);
 
 namespace float_reg
 {
@@ -217,16 +217,22 @@ const std::vector<std::string> RegNames = {
 } // namespace float_reg
 
 inline float32_t
-fsgnj32(float32_t a, float32_t b, bool n, bool x) {
-    if (n) b.v = ~b.v;
-    else if (x) b.v = a.v ^ b.v;
+fsgnj32(float32_t a, float32_t b, bool n, bool x)
+{
+    if (n)
+        b.v = ~b.v;
+    else if (x)
+        b.v = a.v ^ b.v;
     return f32(insertBits(b.v, 30, 0, a.v));
 }
 
 inline float64_t
-fsgnj64(float64_t a, float64_t b, bool n, bool x) {
-    if (n) b.v = ~b.v;
-    else if (x) b.v = a.v ^ b.v;
+fsgnj64(float64_t a, float64_t b, bool n, bool x)
+{
+    if (n)
+        b.v = ~b.v;
+    else if (x)
+        b.v = a.v ^ b.v;
     return f64(insertBits(b.v, 62, 0, a.v));
 }
 

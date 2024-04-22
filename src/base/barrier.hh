@@ -50,7 +50,8 @@ class Barrier
     std::mutex bMutex;
     /// Condition variable for waiting on barrier
     std::condition_variable bCond;
-    /// Number of threads we should be waiting for before completing the barrier
+    /// Number of threads we should be waiting for before completing the
+    /// barrier
     unsigned numWaiting;
     /// Generation of this barrier
     unsigned generation;
@@ -62,8 +63,7 @@ class Barrier
         : numWaiting(_numWaiting), generation(0), numLeft(_numWaiting)
     {}
 
-    bool
-    wait()
+    bool wait()
     {
         std::unique_lock<std::mutex> lock(bMutex);
         unsigned int gen = generation;

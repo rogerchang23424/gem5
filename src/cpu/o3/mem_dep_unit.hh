@@ -59,8 +59,7 @@ namespace gem5
 
 struct SNHash
 {
-    size_t
-    operator()(const InstSeqNum &seq_num) const
+    size_t operator()(const InstSeqNum &seq_num) const
     {
         unsigned a = (unsigned)seq_num;
         unsigned hash = (((a >> 14) ^ ((a >> 2) & 0xffff))) & 0x7FFFFFFF;
@@ -162,7 +161,6 @@ class MemDepUnit
     void dumpLists();
 
   private:
-
     /** Completes a memory instruction. */
     void completed(const DynInstPtr &inst);
 
@@ -218,7 +216,7 @@ class MemDepUnit
     };
 
     /** Finds the memory dependence entry in the hash map. */
-    MemDepEntryPtr &findInHash(const DynInstConstPtr& inst);
+    MemDepEntryPtr &findInHash(const DynInstConstPtr &inst);
 
     /** Moves an entry to the ready list. */
     void moveToReady(MemDepEntryPtr &ready_inst_entry);
@@ -250,10 +248,16 @@ class MemDepUnit
     std::unordered_set<InstSeqNum> storeBarrierSNs;
 
     /** Is there an outstanding load barrier that loads must wait on. */
-    bool hasLoadBarrier() const { return !loadBarrierSNs.empty(); }
+    bool hasLoadBarrier() const
+    {
+        return !loadBarrierSNs.empty();
+    }
 
     /** Is there an outstanding store barrier that loads must wait on. */
-    bool hasStoreBarrier() const { return !storeBarrierSNs.empty(); }
+    bool hasStoreBarrier() const
+    {
+        return !storeBarrierSNs.empty();
+    }
 
     /** Inserts the SN of a barrier inst. to the list of tracked barriers */
     void insertBarrierSN(const DynInstPtr &barr_inst);
@@ -263,6 +267,7 @@ class MemDepUnit
 
     /** The thread id of this memory dependence unit. */
     int id;
+
     struct MemDepUnitStats : public statistics::Group
     {
         MemDepUnitStats(statistics::Group *parent);

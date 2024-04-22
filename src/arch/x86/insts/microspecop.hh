@@ -40,16 +40,15 @@ namespace X86ISA
 class MicroHalt : public InstOperands<X86MicroopBase>
 {
   public:
-    MicroHalt(ExtMachInst mach_inst, const char *inst_mnem,
-            uint64_t set_flags) :
-        InstOperands<X86MicroopBase>(mach_inst, "halt", inst_mnem,
-                set_flags | (1ULL << StaticInst::IsNonSpeculative) |
-                            (1ULL << StaticInst::IsQuiesce),
-                No_OpClass, {})
+    MicroHalt(ExtMachInst mach_inst, const char *inst_mnem, uint64_t set_flags)
+        : InstOperands<X86MicroopBase>(
+              mach_inst, "halt", inst_mnem,
+              set_flags | (1ULL << StaticInst::IsNonSpeculative) |
+                  (1ULL << StaticInst::IsQuiesce),
+              No_OpClass, {})
     {}
 
-    Fault
-    execute(ExecContext *xc, trace::InstRecord *) const override
+    Fault execute(ExecContext *xc, trace::InstRecord *) const override
     {
         xc->tcBase()->suspend();
         return NoFault;

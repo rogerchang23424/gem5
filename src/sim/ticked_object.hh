@@ -92,18 +92,17 @@ class Ticked : public Serializable
 
   public:
     Ticked(ClockedObject &object_,
-        statistics::Scalar *imported_num_cycles = NULL,
-        Event::Priority priority = Event::CPU_Tick_Pri);
+           statistics::Scalar *imported_num_cycles = NULL,
+           Event::Priority priority = Event::CPU_Tick_Pri);
 
-    virtual ~Ticked() { }
+    virtual ~Ticked() {}
 
     /** Register {num,ticks}Cycles if necessary.  If numCycles is
      *  imported, be sure to register it *before* calling this regStats */
     void regStats();
 
     /** Start ticking */
-    void
-    start()
+    void start()
     {
         if (!running) {
             if (!event.scheduled())
@@ -115,22 +114,16 @@ class Ticked : public Serializable
     }
 
     /** How long have we been stopped for? */
-    Cycles
-    cyclesSinceLastStopped() const
+    Cycles cyclesSinceLastStopped() const
     {
         return object.curCycle() - lastStopped;
     }
 
     /** Reset stopped time to current time */
-    void
-    resetLastStopped()
-    {
-        lastStopped = object.curCycle();
-    }
+    void resetLastStopped() { lastStopped = object.curCycle(); }
 
     /** Cancel the next tick event and issue no more */
-    void
-    stop()
+    void stop()
     {
         if (running) {
             if (event.scheduled())
@@ -167,7 +160,7 @@ class TickedObject : public ClockedObject, public Ticked
 {
   public:
     TickedObject(const TickedObjectParams &params,
-        Event::Priority priority = Event::CPU_Tick_Pri);
+                 Event::Priority priority = Event::CPU_Tick_Pri);
 
     /** Disambiguate to make these functions overload correctly */
     using ClockedObject::regStats;

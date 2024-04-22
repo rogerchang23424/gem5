@@ -55,12 +55,11 @@ namespace ruby
 //  - tracks segmented data messages (i.e. when a line transfer is split in
 //    multiple messages)
 
-template<typename RespType, typename DataType>
+template <typename RespType, typename DataType>
 class ExpectedMap
 {
   private:
-
-    template<typename Type>
+    template <typename Type>
     struct ExpectedState
     {
         struct EnumClassHash
@@ -81,12 +80,9 @@ class ExpectedMap
         std::unordered_map<Type, bool, EnumClassHash> expectedTypes;
 
       public:
-        ExpectedState()
-            :chunks(1), currChunk(0), numReceived(0)
-        {}
+        ExpectedState() : chunks(1), currChunk(0), numReceived(0) {}
 
-        void
-        clear(int msg_chunks)
+        void clear(int msg_chunks)
         {
             chunks = msg_chunks;
             currChunk = 0;
@@ -94,16 +90,11 @@ class ExpectedMap
             expectedTypes.clear();
         }
 
-        void
-        addExpectedType(const Type &val)
-        {
-            expectedTypes[val] = false;
-        }
+        void addExpectedType(const Type &val) { expectedTypes[val] = false; }
 
         int received() const { return numReceived; }
 
-        bool
-        increaseReceived(const Type &val)
+        bool increaseReceived(const Type &val)
         {
             if (expectedTypes.find(val) == expectedTypes.end())
                 return false;
@@ -118,8 +109,7 @@ class ExpectedMap
             return true;
         }
 
-        bool
-        receivedType(const Type &val) const
+        bool receivedType(const Type &val) const
         {
             auto i = expectedTypes.find(val);
             if (i != expectedTypes.end())
@@ -134,14 +124,11 @@ class ExpectedMap
     int totalExpected;
 
   public:
-    ExpectedMap()
-        :expectedData(), expectedResp(), totalExpected(0)
-    {}
+    ExpectedMap() : expectedData(), expectedResp(), totalExpected(0) {}
 
     // Clear the tracking state and specified the number of chunks are required
     // to receive a complete data message
-    void
-    clear(int dataChunks)
+    void clear(int dataChunks)
     {
         expectedData.clear(dataChunks);
         expectedResp.clear(1);
@@ -149,15 +136,13 @@ class ExpectedMap
     }
 
     // Register an expected response message type
-    void
-    addExpectedRespType(const RespType &val)
+    void addExpectedRespType(const RespType &val)
     {
         expectedResp.addExpectedType(val);
     }
 
     // Register an expected data message type
-    void
-    addExpectedDataType(const DataType &val)
+    void addExpectedDataType(const DataType &val)
     {
         expectedData.addExpectedType(val);
     }
@@ -170,8 +155,7 @@ class ExpectedMap
     // Returns the number of messages received.
     // Notice that a data message counts as received only after all of
     // its chunks are received.
-    int
-    received() const
+    int received() const
     {
         return expectedData.received() + expectedResp.received();
     }
@@ -188,47 +172,38 @@ class ExpectedMap
     // Has received any response ?
     bool hasReceivedResp() const { return expectedResp.received() != 0; }
 
-
     // Notifies that a response message was received
-    bool
-    receiveResp(const RespType &val)
+    bool receiveResp(const RespType &val)
     {
         assert(received() < totalExpected);
         return expectedResp.increaseReceived(val);
     }
 
     // Notifies that a data message chunk was received
-    bool
-    receiveData(const DataType &val)
+    bool receiveData(const DataType &val)
     {
         assert(received() <= totalExpected);
         return expectedData.increaseReceived(val);
     }
 
     // Has received any data of the given type ?
-    bool
-    receivedDataType(const DataType &val) const
+    bool receivedDataType(const DataType &val) const
     {
         return expectedData.receivedType(val);
     }
 
     // Has received any response of the given type ?
-    bool
-    receivedRespType(const RespType &val) const
+    bool receivedRespType(const RespType &val) const
     {
         return expectedResp.receivedType(val);
     }
 
-    void
-    print(std::ostream& out) const
-    {
-        out << expected();
-    }
+    void print(std::ostream &out) const { out << expected(); }
 };
 
-template<typename RespType, typename DataType>
-inline std::ostream&
-operator<<(std::ostream& out, const ExpectedMap<RespType,DataType>& obj)
+template <typename RespType, typename DataType>
+inline std::ostream &
+operator<<(std::ostream &out, const ExpectedMap<RespType, DataType> &obj)
 {
     obj.print(out);
     return out;

@@ -47,8 +47,7 @@ namespace guest_abi
 template <typename T>
 struct Result<SparcPseudoInstABI, T>
 {
-    static void
-    store(ThreadContext *tc, const T &ret)
+    static void store(ThreadContext *tc, const T &ret)
     {
         // This assumes that all pseudo ops have their return value set
         // by the pseudo op instruction. This may need to be revisited if we
@@ -60,8 +59,7 @@ struct Result<SparcPseudoInstABI, T>
 template <>
 struct Argument<SparcPseudoInstABI, uint64_t>
 {
-    static uint64_t
-    get(ThreadContext *tc, SparcPseudoInstABI::State &state)
+    static uint64_t get(ThreadContext *tc, SparcPseudoInstABI::State &state)
     {
         panic_if(state >= 6, "Too many psuedo inst arguments.");
         return tc->getReg(SparcISA::int_reg::o(state++));
@@ -73,8 +71,7 @@ struct Argument<SparcPseudoInstABI, pseudo_inst::GuestAddr>
 {
     using Arg = pseudo_inst::GuestAddr;
 
-    static Arg
-    get(ThreadContext *tc, SparcPseudoInstABI::State &state)
+    static Arg get(ThreadContext *tc, SparcPseudoInstABI::State &state)
     {
         panic_if(state >= 6, "Too many psuedo inst arguments.");
         return (Arg)tc->getReg(SparcISA::int_reg::o(state++));

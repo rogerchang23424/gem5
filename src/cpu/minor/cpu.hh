@@ -109,16 +109,16 @@ class MinorCPU : public BaseCPU
         MinorCPU &cpu;
 
       public:
-        MinorCPUPort(const std::string& name_, MinorCPU &cpu_)
+        MinorCPUPort(const std::string &name_, MinorCPU &cpu_)
             : RequestPort(name_), cpu(cpu_)
-        { }
-
+        {}
     };
 
     /** Thread Scheduling Policy (RoundRobin, Random, etc) */
     enums::ThreadPolicy threadPolicy;
+
   protected:
-     /** Return a reference to the data port. */
+    /** Return a reference to the data port. */
     Port &getDataPort() override;
 
     /** Return a reference to the instruction port. */
@@ -185,8 +185,7 @@ class MinorCPU : public BaseCPU
             prio_list.push_back(i);
         }
 
-        std::shuffle(prio_list.begin(), prio_list.end(),
-                     random_mt.gen);
+        std::shuffle(prio_list.begin(), prio_list.end(), random_mt.gen);
 
         return prio_list;
     }

@@ -65,20 +65,23 @@ class Base : public SimObject
      * Create and clear the filter.
      */
     Base(const BloomFilterBaseParams &p)
-        : SimObject(p), offsetBits(p.offset_bits),
+        : SimObject(p),
+          offsetBits(p.offset_bits),
           filter(p.size, SatCounter8(p.num_bits)),
-          sizeBits(floorLog2(p.size)), setThreshold(p.threshold)
+          sizeBits(floorLog2(p.size)),
+          setThreshold(p.threshold)
     {
         clear();
     }
-    virtual ~Base() {};
+
+    virtual ~Base(){};
 
     /**
      * Clear the filter by resetting all values.
      */
     virtual void clear()
     {
-        for (auto& entry : filter) {
+        for (auto &entry : filter) {
             entry.reset();
         }
     }
@@ -89,11 +92,10 @@ class Base : public SimObject
      *
      * @param other The other bloom filter to merge with.
      */
-    virtual void
-    merge(const Base* other)
+    virtual void merge(const Base *other)
     {
         assert(filter.size() == other->filter.size());
-        for (int i = 0; i < filter.size(); ++i){
+        for (int i = 0; i < filter.size(); ++i) {
             filter[i] += other->filter[i];
         }
     }
@@ -113,7 +115,7 @@ class Base : public SimObject
      *
      * @param addr The address being parsed.
      */
-    virtual void unset(Addr addr) {};
+    virtual void unset(Addr addr){};
 
     /**
      * Check if the corresponding filter entries of an address should be
@@ -122,8 +124,7 @@ class Base : public SimObject
      * @param addr The address being parsed.
      * @return Whether the respective filter entry is set.
      */
-    virtual bool
-    isSet(Addr addr) const
+    virtual bool isSet(Addr addr) const
     {
         return getCount(addr) >= setThreshold;
     }
@@ -144,7 +145,7 @@ class Base : public SimObject
     virtual int getTotalCount() const
     {
         int count = 0;
-        for (const auto& entry : filter) {
+        for (const auto &entry : filter) {
             count += entry;
         }
         return count;

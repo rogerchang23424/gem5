@@ -56,6 +56,7 @@ class BankedArray
     {
       public:
         AccessRecord() : idx(0), startAccess(0), endAccess(0) {}
+
         int64_t idx;
         Tick startAccess;
         Tick endAccess;

@@ -168,12 +168,16 @@ class RiscvFault : public FaultBase
     {}
 
     FaultName name() const override { return _name; }
+
     bool isInterrupt() const { return _fault_type == FaultType::INTERRUPT; }
+
     bool isNonMaskableInterrupt() const
     {
         return _fault_type == FaultType::NON_MASKABLE_INTERRUPT;
     }
+
     ExceptionCode exception() const { return _code; }
+
     virtual RegVal trap_value() const { return 0; }
 
     virtual void invokeSE(ThreadContext *tc, const StaticInstPtr &inst);
@@ -187,10 +191,11 @@ class Reset : public FaultBase
 
   public:
     Reset() : _name("reset") {}
+
     FaultName name() const override { return _name; }
 
-    void invoke(ThreadContext *tc, const StaticInstPtr &inst =
-        nullStaticInstPtr) override;
+    void invoke(ThreadContext *tc,
+                const StaticInstPtr &inst = nullStaticInstPtr) override;
 };
 
 class InterruptFault : public RiscvFault
@@ -199,6 +204,7 @@ class InterruptFault : public RiscvFault
     InterruptFault(ExceptionCode c)
         : RiscvFault("interrupt", FaultType::INTERRUPT, c)
     {}
+
     InterruptFault(int c) : InterruptFault(static_cast<ExceptionCode>(c)) {}
 };
 
@@ -242,8 +248,7 @@ class IllegalInstFault : public InstFault
 
   public:
     IllegalInstFault(std::string r, const ExtMachInst inst)
-        : InstFault("Illegal instruction", inst),
-          reason(r)
+        : InstFault("Illegal instruction", inst), reason(r)
     {}
 
     void invokeSE(ThreadContext *tc, const StaticInstPtr &inst) override;
@@ -256,22 +261,20 @@ class UnimplementedFault : public InstFault
 
   public:
     UnimplementedFault(std::string name, const ExtMachInst inst)
-        : InstFault("Unimplemented instruction", inst),
-          instName(name)
+        : InstFault("Unimplemented instruction", inst), instName(name)
     {}
 
     void invokeSE(ThreadContext *tc, const StaticInstPtr &inst) override;
 };
 
-class IllegalFrmFault: public InstFault
+class IllegalFrmFault : public InstFault
 {
   private:
     const uint8_t frm;
 
   public:
     IllegalFrmFault(uint8_t r, const ExtMachInst inst)
-        : InstFault("Illegal floating-point rounding mode", inst),
-          frm(r)
+        : InstFault("Illegal floating-point rounding mode", inst), frm(r)
     {}
 
     void invokeSE(ThreadContext *tc, const StaticInstPtr &inst) override;
@@ -298,10 +301,11 @@ class BreakpointFault : public RiscvFault
   public:
     BreakpointFault(const PCStateBase &pc)
         : RiscvFault("Breakpoint", FaultType::OTHERS, BREAKPOINT),
-        pcState(pc.as<PCState>())
+          pcState(pc.as<PCState>())
     {}
 
     RegVal trap_value() const override { return pcState.pc(); }
+
     void invokeSE(ThreadContext *tc, const StaticInstPtr &inst) override;
 };
 
@@ -312,16 +316,16 @@ class SyscallFault : public RiscvFault
         : RiscvFault("System call", FaultType::OTHERS, ECALL_USER)
     {
         switch (prv) {
-          case PRV_U:
+        case PRV_U:
             _code = ECALL_USER;
             break;
-          case PRV_S:
+        case PRV_S:
             _code = ECALL_SUPER;
             break;
-          case PRV_M:
+        case PRV_M:
             _code = ECALL_MACHINE;
             break;
-          default:
+        default:
             panic("Unknown privilege mode %d.", prv);
             break;
         }

@@ -49,21 +49,20 @@ class Nop : public SparcStaticInst
 {
   public:
     // Constructor
-    Nop(const char *mnem, ExtMachInst _machInst, OpClass __opClass) :
-        SparcStaticInst(mnem, _machInst, __opClass)
+    Nop(const char *mnem, ExtMachInst _machInst, OpClass __opClass)
+        : SparcStaticInst(mnem, _machInst, __opClass)
     {
         flags[IsNop] = true;
     }
 
-    Fault
-    execute(ExecContext *xc, trace::InstRecord *traceData) const override
+    Fault execute(ExecContext *xc, trace::InstRecord *traceData) const override
     {
         return NoFault;
     }
 
     std::string
-    generateDisassembly(
-            Addr pc, const loader::SymbolTable *symtab) const override
+    generateDisassembly(Addr pc,
+                        const loader::SymbolTable *symtab) const override
     {
         std::stringstream response;
         printMnemonic(response, mnemonic);

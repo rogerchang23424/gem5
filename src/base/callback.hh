@@ -45,10 +45,9 @@ class CallbackQueue : public std::list<std::function<void()>>
     /**
      * @ingroup api_callback
      */
-    void
-    process()
+    void process()
     {
-        for (auto &f: *this)
+        for (auto &f : *this)
             f();
     }
 };

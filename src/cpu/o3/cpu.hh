@@ -117,7 +117,6 @@ class CPU : public BaseCPU
     Status _status;
 
   private:
-
     /** The tick event used for scheduling CPU ticks. */
     EventFunctionWrapper tickEvent;
 
@@ -125,8 +124,7 @@ class CPU : public BaseCPU
     EventFunctionWrapper threadExitEvent;
 
     /** Schedule tick event, regardless of its current state. */
-    void
-    scheduleTickEvent(Cycles delay)
+    void scheduleTickEvent(Cycles delay)
     {
         if (tickEvent.squashed())
             reschedule(tickEvent, clockEdge(delay));
@@ -135,8 +133,7 @@ class CPU : public BaseCPU
     }
 
     /** Unschedule tick event, regardless of its current state. */
-    void
-    unscheduleTickEvent()
+    void unscheduleTickEvent()
     {
         if (tickEvent.scheduled())
             tickEvent.squash();
@@ -179,11 +176,7 @@ class CPU : public BaseCPU
     /** Register probe points. */
     void regProbePoints() override;
 
-    void
-    demapPage(Addr vaddr, uint64_t asn)
-    {
-        mmu->demapPage(vaddr, asn);
-    }
+    void demapPage(Addr vaddr, uint64_t asn) { mmu->demapPage(vaddr, asn); }
 
     /** Ticks CPU, calling tick() on each stage, and checking the overall
      *  activity to see if the CPU should deschedule itself.
@@ -196,11 +189,7 @@ class CPU : public BaseCPU
     void startup() override;
 
     /** Returns the Number of Active Threads in the CPU */
-    int
-    numActiveThreads()
-    {
-        return activeThreads.size();
-    }
+    int numActiveThreads() { return activeThreads.size(); }
 
     /** Add Thread to Active Threads List */
     void activateThread(ThreadID tid);
@@ -485,18 +474,19 @@ class CPU : public BaseCPU
 
   public:
     /** Records that there was time buffer activity this cycle. */
-    void activityThisCycle() { activityRec.activity(); }
+    void activityThisCycle()
+    {
+        activityRec.activity();
+    }
 
     /** Changes a stage's status to active within the activity recorder. */
-    void
-    activateStage(const StageIdx idx)
+    void activateStage(const StageIdx idx)
     {
         activityRec.activateStage(idx);
     }
 
     /** Changes a stage's status to inactive within the activity recorder. */
-    void
-    deactivateStage(const StageIdx idx)
+    void deactivateStage(const StageIdx idx)
     {
         activityRec.deactivateStage(idx);
     }
@@ -511,14 +501,13 @@ class CPU : public BaseCPU
 
   public:
     /** Returns a pointer to a thread context. */
-    gem5::ThreadContext *
-    tcBase(ThreadID tid)
+    gem5::ThreadContext *tcBase(ThreadID tid)
     {
         return thread[tid]->getTC();
     }
 
     /** The global sequence number counter. */
-    InstSeqNum globalSeqNum;//[MaxThreads];
+    InstSeqNum globalSeqNum; //[MaxThreads];
 
     /** Pointer to the checker, which can dynamically verify
      * instruction results at run time.  This can be set to NULL if it
@@ -549,26 +538,24 @@ class CPU : public BaseCPU
 
     /** CPU pushRequest function, forwards request to LSQ. */
     Fault
-    pushRequest(const DynInstPtr& inst, bool isLoad, uint8_t *data,
+    pushRequest(const DynInstPtr &inst, bool isLoad, uint8_t *data,
                 unsigned int size, Addr addr, Request::Flags flags,
                 uint64_t *res, AtomicOpFunctorPtr amo_op = nullptr,
-                const std::vector<bool>& byte_enable=std::vector<bool>())
+                const std::vector<bool> &byte_enable = std::vector<bool>())
 
     {
-        return iew.ldstQueue.pushRequest(inst, isLoad, data, size, addr,
-                flags, res, std::move(amo_op), byte_enable);
+        return iew.ldstQueue.pushRequest(inst, isLoad, data, size, addr, flags,
+                                         res, std::move(amo_op), byte_enable);
     }
 
     /** Used by the fetch unit to get a hold of the instruction port. */
-    Port &
-    getInstPort() override
+    Port &getInstPort() override
     {
         return fetch.getInstPort();
     }
 
     /** Get the dcache port (used to find block size for translations). */
-    Port &
-    getDataPort() override
+    Port &getDataPort() override
     {
         return iew.ldstQueue.getDataPort();
     }

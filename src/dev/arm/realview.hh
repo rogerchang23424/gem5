@@ -40,8 +40,8 @@
 
 /**
  * @file
- * Declaration of top level class for the RealView platform chips. This class just
- * retains pointers to all its children so the children can communicate.
+ * Declaration of top level class for the RealView platform chips. This class
+ * just retains pointers to all its children so the children can communicate.
  */
 
 #ifndef __DEV_ARM_RealView_HH__

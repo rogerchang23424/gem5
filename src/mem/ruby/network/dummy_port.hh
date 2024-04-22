@@ -41,8 +41,7 @@ class RubyDummyPort : public Port
   public:
     RubyDummyPort() : Port("DummyPort", -1) {}
 
-    void
-    bind(Port &peer) override
+    void bind(Port &peer) override
     {
         // No need to connect anything here currently. MessageBuffer
         // port connections only serve to print the connections in
@@ -50,10 +49,10 @@ class RubyDummyPort : public Port
         // TODO: Add real ports to MessageBuffers and use SimObject connect
         // code below to bind MessageBuffer senders and receivers
     }
+
     void unbind() override {}
 
-    static RubyDummyPort &
-    instance()
+    static RubyDummyPort &instance()
     {
         static RubyDummyPort dummy;
         return dummy;

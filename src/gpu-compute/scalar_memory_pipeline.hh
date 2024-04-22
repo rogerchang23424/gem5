@@ -63,33 +63,32 @@ class ScalarMemPipeline
     void exec();
 
     std::queue<GPUDynInstPtr> &getGMReqFIFO() { return issuedRequests; }
+
     std::queue<GPUDynInstPtr> &getGMStRespFIFO() { return returnedStores; }
+
     std::queue<GPUDynInstPtr> &getGMLdRespFIFO() { return returnedLoads; }
 
     void issueRequest(GPUDynInstPtr gpuDynInst);
 
-    void injectScalarMemFence(
-            GPUDynInstPtr gpuDynInst, bool kernelMemSync, RequestPtr req);
+    void injectScalarMemFence(GPUDynInstPtr gpuDynInst, bool kernelMemSync,
+                              RequestPtr req);
 
-    bool
-    isGMLdRespFIFOWrRdy() const
+    bool isGMLdRespFIFOWrRdy() const
     {
         return returnedLoads.size() < queueSize;
     }
 
-    bool
-    isGMStRespFIFOWrRdy() const
+    bool isGMStRespFIFOWrRdy() const
     {
         return returnedStores.size() < queueSize;
     }
 
-    bool
-    isGMReqFIFOWrRdy(uint32_t pendReqs=0) const
+    bool isGMReqFIFOWrRdy(uint32_t pendReqs = 0) const
     {
         return (issuedRequests.size() + pendReqs) < queueSize;
     }
 
-    const std::string& name() const { return _name; }
+    const std::string &name() const { return _name; }
 
   private:
     ComputeUnit &computeUnit;

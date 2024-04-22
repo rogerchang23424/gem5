@@ -34,9 +34,7 @@
 namespace gem5
 {
 
-ObjectMatch::ObjectMatch()
-{
-}
+ObjectMatch::ObjectMatch() {}
 
 ObjectMatch::ObjectMatch(const std::string &expr)
 {
@@ -107,7 +105,7 @@ std::vector<std::vector<std::string> >
 ObjectMatch::getExpressions()
 {
     std::vector<std::vector<std::string> > to_return;
-    for (const auto &expression: tokens) {
+    for (const auto &expression : tokens) {
         std::vector<std::string> to_add;
         to_add.insert(to_add.end(), expression.begin(), expression.end());
         to_return.push_back(to_add);

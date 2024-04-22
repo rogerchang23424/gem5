@@ -156,18 +156,16 @@ class AddressManager
     {
       public:
         LastWriter()
-            : threadId(-1), cuId(-1), episodeId(-1), value(0),
-              writeTick(0)
-        { }
+            : threadId(-1), cuId(-1), episodeId(-1), value(0), writeTick(0)
+        {}
 
         const std::string print() const
         {
             return "(TesterThread ID " + std::to_string(threadId) +
-                   ", CU ID " + std::to_string(cuId) +
-                   ", Episode ID " + std::to_string(episodeId) +
-                   ", Value " + std::to_string(value) +
-                   ", Tick " + std::to_string(writeTick) +
-                   ")";
+                   ", CU ID " + std::to_string(cuId) + ", Episode ID " +
+                   std::to_string(episodeId) + ", Value " +
+                   std::to_string(value) + ", Tick " +
+                   std::to_string(writeTick) + ")";
         }
 
         void update(int _thread, int _cu, int _episode, Value _value,
@@ -213,7 +211,7 @@ class AddressManager
         Location locationBase;
 
         // array storing all locations this structure is managing
-        Location* locArray;
+        Location *locArray;
         int firstMark, secondMark;
         int arraySize;
 
@@ -236,16 +234,18 @@ class AddressManager
         ExpectedValueSet expectedValues;
 
         // swap two locations in locArray
-        void swap(LocProperty& prop_1, LocProperty& prop_2);
+        void swap(LocProperty &prop_1, LocProperty &prop_2);
 
         bool inFirstRegion(int idx) const
         {
             return (idx >= 0 && idx < firstMark);
         }
+
         bool inSecondRegion(int idx) const
         {
             return (idx >= firstMark && idx < secondMark);
         }
+
         bool inThirdRegion(int idx) const
         {
             return (idx >= secondMark && idx < arraySize);
@@ -264,11 +264,11 @@ class AddressManager
     AddressMap randAddressMap;
 
     // a list of atomic structures
-    typedef std::vector<AtomicStruct*> AtomicStructTable;
+    typedef std::vector<AtomicStruct *> AtomicStructTable;
     AtomicStructTable atomicStructs;
 
     // internal log table
-    typedef std::vector<LastWriter*> LogTable;
+    typedef std::vector<LastWriter *> LogTable;
     LogTable logTable;
 };
 

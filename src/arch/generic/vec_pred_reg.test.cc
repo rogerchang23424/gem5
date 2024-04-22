@@ -74,8 +74,7 @@ class TwoDifferentVecPredRegsBase : public testing::Test
     VecPredRegContainer<size, T> pred1;
     VecPredRegContainer<size, T> pred2;
 
-    void
-    SetUp() override
+    void SetUp() override
     {
         // Initializing with:
         // 0,1,0,1

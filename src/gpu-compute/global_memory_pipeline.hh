@@ -91,15 +91,14 @@ class GlobalMemPipeline
      */
     void handleResponse(GPUDynInstPtr gpuDynInst);
 
-    bool
-    isGMReqFIFOWrRdy(uint32_t pendReqs=0) const
+    bool isGMReqFIFOWrRdy(uint32_t pendReqs = 0) const
     {
         return (gmIssuedRequests.size() + pendReqs) < gmQueueSize;
     }
 
     const std::string &name() const { return _name; }
-    void
-    incLoadVRFBankConflictCycles(int num_cycles)
+
+    void incLoadVRFBankConflictCycles(int num_cycles)
     {
         stats.loadVrfBankConflictCycles += num_cycles;
     }

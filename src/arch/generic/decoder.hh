@@ -51,31 +51,30 @@ class InstDecoder : public SimObject
 
   public:
     template <typename MoreBytesType>
-    InstDecoder(const InstDecoderParams &params, MoreBytesType *mb_buf) :
-        SimObject(params), _moreBytesPtr(mb_buf),
-        _moreBytesSize(sizeof(MoreBytesType)),
-        _pcMask(~mask(floorLog2(_moreBytesSize)))
+    InstDecoder(const InstDecoderParams &params, MoreBytesType *mb_buf)
+        : SimObject(params),
+          _moreBytesPtr(mb_buf),
+          _moreBytesSize(sizeof(MoreBytesType)),
+          _pcMask(~mask(floorLog2(_moreBytesSize)))
     {}
 
-    virtual StaticInstPtr fetchRomMicroop(
-            MicroPC micropc, StaticInstPtr curMacroop);
-    virtual void
-    reset()
+    virtual StaticInstPtr fetchRomMicroop(MicroPC micropc,
+                                          StaticInstPtr curMacroop);
+
+    virtual void reset()
     {
         instDone = false;
         outOfBytes = true;
     }
 
     template <class Type>
-    Type &
-    as()
+    Type &as()
     {
         return *static_cast<Type *>(this);
     }
 
     template <class Type>
-    const Type &
-    as() const
+    const Type &as() const
     {
         return *static_cast<const Type *>(this);
     }
@@ -85,15 +84,16 @@ class InstDecoder : public SimObject
      *
      * @param old Decoder used in old CPU
      */
-    virtual void
-    takeOverFrom(InstDecoder *old)
+    virtual void takeOverFrom(InstDecoder *old)
     {
         instDone = old->instDone;
         outOfBytes = old->outOfBytes;
     }
 
     void *moreBytesPtr() const { return _moreBytesPtr; }
+
     size_t moreBytesSize() const { return _moreBytesSize; }
+
     Addr pcMask() const { return _pcMask; }
 
     /**

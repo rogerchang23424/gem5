@@ -104,8 +104,8 @@
  * be corrected on branch mispredictions. This is done in iew_impl.hh.
  */
 
- #ifndef __ARCH_GENERIC_HTM_HH__
- #define __ARCH_GENERIC_HTM_HH__
+#ifndef __ARCH_GENERIC_HTM_HH__
+#define __ARCH_GENERIC_HTM_HH__
 
 #include <cstdint>
 #include <memory>
@@ -136,10 +136,8 @@ class BaseHTMCheckpoint
     uint64_t localHtmUid;
 
   public:
-    BaseHTMCheckpoint() : localHtmUid(0), _valid(false)
-    {
-        reset();
-    }
+    BaseHTMCheckpoint() : localHtmUid(0), _valid(false) { reset(); }
+
     virtual ~BaseHTMCheckpoint() {}
 
     /**
@@ -150,11 +148,7 @@ class BaseHTMCheckpoint
      *
      * @param tc: thread context state to be saved
      */
-    virtual void
-    save(ThreadContext *tc)
-    {
-        _valid = true;
-    }
+    virtual void save(ThreadContext *tc) { _valid = true; }
 
     /**
      * Every ISA implementing HTM support should override the
@@ -165,8 +159,7 @@ class BaseHTMCheckpoint
      * @param tc: thread context to be restored
      * @param cause: the reason why the transaction has been aborted
      */
-    virtual void
-    restore(ThreadContext *tc, HtmFailureFaultCause cause)
+    virtual void restore(ThreadContext *tc, HtmFailureFaultCause cause)
     {
         reset();
     }
@@ -176,30 +169,21 @@ class BaseHTMCheckpoint
     /**
      * Generates a new HTM identifier (used when starting a new transaction)
      */
-    uint64_t
-    newHtmUid()
+    uint64_t newHtmUid()
     {
-        localHtmUid = ++ globalHtmUid;
+        localHtmUid = ++globalHtmUid;
         return localHtmUid;
     }
 
     /**
      * Returns the current HTM identifier
      */
-    uint64_t
-    getHtmUid() const
-    {
-        return localHtmUid;
-    }
+    uint64_t getHtmUid() const { return localHtmUid; }
 
     /**
      * Sets the current HTM identifier
      */
-    void
-    setHtmUid(uint64_t new_htm_uid)
-    {
-        localHtmUid = new_htm_uid;
-    }
+    void setHtmUid(uint64_t new_htm_uid) { localHtmUid = new_htm_uid; }
 
   protected:
     /**
@@ -211,6 +195,7 @@ class BaseHTMCheckpoint
      * ISA specific state.
      */
     virtual void reset() { _valid = false; }
+
     bool _valid;
 };
 

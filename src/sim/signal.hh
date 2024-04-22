@@ -56,8 +56,7 @@ class SignalSinkPort : public Port
   protected:
     // if bypass_on_change is specified true, it will not call the _onChange
     // function. Only _state will be updated if needed.
-    void
-    set(const State &new_state, const bool bypass_on_change = false)
+    void set(const State &new_state, const bool bypass_on_change = false)
     {
         if (new_state == _state)
             return;
@@ -68,25 +67,27 @@ class SignalSinkPort : public Port
     }
 
   public:
-    SignalSinkPort(const std::string &_name, PortID _id=InvalidPortID) :
-        Port(_name, _id)
+    SignalSinkPort(const std::string &_name, PortID _id = InvalidPortID)
+        : Port(_name, _id)
     {}
 
     const State &state() const { return _state; }
+
     void onChange(OnChangeFunc func) { _onChange = std::move(func); }
 
-    void
-    bind(Port &peer) override
+    void bind(Port &peer) override
     {
         _source = dynamic_cast<SignalSourcePort<State> *>(&peer);
-        fatal_if(!_source, "Attempt to bind signal pin %s to "
-                "incompatible pin %s", name(), peer.name());
+        fatal_if(!_source,
+                 "Attempt to bind signal pin %s to "
+                 "incompatible pin %s",
+                 name(), peer.name());
         // The state of sink has to match the state of source.
         _state = _source->state();
         Port::bind(peer);
     }
-    void
-    unbind() override
+
+    void unbind() override
     {
         _source = nullptr;
         Port::unbind();
@@ -117,8 +118,7 @@ class SignalSourcePort : public Port
 
     // if bypass_on_change is specified true, it will not call the _onChange
     // function. Only _state will be updated if needed.
-    void
-    set(const State &new_state, const bool bypass_on_change = false)
+    void set(const State &new_state, const bool bypass_on_change = false)
     {
         _state = new_state;
         sink->set(new_state, bypass_on_change);
@@ -126,22 +126,23 @@ class SignalSourcePort : public Port
 
     const State &state() const { return _state; }
 
-    void
-    bind(Port &peer) override
+    void bind(Port &peer) override
     {
         sink = dynamic_cast<SignalSinkPort<State> *>(&peer);
-        fatal_if(!sink, "Attempt to bind signal pin %s to "
-                "incompatible pin %s", name(), peer.name());
+        fatal_if(!sink,
+                 "Attempt to bind signal pin %s to "
+                 "incompatible pin %s",
+                 name(), peer.name());
         Port::bind(peer);
     }
-    void
-    unbind() override
+
+    void unbind() override
     {
         sink = nullptr;
         Port::unbind();
     }
 };
 
-}  // namespace gem5
+} // namespace gem5
 
-#endif  //__SIM_SIGNAL_HH__
+#endif //__SIM_SIGNAL_HH__

@@ -59,6 +59,7 @@ class EmulationPageTable : public Serializable
         uint64_t flags;
 
         Entry(Addr paddr, uint64_t flags) : paddr(paddr), flags(flags) {}
+
         Entry() {}
     };
 
@@ -74,18 +75,20 @@ class EmulationPageTable : public Serializable
     const std::string _name;
 
   public:
-
-    EmulationPageTable(
-            const std::string &__name, uint64_t _pid, Addr _pageSize) :
-            _pageSize(_pageSize), offsetMask(mask(floorLog2(_pageSize))),
-            _pid(_pid), _name(__name), shared(false)
+    EmulationPageTable(const std::string &__name, uint64_t _pid,
+                       Addr _pageSize)
+        : _pageSize(_pageSize),
+          offsetMask(mask(floorLog2(_pageSize))),
+          _pid(_pid),
+          _name(__name),
+          shared(false)
     {
         assert(isPowerOf2(_pageSize));
     }
 
     uint64_t pid() const { return _pid; };
 
-    virtual ~EmulationPageTable() {};
+    virtual ~EmulationPageTable(){};
 
     /* generic page table mapping flags
      *              unset | set
@@ -95,24 +98,26 @@ class EmulationPageTable : public Serializable
      */
     enum MappingFlags : uint32_t
     {
-        Clobber     = 1,
+        Clobber = 1,
         Uncacheable = 4,
-        ReadOnly    = 8,
+        ReadOnly = 8,
     };
 
     // flag which marks the page table as shared among software threads
     bool shared;
 
-    virtual void initState() {};
+    virtual void initState(){};
 
     // for DPRINTF compatibility
     const std::string name() const { return _name; }
 
-    Addr pageAlign(Addr a)  { return (a & ~offsetMask); }
-    Addr pageOffset(Addr a) { return (a &  offsetMask); }
+    Addr pageAlign(Addr a) { return (a & ~offsetMask); }
+
+    Addr pageOffset(Addr a) { return (a & offsetMask); }
+
     // Page size can technically vary based on the virtual address, but we'll
     // ignore that for now.
-    Addr pageSize()   { return _pageSize; }
+    Addr pageSize() { return _pageSize; }
 
     /**
      * Maps a virtual memory region to a physical memory region.
@@ -154,8 +159,7 @@ class EmulationPageTable : public Serializable
      * @param vaddr The virtual address.
      * @return True if translation exists
      */
-    bool
-    translate(Addr vaddr)
+    bool translate(Addr vaddr)
     {
         Addr dummy;
         return translate(vaddr, dummy);
@@ -169,16 +173,15 @@ class EmulationPageTable : public Serializable
         void translate(Range &range) const override;
 
       public:
-        PageTableTranslationGen(EmulationPageTable *_pt, Addr vaddr,
-                Addr size) : TranslationGen(vaddr, size), pt(_pt)
+        PageTableTranslationGen(EmulationPageTable *_pt, Addr vaddr, Addr size)
+            : TranslationGen(vaddr, size), pt(_pt)
         {}
     };
 
-    TranslationGenPtr
-    translateRange(Addr vaddr, Addr size)
+    TranslationGenPtr translateRange(Addr vaddr, Addr size)
     {
         return TranslationGenPtr(
-                new PageTableTranslationGen(this, vaddr, size));
+            new PageTableTranslationGen(this, vaddr, size));
     }
 
     /**

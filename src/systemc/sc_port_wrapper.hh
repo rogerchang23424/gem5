@@ -54,34 +54,28 @@ class ScPortWrapper : public gem5::Port
   public:
     using ScPort = sc_core::sc_port_b<IF>;
 
-    ScPortWrapper(ScPort& p, const std::string& name, gem5::PortID id)
+    ScPortWrapper(ScPort &p, const std::string &name, gem5::PortID id)
         : gem5::Port(name, id), port_(p)
     {}
 
-    ScPort&
-    port()
-    {
-        return port_;
-    }
+    ScPort &port() { return port_; }
 
-    void
-    unbind() override
+    void unbind() override
     {
         using namespace gem5;
 
         panic("sc_port can't be unbound.");
     }
 
-    void
-    bind(gem5::Port& peer) override
+    void bind(gem5::Port &peer) override
     {
         using namespace gem5;
 
         // Try ScPortWrapper or ScInterfaceWrapper
-        if (auto* beer = dynamic_cast<ScPortWrapper<IF>*>(&peer)) {
+        if (auto *beer = dynamic_cast<ScPortWrapper<IF> *>(&peer)) {
             port_.bind(beer->port());
-        } else if (auto* iface =
-                       dynamic_cast<ScInterfaceWrapper<IF>*>(&peer)) {
+        } else if (auto *iface =
+                       dynamic_cast<ScInterfaceWrapper<IF> *>(&peer)) {
             port_.bind(iface->interface());
         } else {
             fatal("Attempt to bind sc_port %s to incompatible port %s.",
@@ -91,39 +85,33 @@ class ScPortWrapper : public gem5::Port
     }
 
   private:
-    ScPort& port_;
+    ScPort &port_;
 };
 
 template <typename IF>
 class ScInterfaceWrapper : public gem5::Port
 {
   public:
-    ScInterfaceWrapper(IF& i, const std::string name, gem5::PortID id)
+    ScInterfaceWrapper(IF &i, const std::string name, gem5::PortID id)
         : gem5::Port(name, id), iface_(i)
     {}
 
-    IF&
-    interface()
-    {
-        return iface_;
-    }
+    IF &interface() { return iface_; }
 
-    void
-    unbind() override
+    void unbind() override
     {
         using namespace gem5;
 
         panic("sc_interface can't be unbound.");
     }
 
-    void
-    bind(gem5::Port& peer) override
+    void bind(gem5::Port &peer) override
     {
         using namespace gem5;
 
         // fatal error if peer is neither ScPortWrapper nor ScExportWrapper
-        fatal_if(!dynamic_cast<ScPortWrapper<IF>*>(&peer) &&
-                     !dynamic_cast<ScExportWrapper<IF>*>(&peer),
+        fatal_if(!dynamic_cast<ScPortWrapper<IF> *>(&peer) &&
+                     !dynamic_cast<ScExportWrapper<IF> *>(&peer),
                  "Attempt to bind sc_interface %s to incompatible port %s.",
                  name(), peer.name());
 
@@ -134,7 +122,7 @@ class ScInterfaceWrapper : public gem5::Port
     }
 
   private:
-    IF& iface_;
+    IF &iface_;
 };
 
 template <typename IF>
@@ -143,30 +131,24 @@ class ScExportWrapper : public gem5::Port
   public:
     using ScExport = sc_core::sc_export<IF>;
 
-    ScExportWrapper(ScExport& p, const std::string& name, gem5::PortID id)
+    ScExportWrapper(ScExport &p, const std::string &name, gem5::PortID id)
         : gem5::Port(name, id), port_(p)
     {}
 
-    ScExport&
-    port()
-    {
-        return port_;
-    }
+    ScExport &port() { return port_; }
 
-    void
-    unbind() override
+    void unbind() override
     {
         using namespace gem5;
 
         panic("sc_export cannot be unbound.");
     }
 
-    void
-    bind(gem5::Port& peer) override
+    void bind(gem5::Port &peer) override
     {
         using namespace gem5;
 
-        auto* iface = dynamic_cast<ScInterfaceWrapper<IF>*>(&peer);
+        auto *iface = dynamic_cast<ScInterfaceWrapper<IF> *>(&peer);
         fatal_if(!iface,
                  "Attempt to bind sc_export %s to incompatible port %s.",
                  name(), peer.name());
@@ -176,9 +158,9 @@ class ScExportWrapper : public gem5::Port
     }
 
   private:
-    ScExport& port_;
+    ScExport &port_;
 };
 
-}  // namespace sc_gem5
+} // namespace sc_gem5
 
-#endif  // __SYSTEMC_SC_PORT_WRAPPER_HH__
+#endif // __SYSTEMC_SC_PORT_WRAPPER_HH__
