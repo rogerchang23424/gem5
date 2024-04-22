@@ -40,9 +40,10 @@ namespace gem5
 namespace RiscvISA
 {
 
-BareMetal::BareMetal(const Params &p) : Workload(p),
-    _isBareMetal(p.bare_metal),
-    bootloader(loader::createObjectFile(p.bootloader))
+BareMetal::BareMetal(const Params &p)
+    : Workload(p),
+      _isBareMetal(p.bare_metal),
+      bootloader(loader::createObjectFile(p.bootloader))
 {
     fatal_if(!bootloader, "Could not load bootloader file %s.", p.bootloader);
     bootloaderSymtab = bootloader->symtab();
@@ -56,10 +57,7 @@ BareMetal::BareMetal(const Params &p) : Workload(p),
     loader::debugSymbolTable.insert(bootloaderSymtab);
 }
 
-BareMetal::~BareMetal()
-{
-    delete bootloader;
-}
+BareMetal::~BareMetal() { delete bootloader; }
 
 void
 BareMetal::initState()
@@ -69,7 +67,7 @@ BareMetal::initState()
     warn_if(!bootloader->buildImage().write(system->physProxy),
             "Could not load sections to memory.");
 
-    for (auto *tc: system->threads) {
+    for (auto *tc : system->threads) {
         RiscvISA::Reset().invoke(tc);
         tc->activate();
     }
