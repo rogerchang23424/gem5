@@ -49,6 +49,7 @@ class TaggedEntry : public CacheEntry
 {
   public:
     TaggedEntry() : CacheEntry(), _secure(false) {}
+
     ~TaggedEntry() = default;
 
     /**
@@ -56,7 +57,11 @@ class TaggedEntry : public CacheEntry
      *
      * @return True if the block holds data from the secure memory space.
      */
-    bool isSecure() const { return _secure; }
+    bool
+    isSecure() const
+    {
+        return _secure;
+    }
 
     /**
      * Checks if the given tag information corresponds to this entry's.
@@ -99,7 +104,7 @@ class TaggedEntry : public CacheEntry
     print() const override
     {
         return csprintf("tag: %#x secure: %d valid: %d | %s", getTag(),
-            isSecure(), isValid(), ReplaceableEntry::print());
+                        isSecure(), isValid(), ReplaceableEntry::print());
     }
 
     bool
@@ -115,9 +120,14 @@ class TaggedEntry : public CacheEntry
         panic("Need is_secure arg");
         return;
     }
+
   protected:
     /** Set secure bit. */
-    virtual void setSecure() { _secure = true; }
+    virtual void
+    setSecure()
+    {
+        _secure = true;
+    }
 
   private:
     /**
@@ -127,13 +137,17 @@ class TaggedEntry : public CacheEntry
     bool _secure;
 
     /** Clear secure bit. Should be only used by the invalidation function. */
-    void clearSecure() { _secure = false; }
+    void
+    clearSecure()
+    {
+        _secure = false;
+    }
 
     /** Do not use API without is_secure flag. */
-    using CacheEntry::matchTag;
     using CacheEntry::insert;
+    using CacheEntry::matchTag;
 };
 
 } // namespace gem5
 
-#endif//__CACHE_TAGGED_ENTRY_HH__
+#endif //__CACHE_TAGGED_ENTRY_HH__

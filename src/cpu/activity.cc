@@ -37,9 +37,11 @@ namespace gem5
 {
 
 ActivityRecorder::ActivityRecorder(const std::string &name, int num_stages,
-    int longest_latency, int activity)
-    : _name(name), activityBuffer(longest_latency, 0),
-      longestLatency(longest_latency), activityCount(activity),
+                                   int longest_latency, int activity)
+    : _name(name),
+      activityBuffer(longest_latency, 0),
+      longestLatency(longest_latency),
+      activityCount(activity),
       numStages(num_stages)
 {
     stageActive = new bool[numStages];
@@ -101,7 +103,7 @@ ActivityRecorder::activateStage(const int idx)
         DPRINTF(Activity, "Stage %i already active.\n", idx);
     }
 
-//    assert(activityCount < longestLatency + numStages + 1);
+    //    assert(activityCount < longestLatency + numStages + 1);
 }
 
 void

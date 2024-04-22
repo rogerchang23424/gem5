@@ -90,6 +90,7 @@ unboxF32(uint64_t v)
         return defaultNaNF32UI;
 }
 
+/* clang-format off */
 static constexpr uint64_t boxF16(uint16_t v) { return mask(63, 16) | v; }
 static constexpr uint64_t boxF32(uint32_t v) { return mask(63, 32) | v; }
 
@@ -106,6 +107,8 @@ static constexpr freg_t freg(float16_t f) { return {boxF16(f.v)}; }
 static constexpr freg_t freg(float32_t f) { return {boxF32(f.v)}; }
 static constexpr freg_t freg(float64_t f) { return f; }
 static constexpr freg_t freg(uint_fast64_t f) { return {f}; }
+
+/* clang-format on */
 
 namespace float_reg
 {
@@ -155,11 +158,12 @@ enum : RegIndex
 } // namespace float_reg
 
 inline constexpr RegClass floatRegClass(FloatRegClass, FloatRegClassName,
-        float_reg::NumRegs, debug::FloatRegs);
+                                        float_reg::NumRegs, debug::FloatRegs);
 
 namespace float_reg
 {
 
+/* clang-format off */
 inline constexpr RegId
     Ft0 = floatRegClass[_Ft0Idx],
     Ft1 = floatRegClass[_Ft1Idx],
@@ -208,20 +212,27 @@ const std::vector<std::string> RegNames = {
     "fs8", "fs9", "fs10", "fs11",
     "ft8", "ft9", "ft10", "ft11"
 };
+/* clang-format on */
 
 } // namespace float_reg
 
 inline float32_t
-fsgnj32(float32_t a, float32_t b, bool n, bool x) {
-    if (n) b.v = ~b.v;
-    else if (x) b.v = a.v ^ b.v;
+fsgnj32(float32_t a, float32_t b, bool n, bool x)
+{
+    if (n)
+        b.v = ~b.v;
+    else if (x)
+        b.v = a.v ^ b.v;
     return f32(insertBits(b.v, 30, 0, a.v));
 }
 
 inline float64_t
-fsgnj64(float64_t a, float64_t b, bool n, bool x) {
-    if (n) b.v = ~b.v;
-    else if (x) b.v = a.v ^ b.v;
+fsgnj64(float64_t a, float64_t b, bool n, bool x)
+{
+    if (n)
+        b.v = ~b.v;
+    else if (x)
+        b.v = a.v ^ b.v;
     return f64(insertBits(b.v, 62, 0, a.v));
 }
 
